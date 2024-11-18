@@ -335,6 +335,8 @@ class DistLicence extends Component
         $terminal_info = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
 
         if(count($this->licence_za_dodavanje)){
+            //BRISANJE SVIH SERVISNIH LICENCI AKO IH IMA
+            LicencaZaTerminal::where(['terminal_lokacijaId' => $this->modelId, 'licenca_poreklo' => 2])->delete();
             $model_data = [
                 'distributerId' => $this->distId,
                 'terminal_lokacijaId' => $this->modelId,

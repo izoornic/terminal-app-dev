@@ -66,13 +66,21 @@
                                                 <!-- SERVISER VIDI DA JE TERMINAL NA BLACKLISTI -->
                                                 <svg class="fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">	<path class="st1" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/> <path class="st1" d="M48,238c0,39.8,21.1,75.3,54,98.4c0,0.2,0,0.4,0,0.6v36c0,14.9,12.1,27,27,27h27v-27c0-5,4-9,9-9s9,4,9,9v27 h36v-27c0-5,4-9,9-9s9,4,9,9v27h27c14.9,0,27-12.1,27-27v-36c0-0.2,0-0.4,0-0.6c32.9-23.1,54-58.6,54-98.4	c0-22.2-6.6-43.1-18.1-61.2h-24.5c-40.6,0-75-27.1-86.2-64.1c-5-0.5-10.1-0.7-15.2-0.7C112.5,112,48,168.4,48,238z M138,292	c-19.9,0-36-16.1-36-36s16.1-36,36-36s36,16.1,36,36S157.9,292,138,292z M246,220c19.9,0,36,16.1,36,36s-16.1,36-36,36 s-36-16.1-36-36S226.1,220,246,220z"/></svg>
                                             @elseif($item->tzlid)
-                                               <!--  TERMINAL IMA LICENCU -->
-                                                <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}})">
-                                                    <svg class="fill-current w-5 h-5 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
-                                                </a>
+                                                <!--  TERMINAL IMA LICENCU -->
+                                                @if($item->tzlid == 1)
+                                                    <!-- TERMINAL IMA REGULARNU LICENCU -->
+                                                    <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}}, {{$item->tzlid}})" title="Pregled licence">
+                                                        <svg class="fill-current w-5 h-5 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
+                                                    </a>
+                                                @elseif($item->tzlid == 2)
+                                                    <!-- TERMINAL IMA SERVISNU LICENCU -->
+                                                    <a class="flex p-1 cursor-pointer flex border border-red-800 text-red-800 bg-red-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}}, {{$item->tzlid}})" title="Pregled licence" >
+                                                        <svg class="fill-current w-5 h-5" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384 512" style="enable-background:new 0 0 384 512;" xml:space="preserve"><style type="text/css">.st0{display:none;} .st1{display:inline;}</style><g class="st0"><path class="st1" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16 H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64 c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4 c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/></g><g>	<path d="M119.1,320.1c-13.5,0-25-1.4-34.5-4.2c-9.5-2.8-18.4-6.2-26.8-10.3v-31.1h1.8c8.2,7.7,17.5,13.6,27.8,17.9 c10.4,4.2,20.3,6.3,30,6.3c13.7,0,24.1-2.9,31.1-8.6c7-5.7,10.5-13.3,10.5-22.6c0-7.4-1.8-13.5-5.5-18.2 c-3.7-4.7-9.5-8.1-17.5-10.4c-5.8-1.7-11-3-15.8-4.1c-4.8-1.1-10.7-2.5-17.9-4.4c-6.4-1.7-12.2-3.8-17.3-6.4 c-5.1-2.6-9.6-6-13.5-10.2c-3.8-4.1-6.8-8.9-9-14.5c-2.1-5.6-3.2-12-3.2-19.2c0-15.1,5.9-27.8,17.7-38 c11.8-10.2,26.8-15.4,45.1-15.4c10.4,0,20.3,1,29.6,3.1c9.3,2.1,17.9,5.1,25.9,8.9v29.7h-1.9c-5.9-5.4-13.5-10.2-22.8-14.2 c-9.3-4.1-19-6.1-29.2-6.1c-11.5,0-20.8,2.7-27.9,8.1c-7.1,5.4-10.7,12.5-10.7,21.2c0,7.9,2.1,14.2,6.3,18.9 c4.2,4.7,10.2,8.1,18.2,10.3c5.3,1.4,11.7,3,19.3,4.8c7.6,1.8,13.9,3.4,18.9,5c12.9,3.9,22.3,9.9,28.2,17.8 c5.9,7.9,8.9,17.7,8.9,29.3c0,7.3-1.5,14.5-4.4,21.6c-3,7.1-7.1,13.1-12.5,18c-6,5.4-12.8,9.6-20.4,12.5 C139.9,318.7,130.5,320.1,119.1,320.1z"/></g><g><path d="M303,430.5h-96.8V263.5h22.2v147.2H303V430.5z"/></g></svg>
+                                                    </a>
+                                                @endif
                                             @else
                                                 <!-- TERMINAL NEMA LICENCU I MOZE MU SE DODATI SERVISNA LICENCA -->
-                                                <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}})">
+                                                <a class="flex p-1 cursor-pointer flex border border-sky-600 bg-sky-50 hover:bg-stone-500 text-sky-600 hover:text-white rounded" title="Dodaj SERVISNU licencu" wire:click="novaServisnaShowwModal({{ $item->tlid}},  {{$item->tzlid}})">
 
                                                 <svg class="fill-current w-5 h-5 ml-1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"><style type="text/css"> .st0{display:none;} .st1{display:inline;}</style><g id="Layer_1_1_" class="st0"><path class="st1" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16 H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64 c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M119.1,320.1c-13.5,0-25-1.4-34.5-4.2c-9.5-2.8-18.4-6.2-26.8-10.3v-31.1h1.8c8.2,7.7,17.5,13.6,27.8,17.9 c10.4,4.2,20.3,6.3,30,6.3c13.7,0,24.1-2.9,31.1-8.6c7-5.7,10.5-13.3,10.5-22.6c0-7.4-1.8-13.5-5.5-18.2 c-3.7-4.7-9.5-8.1-17.5-10.4c-5.8-1.7-11-3-15.8-4.1c-4.8-1.1-10.7-2.5-17.9-4.4c-6.4-1.7-12.2-3.8-17.3-6.4	c-5.1-2.6-9.6-6-13.5-10.2c-3.8-4.1-6.8-8.9-9-14.5c-2.1-5.6-3.2-12-3.2-19.2c0-15.1,5.9-27.8,17.7-38	c11.8-10.2,26.8-15.4,45.1-15.4c10.4,0,20.3,1,29.6,3.1c9.3,2.1,17.9,5.1,25.9,8.9v29.7h-1.9c-5.9-5.4-13.5-10.2-22.8-14.2	c-9.3-4.1-19-6.1-29.2-6.1c-11.5,0-20.8,2.7-27.9,8.1c-7.1,5.4-10.7,12.5-10.7,21.2c0,7.9,2.1,14.2,6.3,18.9 c4.2,4.7,10.2,8.1,18.2,10.3c5.3,1.4,11.7,3,19.3,4.8c7.6,1.8,13.9,3.4,18.9,5c12.9,3.9,22.3,9.9,28.2,17.8 c5.9,7.9,8.9,17.7,8.9,29.3c0,7.3-1.5,14.5-4.4,21.6c-3,7.1-7.1,13.1-12.5,18c-6,5.4-12.8,9.6-20.4,12.5 C139.9,318.7,130.5,320.1,119.1,320.1z"/></g><g><path d="M303,430.5h-96.8V263.5h22.2v147.2H303V430.5z"/></g><g>	<path d="M391.3,310.7v-87.2c-44.9,6.8-80.4,42.3-87.2,87.2H391.3z"/><path d="M422.7,310.7h87.2c-6.8-44.9-42.3-80.4-87.2-87.2V310.7z"/><path d="M422.7,342.1v87.2c44.9-6.8,80.4-42.3,87.2-87.2H422.7z"/><path d="M391.3,342.1h-87.2c6.8,44.9,42.3,80.4,87.2,87.2V342.1z"/></g><path d="M358.4,459.1c-1.2,6.7-4.5,12.9-9.4,17.9c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359v31.9h25v-47.8c0-9.9-3.9-19.4-10.9-26.3L253.4,15.3	C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c30.4,0,55.6-23.3,58.7-52.9H358.4z M228.4,27.8	c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z"/></svg>
                                                 </a>
@@ -649,4 +657,77 @@
             @endif
         </x-slot>
     </x-jet-dialog-modal>
+
+    {{-- NOVA SERVISNA LICENCA --}}
+    <x-jet-dialog-modal wire:model="novaServisnaModalVisible">
+        <x-slot name="title">
+            {{ __('Dodaj licence terminalu') }}
+        </x-slot>
+        <x-slot name="content"> 
+            @if($novaServisnaModalVisible)
+            <div class="my-4">
+            @if(count($licence_za_dodavanje))
+                <div class="border-y py-2 bg-gray-50">
+                    <p class="ml-4 font-bold">Trajanje licence:</p>
+                    <div class="flex justify-between">
+                        <div class="pl-4 my-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-blue-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM288 437v11H96V437c0-25.5 10.1-49.9 28.1-67.9L192 301.3l67.9 67.9c18 18 28.1 42.4 28.1 67.9z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_pocetka_licence" value="Datum početka licence" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($datum_pocetka_licence) }}</p>
+                            </div>
+                        </div>
+                        <div class="pr-4 mt-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-blue-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM96 75V64H288V75c0 25.5-10.1 49.9-28.1 67.9L192 210.7l-67.9-67.9C106.1 124.9 96 100.4 96 75z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_kraja_licence" value="Datum isteka licence" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($datum_kraja_licence) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            <div class="my-4">
+                <div>
+                    @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId) as $licenca_dodatak)
+                        <div class="my-4 border-y py-2 bg-gray-50">
+                            <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                            <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
+                            @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
+                                
+                                <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
+                                    @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
+                                        <div class="px-1 rounded-md text-center">
+                                            <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
+                                            <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+            </div>
+           @endif 
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('novaServisnaModalVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+            @if($novaServisnaModalVisible)
+                @if(count($licence_za_dodavanje))
+                    <x-jet-button class="ml-2" wire:click="dodajServisnueLicence" wire:loading.attr="disabled">
+                        {{ __('Dodaj licence') }}
+                    </x-jet-button>
+                @endif
+            @endif
+        </x-slot>
+    </x-jet-dialog-modal>
+
 </div>

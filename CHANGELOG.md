@@ -105,6 +105,10 @@ V 0.5.2.1 (2.6.2024.)
 V 1.0.0.0 (16.11.2024.)
     - Prvi komit u branch Servisna licenca na novom repostriju Terminal-App-Dev sa Asus Kompa- u novom okruzenju
 
+V 1.0.0.1 (18.11.2024.)
+    - Komit na branch "Servisna licenca" 
+        - dodata tabela "licenca_servisnas" gde se loguju servisne licence
+        - Dodato polje u tabelu "licence_za_terminals" - "licenca_poreklo" 
     
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
