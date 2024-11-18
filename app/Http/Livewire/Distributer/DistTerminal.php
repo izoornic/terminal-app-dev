@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
+use App\Models\LicenceZaTerminal;
 use App\Models\DistributerUserIndex;
 use App\Models\LicencaDistributerTip;
 use App\Models\TerminalLokacijaHistory;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Ivan\TerminalHistory;
+use App\Ivan\TerminalBacklist;
 use App\Ivan\SelectedTerminalInfo;
 
 use App\Helpers\PaginationHelper;
@@ -37,6 +39,7 @@ class DistTerminal extends Component
     public $searchPib;
     public $searchTip;
     public $searchStatus;
+    public $searchBlackist;
 
     //select all
     public $selsectedTerminals = [];
@@ -61,9 +64,15 @@ class DistTerminal extends Component
     public $modalStatusPremesti;
     public $datum_premestanja_terminala;
 
+    //BLACKLIST
+    public $blacklistFormVisible;
+    public $canBlacklist;
+    public $canBlacklistErorr;
+
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
+        $this->searchBlackist = 0;
     }
 
     /**
@@ -312,6 +321,51 @@ class DistTerminal extends Component
         $this->modalFormVisible = false;
     }
 
+
+    /**
+     * Shows blacklist update modal - multi or sigle
+     *
+     * @return void
+     */
+    public function blacklistShowModal($id=0)
+    {
+        $this->canBlacklistErorr = '';
+        $this->canBlacklist = true;
+        $this->multiSelected = false;
+        $this->modelId = $id;
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        if($this->selectedTerminal->blacklist == 1){
+            $this->canBlacklistErorr = 'Da li ste sigurni da želite da uklonite terminal sa Blackliste?';
+        }else{
+            $this->canBlacklistErorr = 'Da li ste sigurni da želite da dodate terminal na Blacklistu?';
+        }
+        if($this->selectedTerminal->lokacija_tipId != 3){
+            $this->canBlacklist = false;
+            $this->canBlacklistErorr = 'Samo terminali koji su instalirani korisnicima mogu se dodavti na Blacklistu!';
+        }
+        if($this->selectedTerminal->ts_naziv != 'Instaliran'){
+            $this->canBlacklist = false;
+            $this->canBlacklistErorr = 'Samo terminali sa statsom "Instaliran" se mogu dodavti na Blacklistu!';
+        }
+        $this->blacklistFormVisible = true;
+    }
+
+    /**
+     * The update function
+     *
+     * @return void
+     */
+    public function blacklistUpdate()
+    {
+        if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
+            TerminalBacklist::CreateBlacklistFile();
+        }
+        $this->selsectedTerminals=[];
+        $this->canBlacklistErorr = '';
+        $this->blacklistFormVisible = false;
+    }
+
+
     /**
      * updated
      *
@@ -359,11 +413,18 @@ class DistTerminal extends Component
         ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
         ->where('terminal_status_tips.id', ($this->searchStatus > 0) ? '=' : '<>', $this->searchStatus)
         ->where('terminal_lokacijas.distributerId', '=', $this->distId)
+        ->when($this->searchBlackist != 0, function ($rtval){
+            if ($this->searchBlackist == 1){
+                 return $rtval->where('terminal_lokacijas.blacklist', '=', 1); 
+            }else{
+                 return $rtval->whereNull('terminal_lokacijas.blacklist');
+            }
+         })
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
 
-        foreach($terms as $terminal){
-            array_push($this->allInPage,  $terminal->tid);
-        }
+        $terms->each(function ($item, $key){
+            array_push($this->allInPage,  $item->tid);
+        });
 
         return $terms; 
     }

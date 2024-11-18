@@ -3,6 +3,7 @@
 /public/storage
 /public/predracuni
 /public/bl
+/public/bl/blacklist.txt
 /storage/*.key
 /vendor
 .env
