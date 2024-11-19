@@ -105,6 +105,9 @@ V 0.5.2.1 (2.6.2024.)
 V 1.0.0.2 (18.11.2024.)
     -Dodata funkcija BLACKLIST distributerima - branch Black-lista-distributer
 
+V 1.0.0.3 (19.11.2024.)
+    - Vendor folder included in git...
+
     --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
     -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
