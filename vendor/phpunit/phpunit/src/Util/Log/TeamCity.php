@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Util\Log;
 
-use const PHP_EOL;
 use function class_exists;
 use function count;
 use function explode;
@@ -32,19 +31,18 @@ use PHPUnit\Framework\TestFailure;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
-use PHPUnit\TextUI\ResultPrinter;
+use PHPUnit\TextUI\DefaultResultPrinter;
 use PHPUnit\Util\Exception;
 use PHPUnit\Util\Filter;
 use ReflectionClass;
 use ReflectionException;
 use SebastianBergmann\Comparator\ComparisonFailure;
-use SebastianBergmann\Timer\RuntimeException;
 use Throwable;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TeamCity extends ResultPrinter
+final class TeamCity extends DefaultResultPrinter
 {
     /**
      * @var bool
@@ -61,9 +59,6 @@ final class TeamCity extends ResultPrinter
      */
     private $flowId;
 
-    /**
-     * @throws RuntimeException
-     */
     public function printResult(TestResult $result): void
     {
         $this->printHeader($result);
@@ -165,7 +160,7 @@ final class TeamCity extends ResultPrinter
         }
     }
 
-    public function printIgnoredTest($testName, Throwable $t, float $time): void
+    public function printIgnoredTest(string $testName, Throwable $t, float $time): void
     {
         $this->printEvent(
             'testIgnored',
@@ -371,7 +366,7 @@ final class TeamCity extends ResultPrinter
         } catch (ReflectionException $e) {
             throw new Exception(
                 $e->getMessage(),
-                $e->getCode(),
+                (int) $e->getCode(),
                 $e
             );
         }

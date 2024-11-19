@@ -26,6 +26,7 @@ use function is_numeric;
 use function is_object;
 use function is_scalar;
 use function is_string;
+use function mb_strtolower;
 use function ord;
 use function preg_quote;
 use function preg_replace;
@@ -46,7 +47,6 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionObject;
 use SebastianBergmann\Exporter\Exporter;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -63,7 +63,7 @@ final class NamePrettifier
      */
     private $useColor;
 
-    public function __construct($useColor = false)
+    public function __construct(bool $useColor = false)
     {
         $this->useColor = $useColor;
     }
@@ -109,7 +109,24 @@ final class NamePrettifier
             $fullyQualifiedName = $className;
         }
 
-        $result = preg_replace('/(?<=[[:lower:]])(?=[[:upper:]])/u', ' ', $className);
+        $result       = '';
+        $wasLowerCase = false;
+
+        foreach (range(0, strlen($className) - 1) as $i) {
+            $isLowerCase = mb_strtolower($className[$i], 'UTF-8') === $className[$i];
+
+            if ($wasLowerCase && !$isLowerCase) {
+                $result .= ' ';
+            }
+
+            $result .= $className[$i];
+
+            if ($isLowerCase) {
+                $wasLowerCase = true;
+            } else {
+                $wasLowerCase = false;
+            }
+        }
 
         if ($fullyQualifiedName !== $className) {
             return $result . ' (' . $fullyQualifiedName . ')';
@@ -119,11 +136,15 @@ final class NamePrettifier
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function prettifyTestCase(TestCase $test): string
     {
-        $annotations                = $test->getAnnotations();
+        $annotations = Test::parseTestMethodAnnotations(
+            get_class($test),
+            $test->getName(false)
+        );
+
         $annotationWithPlaceholders = false;
 
         $callback = static function (string $variable): string
@@ -229,7 +250,7 @@ final class NamePrettifier
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function mapTestMethodParameterNamesToProvidedDataValues(TestCase $test): array
     {
@@ -239,7 +260,7 @@ final class NamePrettifier
         } catch (ReflectionException $e) {
             throw new UtilException(
                 $e->getMessage(),
-                $e->getCode(),
+                (int) $e->getCode(),
                 $e
             );
         }
@@ -259,7 +280,7 @@ final class NamePrettifier
                 } catch (ReflectionException $e) {
                     throw new UtilException(
                         $e->getMessage(),
-                        $e->getCode(),
+                        (int) $e->getCode(),
                         $e
                     );
                 }

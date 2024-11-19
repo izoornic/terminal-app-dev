@@ -15,11 +15,9 @@ use function is_iterable;
 use function sprintf;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
-use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\InvalidParameterGroupException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -37,7 +35,7 @@ final class ConsecutiveParameters implements ParametersRule
     private $invocations = [];
 
     /**
-     * @throws Exception
+     * @throws \PHPUnit\Framework\Exception
      */
     public function __construct(array $parameterGroups)
     {
@@ -68,8 +66,8 @@ final class ConsecutiveParameters implements ParametersRule
     }
 
     /**
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     public function apply(BaseInvocation $invocation): void
     {
@@ -80,8 +78,8 @@ final class ConsecutiveParameters implements ParametersRule
     }
 
     /**
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function verify(): void
     {
@@ -95,20 +93,14 @@ final class ConsecutiveParameters implements ParametersRule
      *
      * @param int $callIndex
      *
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     private function verifyInvocation(BaseInvocation $invocation, $callIndex): void
     {
         if (!isset($this->parameterGroups[$callIndex])) {
             // no parameter assertion for this call index
             return;
-        }
-
-        if ($invocation === null) {
-            throw new ExpectationFailedException(
-                'Mocked method does not exist.'
-            );
         }
 
         $parameters = $this->parameterGroups[$callIndex];
