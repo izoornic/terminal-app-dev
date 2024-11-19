@@ -102,14 +102,22 @@ V 0.5.1.5 (2.6.2024.)
 V 0.5.2.1 (2.6.2024.)
     - Ispravljen bug u blade fajlovima 'Terminali' za uloge 'admin' i 'menadzer licenci'
 
+V 1.0.0.0 (16.11.2024.)
+    - Prvi komit u branch Servisna licenca na novom repostriju Terminal-App-Dev sa Asus Kompa- u novom okruzenju
+
 V 1.0.0.2 (18.11.2024.)
     -Dodata funkcija BLACKLIST distributerima - branch Black-lista-distributer
+
+V 1.0.0.1 (18.11.2024.)
+    - Komit na branch "Servisna licenca" 
+        - dodata tabela "licenca_servisnas" gde se loguju servisne licence
+        - Dodato polje u tabelu "licence_za_terminals" - "licenca_poreklo"
 
 V 1.0.0.3 (19.11.2024.)
 V 1.0.0.4 (19.11.2024.)
 V 1.0.0.5 (19.11.2024.)
     - Vendor folder included in git...
-    - composer updated na php 8.1
+    - composer updated na php 8.1 (neuspesno)
     - novi composer updete da dependecima na 8.1
 
     --
