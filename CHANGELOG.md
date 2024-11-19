@@ -102,6 +102,9 @@ V 0.5.1.5 (2.6.2024.)
 V 0.5.2.1 (2.6.2024.)
     - Ispravljen bug u blade fajlovima 'Terminali' za uloge 'admin' i 'menadzer licenci'
 
+V 1.0.0.0 (16.11.2024.)
+    - Prvi komit u branch Servisna licenca na novom repostriju Terminal-App-Dev sa Asus Kompa- u novom okruzenju
+
 V 1.0.0.2 (18.11.2024.)
     -Dodata funkcija BLACKLIST distributerima - branch Black-lista-distributer
 
@@ -112,24 +115,11 @@ V 1.0.0.5 (19.11.2024.)
     - composer updated na php 8.1
     - novi composer updete da dependecima na 8.1
 
-    --
-    PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
-    -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
-    terminal_lokacijaID = 15335
-    distributerId = 1       (Zeta Test)
-    licenca_distributer_cenaId = 2 (stock)
-    SN = 0310639000225881 
-         0310639000225881
-
-         08. 02. '24. 		01. 02. '25. 
-
-
-
-    //==== Upit za proveru slicnosti tabela 'licenca_naplatas' i 'licenca_distributer_terminals' ====//
-    SELECT ln.licenca_dist_terminalId, ldt.id, ln.* FROM licenca_naplatas ln
-    LEFT JOIN licenca_distributer_terminals ldt ON ln.licenca_dist_terminalId = ldt.id
-    WHERE ln.aktivna > 0
-    ORDER BY ln.licenca_dist_terminalId;
+V 1.0.0.1 (18.11.2024.)
+    - Komit na branch "Servisna licenca" 
+        - dodata tabela "licenca_servisnas" gde se loguju servisne licence
+        - Dodato polje u tabelu "licence_za_terminals" - "licenca_poreklo" 
+    
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

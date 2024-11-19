@@ -11,7 +11,7 @@ class CryptoSign
      * @param array $vals_ins
      * 
      * $vals_ins = [
-     *      'mesecId'=> 'int',
+     *      'mesecId'=> 'int', -> NE ULAZI U KLJC!!!
      *      'terminal_sn' => 'string',
      *      'datum_pocetak' => 'Y-m-d',
      *      'datum_kraj' => 'Y-m-d',

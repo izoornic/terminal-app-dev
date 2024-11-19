@@ -22,6 +22,7 @@ class LicenceZaTerminal extends Model
         'datum_pocetak',
         'datum_kraj',
         'datum_prekoracenja',
+        'licenca_poreklo',
         'signature'
     ];
 
