@@ -106,7 +106,9 @@ V 1.0.0.2 (18.11.2024.)
     -Dodata funkcija BLACKLIST distributerima - branch Black-lista-distributer
 
 V 1.0.0.3 (19.11.2024.)
+V 1.0.0.4 (19.11.2024.)
     - Vendor folder included in git...
+    - composer updated na php 8.1
 
     --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)

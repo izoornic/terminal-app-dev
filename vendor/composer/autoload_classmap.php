@@ -90,7 +90,6 @@ return array(
     'App\\Models\\LicencaNaplata' => $baseDir . '/app/Models/LicencaNaplata.php',
     'App\\Models\\LicencaParametar' => $baseDir . '/app/Models/LicencaParametar.php',
     'App\\Models\\LicencaParametarTerminal' => $baseDir . '/app/Models/LicencaParametarTerminal.php',
-    'App\\Models\\LicencaServisna' => $baseDir . '/app/Models/LicencaServisna.php',
     'App\\Models\\LicencaTip' => $baseDir . '/app/Models/LicencaTip.php',
     'App\\Models\\LicenceZaTerminal' => $baseDir . '/app/Models/LicenceZaTerminal.php',
     'App\\Models\\Lokacija' => $baseDir . '/app/Models/Lokacija.php',

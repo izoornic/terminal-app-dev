@@ -719,7 +719,6 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Models\\LicencaNaplata' => __DIR__ . '/../..' . '/app/Models/LicencaNaplata.php',
         'App\\Models\\LicencaParametar' => __DIR__ . '/../..' . '/app/Models/LicencaParametar.php',
         'App\\Models\\LicencaParametarTerminal' => __DIR__ . '/../..' . '/app/Models/LicencaParametarTerminal.php',
-        'App\\Models\\LicencaServisna' => __DIR__ . '/../..' . '/app/Models/LicencaServisna.php',
         'App\\Models\\LicencaTip' => __DIR__ . '/../..' . '/app/Models/LicencaTip.php',
         'App\\Models\\LicenceZaTerminal' => __DIR__ . '/../..' . '/app/Models/LicenceZaTerminal.php',
         'App\\Models\\Lokacija' => __DIR__ . '/../..' . '/app/Models/Lokacija.php',
