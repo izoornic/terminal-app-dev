@@ -89,17 +89,6 @@ class LicenceController extends Controller
                         ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
                         ->pluck('licenca_parametars.param_opis')
                         ->all();
-
-
-                    /* $licenca_distibuter_terminal_row = LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
-                                                        ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                                                        ->first();
-                    if(isset($licenca_distibuter_terminal_row->id)){
-                        $each_data['parametars'] = LicencaParametarTerminal::where('licenca_parametar_terminals.licenca_distributer_terminalId', '=', $licenca_distibuter_terminal_row->id)
-                                                        ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
-                                                        ->pluck('licenca_parametars.param_opis')
-                                                        ->all();
-                    } */
                 }           
 
                 array_push($this->terminal_data, $each_data);

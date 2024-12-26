@@ -122,13 +122,13 @@ class LicencaDistributerCena extends Model
      * @return [type]
      * 
      */
-    public static function nazivLicence($licencaCenaId)
+    public static function licencaCenaIdInfo($licencaCenaId)
     {
-        $naziv_obj = LicencaDistributerCena::select('licenca_tips.licenca_naziv')
+        return LicencaDistributerCena::select('licenca_tips.*')
                         ->join('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
                         ->where('licenca_distributer_cenas.id', '=', $licencaCenaId)
                         ->first();
-        return ($naziv_obj) ?  $naziv_obj->licenca_naziv : 'N/A';
+        //return ($naziv_obj) ?  $naziv_obj->licenca_naziv : 'N/A';
     }
 
     public static function idLicenciDistributera($did)
