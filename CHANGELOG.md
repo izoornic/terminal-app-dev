@@ -120,13 +120,16 @@ V 1.0.0.5 (19.11.2024.)
     - composer updated na php 8.1 (neuspesno)
     - novi composer updete sa dependecima na 8.1 (uspesno)
 
-V 1.0.0.7 ()
+V 1.0.0.7 (26.12.2024.)
     - Dodata nova tabela u bazu "licenca_servisnas" loguje servisne licence
     - Dodato polje u tabelu "licence_za_terminals" >> "licenca_poreklo"->default(1) zastavica za poreklo licence
     - Zavresena Servisna licenca. 
     - Refaktorovane funkcije na stranici DistLicence a manipulacija parametima apstrahovana u model LicencaParametarTerminal
     - Deploj na barnch Servisna-licenca-sa-novim-composerom. 
     - Odradio greskom composer update pa ima 1K fajlova za depliy
+
+V 1.0.0.8 (26.12.2024.)
+    - Promenjen cpanel.yml da bi deploj isao na dev adresu
     
  //TODO Cron job koji ce da brise sve istekle licence iz tabele lecence za terminals
    
