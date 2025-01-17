@@ -667,7 +667,7 @@ class Terminal extends Component
                     'terminal_sn' => $this->selectedTerminal->sn,
                     'datum_pocetak' => $this->datum_pocetka_licence,
                     'datum_kraj' => $this->datum_kraja_licence,
-                    'datum_prekoracenja' => $this->datum_kraja_licence,
+                    'datum_prekoracenja' => $this->datum_prekoracenja,
                     'naziv_licence' => $nazivLicence
                 ];
 

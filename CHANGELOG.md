@@ -130,6 +130,10 @@ V 1.0.0.7 (26.12.2024.)
 
 V 1.0.0.8 (26.12.2024.)
     - Promenjen cpanel.yml da bi deploj isao na dev adresu
+
+V 1.0.0.9 (17.1.2025.)
+    - Ispravljen bug na sevisnoj licenci, "Datum_prekoracenja" je bio pogresan u nizu za signature
+    - Dodat "temp" parametar za sve servisne licence. Hardcoded u LicencaControler.php
     
  //TODO Cron job koji ce da brise sve istekle licence iz tabele lecence za terminals
    
