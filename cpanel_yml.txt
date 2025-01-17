@@ -1,0 +1,14 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/eposrs/servis-epos-app/
+    - /bin/cp -a * $DEPLOYPATH
+
+
+
+
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/eposrs/develop-servis-epos-app/
+    - /bin/cp -a * $DEPLOYPATH

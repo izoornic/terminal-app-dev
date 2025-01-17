@@ -119,7 +119,7 @@ class DistributerTerminal extends Component
    public function deleteLicenceTerminala()
    {
         dd($this->licenceDodateTerminalu());
-        foreach ($this->licenceDodateTerminalu() as $key => $value) {
+        foreach ($this->licenceDodateTerminalu() as $key => $value) { 
             
         }
         $this->modalTerminalInfoVisible = false;
@@ -127,6 +127,7 @@ class DistributerTerminal extends Component
 
     private function deleteParams($distributer_terminal_licId)
         {
+            //TODO - ova tabela ne postoji u bazi!!!
             LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $distributer_terminal_licId)->delete();
         }
 

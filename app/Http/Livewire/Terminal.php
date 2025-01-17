@@ -5,10 +5,14 @@ namespace App\Http\Livewire;
 use App\Models\User;
 use App\Models\Tiket;
 use App\Models\Lokacija;
+use App\Models\LicencaServisna;
 use App\Models\TerminalLokacija;
 use App\Models\TiketPrioritetTip;
 use App\Models\TiketOpisKvaraTip;
 use App\Models\LicenceZaTerminal;
+use App\Models\LicencaNaplata;
+use App\Models\LicencaDistributerCena;
+use App\Models\LicencaParametarTerminal;
 use App\Models\TerminalLokacijaHistory;
 use App\Models\DistributerLokacijaIndex;
 use App\Models\TiketAkcijaKorisnikPozicija;
@@ -22,6 +26,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
+use App\Ivan\CryptoSign;
 use App\Ivan\TerminalHistory;
 use App\Ivan\SelectedTerminalInfo;
 use App\Ivan\MailToUser;
@@ -102,6 +107,16 @@ class Terminal extends Component
     public $userRegion;
 
     private $mailToUser;
+
+    //Servisne licence
+    public $novaServisnaModalVisible;
+    public $licence_za_dodavanje;
+    public $distId;
+    public $licence_dodate_terminalu;
+    public $datum_pocetka_licence;
+    public $datum_kraja_licence;
+    public $datum_prekoracenja;
+    public $parametri;
 
     public function newTiketShowModal($tid)
     {
@@ -340,7 +355,11 @@ class Terminal extends Component
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
         
         $terms->each(function ($item, $key){
-            $item->tzlid = (LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first()) ? 1 : 0;
+           // da li terminal ima licencu i da li je regularna ili servisna
+            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first();
+            $item->tzlid = ($licenca) ?  $licenca->licenca_poreklo : 0;
+            
+            //ovo sluzi za check ALL box
             array_push($this->allInPage,  $item->tid);
         });
 
@@ -600,13 +619,91 @@ class Terminal extends Component
      * @return [type]
      * 
      */
-    public function licencaShowModal($id)
+    public function licencaShowModal($id, $tpl=0)
     {
+        //dd($tpl);
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->licencaData = LicenceZaTerminal::sveAktivneLicenceTerminala($id);
         //dd($this->licencaData);
         $this->licencaModalVisible = true;
+    }
+    
+    public function novaServisnaShowwModal($id)
+    {
+        $this->parametri = [];
+        $this->distId = 2;
+        $this->licence_dodate_terminalu = [];
+        $this->datum_pocetka_licence = Helpers::datumKalendarNow();
+        $this->datum_kraja_licence = Helpers::addDaysToDate($this->datum_pocetka_licence, 4);
+        $this->datum_prekoracenja = Helpers::addDaysToDate($this->datum_pocetka_licence, 5);
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->licence_za_dodavanje = [];
+        $this->novaServisnaModalVisible = true;
+    }
+
+    //TODO da menager licenci vidi privremene licence
+    public function dodajServisnueLicence()
+    {
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+       
+        foreach($this->licence_za_dodavanje as $lc){
+            
+            DB::transaction(function()use($lc) {
+
+                $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($lc);
+                $nazivLicence = $licenceInf->licenca_naziv;
+                $licenca_tip_id = $licenceInf->id;
+
+                $key_arr = [
+                    'terminal_lokacijaId' => $this->modelId,
+                    'distributerId' => $this->distId,
+                    'licenca_distributer_cenaId' => $lc,
+                ];
+
+                $signature_vals = [
+                    'mesecId'=> 0,
+                    'terminal_sn' => $this->selectedTerminal->sn,
+                    'datum_pocetak' => $this->datum_pocetka_licence,
+                    'datum_kraj' => $this->datum_kraja_licence,
+                    'datum_prekoracenja' => $this->datum_prekoracenja,
+                    'naziv_licence' => $nazivLicence
+                ];
+
+                LicencaServisna::create([
+                    'userId' => auth()->user()->id,
+                    'terminal_lokacijaId' => $this->modelId,
+                    'distributerId' => $this->distId,
+                    'licenca_naziv' => $nazivLicence,
+                    'terminal_sn' => $this->selectedTerminal->sn,
+                    'licenca_distributer_cenaId' => $lc,
+                    'datum_pocetka_licence' => $this->datum_pocetka_licence,
+                    'datum_kraj_licence' => $this->datum_kraja_licence,
+                    'datum_isteka_prekoracenja' => $this->datum_prekoracenja
+                ]);
+                LicenceZaTerminal::create([
+                    'terminal_lokacijaId' => $this->modelId,
+                    'distributerId' => $this->distId,
+                    'licenca_distributer_cenaId' => $lc,
+                    'naziv_licence' => $nazivLicence,
+                    'mesecId' => 0,
+                    'terminal_sn' => $this->selectedTerminal->sn,
+                    'datum_pocetak' => $this->datum_pocetka_licence,
+                    'datum_kraj' => $this->datum_kraja_licence,
+                    'datum_prekoracenja' => $this->datum_prekoracenja,
+                    'licenca_poreklo' => 2,
+                    'signature' => CryptoSign::criptSignature($signature_vals)
+                ]);
+
+                if(count($this->parametri)) LicencaParametarTerminal::addParametarsToLicence($key_arr, $licenca_tip_id, $this->parametri);
+            });
+
+        }
+        $this->licence_za_dodavanje=[];
+        $this->novaServisnaModalVisible = false;
+
+        //dd($values, $signature_vals, $model_za_lic);
     }
 
     public function render()

@@ -56,6 +56,7 @@ class LicenceController extends Controller
                             'licence_za_terminals.datum_kraj',
                             'licence_za_terminals.datum_prekoracenja',
                             'licence_za_terminals.signature',
+                            'licence_za_terminals.licenca_poreklo',
                             'licenca_tips.id as ltid'
                         )
                         ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_cenas.id', '=', 'licence_za_terminals.licenca_distributer_cenaId')
@@ -89,18 +90,11 @@ class LicenceController extends Controller
                         ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
                         ->pluck('licenca_parametars.param_opis')
                         ->all();
-
-
-                    /* $licenca_distibuter_terminal_row = LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
-                                                        ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                                                        ->first();
-                    if(isset($licenca_distibuter_terminal_row->id)){
-                        $each_data['parametars'] = LicencaParametarTerminal::where('licenca_parametar_terminals.licenca_distributer_terminalId', '=', $licenca_distibuter_terminal_row->id)
-                                                        ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
-                                                        ->pluck('licenca_parametars.param_opis')
-                                                        ->all();
-                    } */
-                }           
+                }  
+                //hardcoded parametars za Servisne licence
+                if($item->licenca_poreklo == 2){
+                    array_push($each_data['parametars'] , 'temp');
+                }
 
                 array_push($this->terminal_data, $each_data);
             }); 

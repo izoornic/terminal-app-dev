@@ -118,8 +118,25 @@ V 1.0.0.4 (19.11.2024.)
 V 1.0.0.5 (19.11.2024.)
     - Vendor folder included in git...
     - composer updated na php 8.1 (neuspesno)
-    - novi composer updete da dependecima na 8.1
+    - novi composer updete sa dependecima na 8.1 (uspesno)
 
+V 1.0.0.7 (26.12.2024.)
+    - Dodata nova tabela u bazu "licenca_servisnas" loguje servisne licence
+    - Dodato polje u tabelu "licence_za_terminals" >> "licenca_poreklo"->default(1) zastavica za poreklo licence
+    - Zavresena Servisna licenca. 
+    - Refaktorovane funkcije na stranici DistLicence a manipulacija parametima apstrahovana u model LicencaParametarTerminal
+    - Deploj na barnch Servisna-licenca-sa-novim-composerom. 
+    - Odradio greskom composer update pa ima 1K fajlova za depliy
+
+V 1.0.0.8 (26.12.2024.)
+    - Promenjen cpanel.yml da bi deploj isao na dev adresu
+
+V 1.0.0.9 (17.1.2025.)
+    - Ispravljen bug na sevisnoj licenci, "Datum_prekoracenja" je bio pogresan u nizu za signature
+    - Dodat "temp" parametar za sve servisne licence. Hardcoded u LicencaControler.php
+    
+ //TODO Cron job koji ce da brise sve istekle licence iz tabele lecence za terminals
+   
     --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
     -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
