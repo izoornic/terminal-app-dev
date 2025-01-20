@@ -134,6 +134,9 @@ V 1.0.0.8 (26.12.2024.)
 V 1.0.0.9 (17.1.2025.)
     - Ispravljen bug na sevisnoj licenci, "Datum_prekoracenja" je bio pogresan u nizu za signature
     - Dodat "temp" parametar za sve servisne licence. Hardcoded u LicencaControler.php
+
+V 1.0.1.2 (20.1.2025.)
+    -Ispravljen bug sa parametrima kod produzenja licence za nalog distributera
     
  //TODO Cron job koji ce da brise sve istekle licence iz tabele lecence za terminals
    

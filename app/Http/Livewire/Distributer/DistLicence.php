@@ -193,13 +193,12 @@ class DistLicence extends Component
         $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
         if($this->dani_trajanja < 1) return;
 
-        $this->licenca_parametri_ids = [
+       /*  $this->licenca_parametri_ids = [
             'terminal_lokacijaId' => $this->naplata_podaci_licence->terminal_lokacijaId,
             'distributerId' => $this->naplata_podaci_licence->distributerId,
             'licenca_distributer_cenaId' => $this->naplata_podaci_licence->licenca_distributer_cenaId
-        ];
-        LicencaParametarTerminal::updateParametars($this->licenca_parametri_ids, $this->licenca_tip_parametri);
-        //$this->updateParametre($this->licenca_parametri_ids, $this->licenca_tip_parametri);
+        ]; */
+        
 
         $model_data = [
             'datum_pocetak' => $this->datum_pocetka_licence,
@@ -210,7 +209,10 @@ class DistLicence extends Component
         //LicencaDistributerTerminal::where('id', '=', $this->distrib_terminal_id)->update($model_data);
 
         $datum_prekoracenja = Helpers::addDaysToDate($this->datum_kraja_licence, $this->ditributer_info->dani_prekoracenja_licence);
-        //dodaj licence terminalu za prezimanje
+        $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($this->licenca_distributer_cena_id);
+        $nazivLicence = $licenceInf->licenca_naziv;
+        $licenca_tip_id = $licenceInf->id;
+        //dodaj licence terminalu za prezimanje        
         $key_arr = [
             'terminal_lokacijaId' => $this->modelId,
             'distributerId' => $this->distId,
@@ -246,6 +248,9 @@ class DistLicence extends Component
         }
         LicencaNaplata::create($model_lic_nap);
 
+        if(count($this->parametri)) LicencaParametarTerminal::addParametarsToLicence($key_arr, $licenca_tip_id, $this->parametri);
+        //LicencaParametarTerminal::updateParametars($this->licenca_parametri_ids, $this->licenca_tip_parametri);
+        //$this->updateParametre($this->licenca_parametri_ids, $this->licenca_tip_parametri);
         $this->produziLicModalVisible = false;
     }
 

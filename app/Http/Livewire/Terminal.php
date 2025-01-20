@@ -644,6 +644,7 @@ class Terminal extends Component
     }
 
     //TODO da menager licenci vidi privremene licence
+    //TODO napravi cron job za brisanje isteklih servisnih licenci
     public function dodajServisnueLicence()
     {
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
