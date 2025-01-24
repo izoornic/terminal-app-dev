@@ -137,9 +137,11 @@ V 1.0.0.9 (17.1.2025.)
 
 V 1.0.1.2 (20.1.2025.)
     -Ispravljen bug sa parametrima kod produzenja licence za nalog distributera
+
+V 1.0.1.3 (24.1.2025.)
+    - Dodat Cron job koji brise servisne licence 3 dana posle isteka
     
- //TODO Cron job koji ce da brise sve istekle licence iz tabele lecence za terminals
-   
+ 
     --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
     -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'

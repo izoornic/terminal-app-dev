@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Http\Helpers;
 
 use App\Models\LicencaNaplata;
 
@@ -52,6 +53,16 @@ class LicenceZaTerminal extends Model
                         ->get();
 
         
+        return $retval;
+    }
+
+    public static function deleteExpiredServiceLicences()
+    {
+        $istekLimit = Helpers::addDaysToDate(Helpers::datumKalendarNow(), -3);
+
+        $retval = LicenceZaTerminal::where('datum_prekoracenja', '<', $istekLimit)
+                                    ->where('licenca_poreklo', '=', 2)
+                                    ->delete();
         return $retval;
     }
 

@@ -192,12 +192,6 @@ class DistLicence extends Component
         $this->produzenje_unete_cene_error = '';
         $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
         if($this->dani_trajanja < 1) return;
-
-       /*  $this->licenca_parametri_ids = [
-            'terminal_lokacijaId' => $this->naplata_podaci_licence->terminal_lokacijaId,
-            'distributerId' => $this->naplata_podaci_licence->distributerId,
-            'licenca_distributer_cenaId' => $this->naplata_podaci_licence->licenca_distributer_cenaId
-        ]; */
         
 
         $model_data = [
@@ -249,8 +243,7 @@ class DistLicence extends Component
         LicencaNaplata::create($model_lic_nap);
 
         if(count($this->parametri)) LicencaParametarTerminal::addParametarsToLicence($key_arr, $licenca_tip_id, $this->parametri);
-        //LicencaParametarTerminal::updateParametars($this->licenca_parametri_ids, $this->licenca_tip_parametri);
-        //$this->updateParametre($this->licenca_parametri_ids, $this->licenca_tip_parametri);
+    
         $this->produziLicModalVisible = false;
     }
 
@@ -473,45 +466,6 @@ class DistLicence extends Component
     {
         return (LicencaParametar::where('licenca_tipId', '=', $licenca_tip_id)->first()) ? true : false;
     }
-
-    /**
-     * Spakuje sve parametre izabranih licenci u niz da bi posle 
-     * odabrane parametre upisao u licencu
-     *
-     * @return [type]
-     * 
-     */
-    /* private function parametersAll()
-    {
-        $parametriAll = [];
-        foreach ($this->licence_za_dodavanje as $licencaa_id){
-            $licenca_tip_id = LicencaDistributerCena::where('id', '=', $licencaa_id)->first()->licenca_tipId;
-            $parametri_licence = LicencaParametar::where('licenca_tipId', '=', $licenca_tip_id)->pluck('id')->all();
-            $parametriAll[$licenca_tip_id] = $parametri_licence;
-        }
-        return $parametriAll;
-    } */
-
-    /**
-     * Dodaje parametre novoj licenci
-     *
-     * @param mixed $lic_dist_termId
-     * @param mixed $parametriAll
-     * @param mixed $licenca_tip_id
-     * 
-     * @return [type]
-     * 
-     */
-    /* private function addParametersToLicence($key_arr, $parametriAll, $licenca_tip_id, $selectedParametars)
-    {
-        foreach($parametriAll[$licenca_tip_id] as $singleLicenceParameter){
-            if(in_array($singleLicenceParameter, $selectedParametars)){
-                $ins_arr = $key_array;
-                $ins_arr['licenca_parametarId'] = $singleLicenceParameter;
-                LicencaParametarTerminal::create($ins_arr);
-            }
-        }
-    } */
 
 
     /**
