@@ -140,6 +140,9 @@ V 1.0.1.2 (20.1.2025.)
 
 V 1.0.1.3 (24.1.2025.)
     - Dodat Cron job koji brise servisne licence 3 dana posle isteka
+
+V 1.0.1.4 (28.1.2025.)
+    - Vracen serach na modal 'premesti terminal' za ulogu "distributer"
     
  
     --

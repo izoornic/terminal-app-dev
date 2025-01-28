@@ -26,7 +26,7 @@ class EuroratesInfo extends Command
      * Local rucno pokrenuti
      * php artisan eurorates:info
      * Cron na servery
-     * /usr/local/bin/php /home/eposrs/artisan eurorates:info
+     * /usr/local/bin/php /home/epos-servis-app/artisan eurorates:info
      * @return void
      */
     public function __construct()

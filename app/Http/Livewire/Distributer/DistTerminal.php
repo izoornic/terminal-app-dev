@@ -202,8 +202,7 @@ class DistTerminal extends Component
      */
     public function lokacijeTipa($tipId)
     {
-        //$dataAll =  
-        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
+        $dataAll =  Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
@@ -213,9 +212,10 @@ class DistTerminal extends Component
                 ->where('terminal_lokacijas.distributerId', '=', $this->distId);
         })
         ->orWhere('lokacijas.distributerId', '=', $this->distId)
-        ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
+        ->get();
+        //->paginate(Config::get('global.modal_search'), ['*'], 'loc');
 
-        //return PaginationHelper::paginate($this->displayData($dataAll), Config::get('global.paginate'));
+        return PaginationHelper::paginate($this->displayData($dataAll), Config::get('global.paginate'));
     }
 
      /**

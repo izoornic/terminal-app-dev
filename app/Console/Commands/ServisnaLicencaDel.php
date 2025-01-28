@@ -26,7 +26,7 @@ class ServisnaLicencaDel extends Command
      * Local rucno pokrenuti
      * php artisan  servisnalicenca:del
      * Cron na servery
-     * /usr/local/bin/php /home/eposrs/artisan servisnalicenca:del
+     * /usr/local/bin/php /home/epos-servis-app/artisan servisnalicenca:del
      * @return void
      */
     public function __construct()
