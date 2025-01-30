@@ -143,7 +143,8 @@ class LicencaTerminal extends Component
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
 
         $terms->each(function ($item, $key){
-            $item->tzlid = (LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first()) ? 1 : 0;
+            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first();
+            $item->tzlid = ($licenca) ?  $licenca->licenca_poreklo : 0;
             array_push($this->allInPage,  $item->tid);
         });
 

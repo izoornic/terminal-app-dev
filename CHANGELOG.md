@@ -143,19 +143,12 @@ V 1.0.1.3 (24.1.2025.)
 
 V 1.0.1.4 (28.1.2025.)
     - Vracen serach na modal 'premesti terminal' za ulogu "distributer"
+
+V 1.0.1.5 (30.1.2025.)
+    - Menadzer licenci u pregledu terminala vidi "Servisne licence"
     
  
-    --
-    PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
-    -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
-    terminal_lokacijaID = 15335
-    distributerId = 1       (Zeta Test)
-    licenca_distributer_cenaId = 2 (stock)
-    SN = 0310639000225881 
-         0310639000225881
-
-         08. 02. '24. 		01. 02. '25. 
-
+    
 
 
     //==== Upit za proveru slicnosti tabela 'licenca_naplatas' i 'licenca_distributer_terminals' ====//

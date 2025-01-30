@@ -71,9 +71,23 @@
                                         <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
                                         <td class="px-1 py-2">
                                             @if($item->tzlid)
-                                                <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}})">
+                                                <!-- <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}})">
                                                     <svg class="fill-current w-5 h-5 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
-                                                </a>
+                                                </a> -->
+                                                {{ $item->tzlid }} 
+                                                <!--  TERMINAL IMA LICENCU -->
+                                                @if($item->tzlid == 1)
+                                                    <!-- TERMINAL IMA REGULARNU LICENCU -->
+                                                    <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}}, {{$item->tzlid}})" title="Pregled licence">
+                                                        <svg class="fill-current w-5 h-5 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
+                                                    </a>
+                                                @elseif($item->tzlid == 2)
+                                                    <!-- TERMINAL IMA SERVISNU LICENCU -->
+                                                    <a class="flex p-1 cursor-pointer flex border border-green-800 bg-green-50 text-green-800 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}}, {{$item->tzlid}})" title="Pregled licence" >
+
+                                                        <svg class="fill-current w-5 h-5" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384 512" style="enable-background:new 0 0 384 512;" xml:space="preserve"><g><path d="M272.2,391.1h111.3v26.3h-141V197.8h29.7L272.2,391.1L272.2,391.1z"/></g><path d="M359,451.2v1.8c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359v177.4h25V160.9c0-9.8-3.9-19.3-10.9-26.3L253.4,15.3 C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59v-1.8H359z M228.4,27.8 c2.7,1.3,5.1,3.1,7.3,5.2l119.2,118.8h-61.5c-35.8,0-65-29.2-65-65V27.8z"/><g><path d="M62.7,374.4c12.7,7.3,32,13.7,52.1,13.7c25.1,0,39.2-11.8,39.2-29.4c0-16.3-10.9-25.9-38.2-35.8 c-35.6-12.6-58.4-31.8-58.4-62.7c0-35.3,29.5-61.9,76.3-61.9c23.4,0,40.5,5,51.7,10.7l-9.4,31.8c-7.8-4.1-22.8-10.2-43.1-10.2 c-25,0-35.6,13.3-35.6,26c0,16.5,12.5,24.3,41.3,35.3c37.5,14.3,55.5,33.1,55.5,64.1c0,34.7-26.1,64.8-81.8,64.8 c-22.8,0-46.5-6.5-58.3-13.7L62.7,374.4z"/></g></svg>
+                                                    </a>
+                                                @endif
                                             @endif
                                         </td>
                                         <td class="px-1 py-2">{{ $item->sn }}</td>
@@ -169,7 +183,9 @@
                                 @php
                                     $privremena = (isset($licenca->razduzeno)) ? 0 : 1;
                                 @endphp
-                                @if($privremena)
+                                @if($licenca->licenca_poreklo == 2)
+                                    <p class="text-sm pt-2">Status:  <span class="font-bold text-green-700"> Servisna </span> </p>
+                                @elseif($privremena)
                                 <div class="bg-red-100 p-2 w-full">
                                     <p class="text-sm pt-2">Status:  <span class="font-bold text-red-700"> Privremena </span> </p>
                                     <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj) }}</span></p>
@@ -179,8 +195,15 @@
                                 @else
                                 <p class="text-sm pt-2">Status:  <span class="font-bold text-red-700"> Trajna </span> </p>
                                 @endif
-                                <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj_licence) }}</span></p>
-                                <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_isteka_prekoracenja) }}</span></p>
+                                
+                                <!-- AKO JE SERVISNA DATUMI IZ TABELE licenca_za_terminals -->
+                                @if($licenca->licenca_poreklo == 2)
+                                    <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj) }}</span></p>
+                                    <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_prekoracenja) }}</span></p>
+                                @else
+                                    <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj_licence) }}</span></p>
+                                    <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_isteka_prekoracenja) }}</span></p>
+                                @endif
                             </div>
                         </div>
                     </div>
