@@ -93,6 +93,11 @@ class DistLicence extends Component
     public $naziv_licence;
     public $produzenje_tip_licence;
 
+    //ERROR MODAL
+    public $errorModalVisible;
+    public $error_message;
+
+
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
@@ -281,7 +286,11 @@ class DistLicence extends Component
      */
     public function dodajLicencaShowModal($tre_loc_id)
     {
-        $this->resetTerm();
+        if(!$this->resetTerm()){
+            $this->error_message = 'Greška! Nije moguće dodati licencu, jer distributer nema dodeljenih licenci!';
+            $this->errorModalVisible = true;
+            return;
+        };
         //$this->distrib_terminal_id = $ldtidd;
         $this->modelId = $tre_loc_id;
         $this->licence_dodate_terminalu = $this->licenceDodateTerminalu();
@@ -418,6 +427,7 @@ class DistLicence extends Component
      */
     public function resetTerm()
     {
+        if(!$this->unete_cene_error || !$this->unete_cene_licenci) return false;
         $this->datum_pocetka_licence = Helpers::datumKalendarNow();
         $this->datum_kraja_licence = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
         $this->licence_za_dodavanje = [];
@@ -441,6 +451,8 @@ class DistLicence extends Component
         $this->datum_pocetak_error = '';
         $this->lic_nenaplativa = 0;
         $this->licenca_parametri_ids = [];
+
+        return true;
     }
     
     

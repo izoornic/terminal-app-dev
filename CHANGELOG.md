@@ -146,6 +146,9 @@ V 1.0.1.4 (28.1.2025.)
 
 V 1.0.1.5 (30.1.2025.)
     - Menadzer licenci u pregledu terminala vidi "Servisne licence"
+
+V 1.0.1.6 (4.2.2025.)
+    - Dodat Error modal na stranici Dist-licenca za slucaj da se pokusa dodavanje licence na terminal za distributera koji nema dodeljene licence.
     
  
     
