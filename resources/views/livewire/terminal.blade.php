@@ -60,7 +60,7 @@
                             @if ($data->count())
                                 @foreach ($data as $item)
                                     <tr @if($loop->even) class="bg-gray-50" @endif >
-                                        <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
+                                        <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tid }}" wire:model="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
                                         <td class="px-1 py-2">
                                             @if($item->blacklist == 1)
                                                 <!-- SERVISER VIDI DA JE TERMINAL NA BLACKLISTI -->
@@ -133,16 +133,16 @@
         {{ $data->links() }}
     </div>
     <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 my-4 flex flex-row" role="alert">
-        <div class="basis-1/2"><p class="text-sm">Ukupno izabranih terminala: <span class="font-bold"> {{ count($selsectedTerminals) }}</span></p></div>
+        <div class="basis-1/2"><p class="text-sm">Ukupno izabranih terminala: <span class="font-bold"> {{ count($selectedTerminals) }}</span></p></div>
         <div class="basis-1/4 text-right mr-6">
-            @if(count($selsectedTerminals))
+            @if(count($selectedTerminals))
                 <x-jet-button class="ml-2" wire:click="statusSelectedShowModal()">
                     {{ __('Promeni status') }}
                 </x-jet-button>
             @endif
         </div>
         <div class="basis-1/4 text-right mr-6">
-            @if(count($selsectedTerminals))
+            @if(count($selectedTerminals))
                 <x-jet-button class="ml-2" wire:click="premestiSelectedShowModal()">
                     {{ __('Premesti') }}
                 </x-jet-button>

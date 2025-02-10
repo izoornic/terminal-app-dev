@@ -78,4 +78,10 @@ class LicencaParametarTerminal extends Model
             ->delete();
     }
 
+    public static function deleteAllParametarsForTerminal($terminal_lokacijaId)
+    {
+        self::where('terminal_lokacijaId', '=', $terminal_lokacijaId)
+            ->delete();
+    }
+    
 }

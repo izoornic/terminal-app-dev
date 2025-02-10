@@ -68,7 +68,7 @@
                             @if ($data->count())
                                 @foreach ($data as $item)
                                     <tr @if($loop->even) class="bg-gray-50" @endif >
-                                        <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
+                                        <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tid }}" wire:model="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
                                         <td class="px-1 py-2">
                                             @if($item->tzlid)
                                                 <!-- <a class="flex p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" wire:click="licencaShowModal({{ $item->tlid}})">
@@ -140,12 +140,12 @@
     </div>
 
     <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 my-4 flex flex-row">
-        <div class="basis-1/3"><p class="text-sm">Ukupno izabranih terminala: <span class="font-bold"> {{ count($selsectedTerminals) }}</span></p></div>
+        <div class="basis-1/3"><p class="text-sm">Ukupno izabranih terminala: <span class="font-bold"> {{ count($selectedTerminals) }}</span></p></div>
         <div class="basis-1/3 text-right mr-6">
            
         </div>
         <div class="basis-1/3 text-center mr-6">
-            @if(count($selsectedTerminals))
+            @if(count($selectedTerminals))
                 <x-jet-button class="ml-2" wire:click="premestiSelectedShowModal()">
                     {{ __('Premesti') }}
                 </x-jet-button>

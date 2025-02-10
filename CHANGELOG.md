@@ -149,9 +149,12 @@ V 1.0.1.5 (30.1.2025.)
 
 V 1.0.1.6 (4.2.2025.)
     - Dodat Error modal na stranici Dist-licenca za slucaj da se pokusa dodavanje licence na terminal za distributera koji nema dodeljene licence.
+
+V 1.0.1.7 (10.2.2025.)
+    - Dodata funkcija da se brise "Servisna licenca" kada se premesta terminal
     
  
-    
+ //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre
 
 
     //==== Upit za proveru slicnosti tabela 'licenca_naplatas' i 'licenca_distributer_terminals' ====//

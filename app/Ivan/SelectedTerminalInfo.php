@@ -85,8 +85,7 @@ class SelectedTerminalInfo
     public static function terminalImaLicencu($terminalId)
     {
         $tlid = TerminalLokacija::where('terminalId', $terminalId) -> first()->id;
-        
-        return LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> exists();
+        return LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> first();
     }
 
 }

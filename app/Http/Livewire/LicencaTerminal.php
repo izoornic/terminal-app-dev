@@ -8,6 +8,7 @@ use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\DistributerLokacijaIndex;
 use App\Models\TerminalLokacijaHistory;
+use App\Models\LicencaParametarTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -52,7 +53,7 @@ class LicencaTerminal extends Component
     public $canBlacklistErorr;
 
     //select all
-    public $selsectedTerminals = [];
+    public $selectedTerminals = [];
     public $selectAll;
     public $allInPage = [];
 
@@ -188,7 +189,7 @@ class LicencaTerminal extends Component
         $this->multiSelectedInfo = $this->multiSelectedTInfo();
 
         //status na listi se setuje prema prvom izabranom terminalu
-        $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selsectedTerminals[0])->first()->terminal_statusId;
+        $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selectedTerminals[0])->first()->terminal_statusId;
         //dd($this->modalStatusPremesti);
 
         $this->plokacijaTip = 0;
@@ -219,32 +220,39 @@ class LicencaTerminal extends Component
         //da li se terminal dodaje Distributeru?
         $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : null;
        
-        if(!$this->multiSelected) $this->selsectedTerminals[0] = $this->modelId;
+        if(!$this->multiSelected) $this->selectedTerminals[0] = $this->modelId;
 
         //Da li terminal ima aktivnu licencu
-        foreach($this->selsectedTerminals as $item){
-            if(SelectedTerminalInfo::terminalImaLicencu($item)){
-                $this->licencaError = 'multi';
-                $this->modalErorLicencaVisible = true;
-                $this->selsectedTerminals=[];
-                $this->modalConfirmPremestiVisible = false;
-                return;
+        foreach($this->selectedTerminals as $item){
+            $lis = SelectedTerminalInfo::terminalImaLicencu($item);
+            if($lis){
+                if($lis->licenca_poreklo == 2){
+                    //obrisi sve parametre i servisne licence za terminal
+                    LicencaParametarTerminal::deleteAllParametarsForTerminal($lis->terminal_lokacijaId);
+                    LicenceZaTerminal::where('terminal_lokacijaId', '=', $lis->terminal_lokacijaId)->delete();
+                }else{
+                    $this->licencaError = 'multi';
+                    $this->modalErorLicencaVisible = true;
+                    $this->selectedTerminals=[];
+                    $this->modalConfirmPremestiVisible = false;
+                    return;
+                }
             }
         }
 
         //PREMESTI TERMINALE
-        $terminali_premesteni = TerminalLokacija::premestiTerminale($this->selsectedTerminals, $this->plokacija, $this->datum_premestanja_terminala, $this->modalStatusPremesti, $distributer_tip_id);
+        $terminali_premesteni = TerminalLokacija::premestiTerminale($this->selectedTerminals, $this->plokacija, $this->datum_premestanja_terminala, $this->modalStatusPremesti, $distributer_tip_id);
        
         if(!$terminali_premesteni){
             $this->licencaError = 'db';
             $this->modalErorLicencaVisible = true;
-            $this->selsectedTerminals=[];
+            $this->selectedTerminals=[];
             $this->modalConfirmPremestiVisible = false;
             return;
         }
 
         
-        $this->selsectedTerminals=[];
+        $this->selectedTerminals=[];
         $this->modalConfirmPremestiVisible = false;
     }
     /**
@@ -320,14 +328,14 @@ class LicencaTerminal extends Component
         if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
             TerminalBacklist::CreateBlacklistFile();
         }
-        $this->selsectedTerminals=[];
+        $this->selectedTerminals=[];
         $this->canBlacklistErorr = '';
         $this->modalFormVisible = false;
     }
 
     private function multiSelectedTInfo()
     {
-        return TerminalLokacija::whereIn('terminalId', $this->selsectedTerminals )
+        return TerminalLokacija::whereIn('terminalId', $this->selectedTerminals )
         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
@@ -379,12 +387,12 @@ class LicencaTerminal extends Component
         $exp = Str::of($key)->explode(delimiter: '.');
         if($exp[0] === 'selectAll' && is_numeric($value)){
            foreach($this->allInPage as $termid){
-               if(!in_array($termid, $this->selsectedTerminals)){
-                array_push($this->selsectedTerminals, $termid);
+               if(!in_array($termid, $this->selectedTerminals)){
+                array_push($this->selectedTerminals, $termid);
                }  
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
+            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
         }
 
         if($this->modalConfirmPremestiVisible || $this->modalFormVisible){
