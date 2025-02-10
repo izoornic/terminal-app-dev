@@ -78,6 +78,11 @@ class LicencaParametarTerminal extends Model
             ->delete();
     }
 
+    /**
+     * Brisanje svih parametara za terminal
+     * @param  mixed $terminal_lokacijaId
+     * @return void
+     */
     public static function deleteAllParametarsForTerminal($terminal_lokacijaId)
     {
         self::where('terminal_lokacijaId', '=', $terminal_lokacijaId)

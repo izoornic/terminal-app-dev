@@ -11,6 +11,8 @@ use App\Models\TerminalLokacija;
 use App\Models\LokacijaKontaktOsoba;
 use App\Models\TerminalLokacijaHistory;
 use App\Models\DistributerLokacijaIndex;
+use App\Models\LicenceZaTerminal;
+use App\Models\LicencaParametarTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -537,14 +539,14 @@ class Lokacijes extends Component
                 return;
             }
             
-            $this->errAddMsg = '';
+            $this->errAddMsg = ''; 
 
-            //Da li treminali imaju licencu?
+            //Da li treminali imaju licencu? Brisu se servisne licence ako ih ima
             foreach($this->selsectedTerminals as $item){
                 if(SelectedTerminalInfo::terminalImaLicencu($item)){
                     $this->licencaError = 'multi';
                     $this->modalErorLicencaVisible = true;
-                    $this->selsectedTerminals=[];
+                    $this->selectedTerminals=[];
                     $this->modalAddTerminalVisible = false;
                     return;
                 }

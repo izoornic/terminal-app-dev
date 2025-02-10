@@ -529,21 +529,14 @@ class Terminal extends Component
 
         if(!$this->multiSelected) $this->selectedTerminals[0] = $this->modelId;
 
-        //Da li terminal ima aktivnu licencu 
+        //Da li terminal ima aktivnu licencu  Brisu se servisne licence ako ih ima
         foreach($this->selectedTerminals as $item){
-            $lis = SelectedTerminalInfo::terminalImaLicencu($item);
-            if($lis){
-                if($lis->licenca_poreklo == 2){
-                    //obrisi sve parametre i servisne licence za terminal
-                    LicencaParametarTerminal::deleteAllParametarsForTerminal($lis->terminal_lokacijaId);
-                    LicenceZaTerminal::where('terminal_lokacijaId', '=', $lis->terminal_lokacijaId)->delete();
-                }else{
-                    $this->licencaError = 'multi';
-                    $this->modalErorLicencaVisible = true;
-                    $this->selectedTerminals=[];
-                    $this->modalConfirmPremestiVisible = false;
-                    return;
-                }
+            if(SelectedTerminalInfo::terminalImaLicencu($item)){
+                $this->licencaError = 'multi';
+                $this->modalErorLicencaVisible = true;
+                $this->selectedTerminals=[];
+                $this->modalConfirmPremestiVisible = false;
+                return;
             }
         }
         

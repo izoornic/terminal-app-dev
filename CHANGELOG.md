@@ -151,7 +151,11 @@ V 1.0.1.6 (4.2.2025.)
     - Dodat Error modal na stranici Dist-licenca za slucaj da se pokusa dodavanje licence na terminal za distributera koji nema dodeljene licence.
 
 V 1.0.1.7 (10.2.2025.)
-    - Dodata funkcija da se brise "Servisna licenca" kada se premesta terminal
+    - Dodata funkcija da se brise "Servisna licenca" kada se premesta terminal na stranici "Terminali"
+
+V 1.0.1.8 (10.2.2025.)
+    - Dodata funkcija da se brise "Servisna licenca" kada se premesta terminal na stranici "Lokacije"
+    - Izdvojena logika brisanja servisnih licenci i parametara u clasu Ivan/SelectedTerminalInfo
     
  
  //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre

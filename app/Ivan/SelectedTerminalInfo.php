@@ -3,6 +3,7 @@ namespace App\Ivan;
 
 use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
+use App\Models\LicencaParametarTerminal;
 
 class SelectedTerminalInfo 
 {
@@ -81,11 +82,28 @@ class SelectedTerminalInfo
         
     }
 
-    //provera da li terminal ima na sebi aktivnu licencu 
+    /**
+     * Kada se terminal premesta sa lokacije na lokaciju, proveri da li terminal ima licencu 
+     * i briše sve parametre i servisne licence za terminal
+     * @param  mixed $terminalId
+     * @return void
+     */
     public static function terminalImaLicencu($terminalId)
     {
         $tlid = TerminalLokacija::where('terminalId', $terminalId) -> first()->id;
-        return LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> first();
+        $licId = LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> first();
+        
+        if($licId == null) return false;
+
+        if($licId->licenca_poreklo == 2){
+            //obrisi sve parametre i servisne licence za terminal
+            LicencaParametarTerminal::deleteAllParametarsForTerminal($licId->terminal_lokacijaId);
+            LicenceZaTerminal::where('terminal_lokacijaId', '=', $licId->terminal_lokacijaId)->delete();
+            return false;
+        }
+
+        return true;
+        
     }
 
 }
