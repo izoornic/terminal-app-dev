@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Lokacija;
+use App\Models\Terminal;
 use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
@@ -77,6 +78,15 @@ class LicencaTerminal extends Component
     //licence modal
     public $licencaModalVisible;
     public $licencaData;
+
+    //novi terminal
+    public $modalNoviTerminalVisible;
+    public $datum_dodavanja_terminala;
+    public $errAddMsg;
+    public $noviSN;
+    public $noviKutijaNO;
+    public $new_terminal_tip;
+    public $t_status;
    
     /**
      * [Description for mount]
@@ -154,6 +164,43 @@ class LicencaTerminal extends Component
         } */
 
         return $terms;
+    }
+    
+    public function noviTerminalShowModal()
+    {
+        $this->noviSN = '';
+        $this->noviKutijaNO = '';
+        $this->new_terminal_tip = 0;
+        $this->t_status = 0;
+        $this->errAddMsg = '';
+        $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();
+        $this->modalNoviTerminalVisible = true;
+    }
+
+    public function noviTerminalAdd()
+    {
+        $this->validate([
+            'noviSN' => 'required',
+            'noviKutijaNO' => 'required',
+        ]);
+
+        if($this->t_status < 1 || $this->new_terminal_tip < 1){
+            $this->errAddMsg = 'Niste izabrali status ili tip terminala';
+            return;
+        }
+        
+        if(Terminal::where('sn', 'like', $this->noviSN)->first()){
+            $this->errAddMsg = 'Terminal sa serijskim brojem koji ste uneli već postoji!';
+            return;
+        }
+        
+        $this->errAddMsg = '';
+        DB::transaction(function(){
+            //add to terminal table
+            $newTerminal = Terminal::create(['sn' => $this->noviSN, 'terminal_tipId' => $this->new_terminal_tip, 'broj_kutije' => $this->noviKutijaNO]);
+            TerminalLokacija::create(['terminalId' => $newTerminal->id, 'lokacijaId' => 3, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala ]);
+        });
+        $this->modalNoviTerminalVisible = false; 
     }
 
     /**
