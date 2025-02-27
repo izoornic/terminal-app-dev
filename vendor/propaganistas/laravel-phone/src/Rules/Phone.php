@@ -2,54 +2,84 @@
 
 namespace Propaganistas\LaravelPhone\Rules;
 
-use libphonenumber\PhoneNumberType;
-use Propaganistas\LaravelPhone\Traits\ParsesTypes;
+use Closure;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Arr;
+use libphonenumber\PhoneNumberType as libPhoneNumberType;
+use Propaganistas\LaravelPhone\Concerns\PhoneNumberCountry;
+use Propaganistas\LaravelPhone\Concerns\PhoneNumberType;
+use Propaganistas\LaravelPhone\Exceptions\IncompatibleTypesException;
+use Propaganistas\LaravelPhone\Exceptions\NumberParseException;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
-class Phone
+class Phone implements ValidationRule, DataAwareRule
 {
-    use ParsesTypes;
+    protected array $data;
 
-    /**
-     * The provided phone countries.
-     *
-     * @var array
-     */
-    protected $countries = [];
+    protected ?string $countryField = null;
 
-    /**
-     * The input field name to check for a country value.
-     *
-     * @var string
-     */
-    protected $countryField;
+    protected array $countries = [];
 
-    /**
-     * The provided phone types.
-     *
-     * @var array
-     */
-    protected $types = [];
+    protected array $allowedTypes = [];
 
-    /**
-     * Whether the number's country should be auto-detected.
-     *
-     * @var bool
-     */
-    protected $detect = false;
+    protected array $blockedTypes = [];
 
-    /**
-     * Whether to allow lenient checks (i.e. landline numbers without area codes).
-     *
-     * @var bool
-     */
-    protected $lenient = false;
+    protected bool $international = false;
 
-    /**
-     * Set the phone countries.
-     *
-     * @param string|array $country
-     * @return $this
-     */
+    protected bool $lenient = false;
+
+    public function setData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! $this->passes($attribute, $value)) {
+            $fail('validation.phone')->translate();
+        }
+    }
+
+    protected function passes(string $attribute, mixed $value) {
+        $countries = PhoneNumberCountry::sanitize([
+            $this->getCountryFieldValue($attribute),
+            ...$this->countries,
+        ]);
+
+        $allowedTypes = PhoneNumberType::sanitize($this->allowedTypes);
+        $blockedTypes = PhoneNumberType::sanitize($this->blockedTypes);
+
+        try {
+            $phone = (new PhoneNumber($value, $countries))->lenient($this->lenient);
+
+            // Is the country within the allowed list (if applicable)?
+            if (! $this->international && ! empty($countries) && ! $phone->isOfCountry($countries)) {
+                return false;
+            }
+
+            if (! empty($allowedTypes) && ! empty($blockedTypes)) {
+                throw IncompatibleTypesException::invalid();
+            }
+
+            // Is the type within the allowed list (if applicable)?
+            if (! empty($allowedTypes) && ! $phone->isOfType($allowedTypes)) {
+                return false;
+            }
+
+            // Is the type within the blocked list (if applicable)?
+            if (! empty($blockedTypes) && $phone->isOfType($blockedTypes)) {
+                return false;
+            }
+
+            return $phone->isValid();
+        } catch (NumberParseException $e) {
+            return false;
+        }
+    }
+
     public function country($country)
     {
         $countries = is_array($country) ? $country : func_get_args();
@@ -59,12 +89,6 @@ class Phone
         return $this;
     }
 
-    /**
-     * Set the country input field.
-     *
-     * @param string $name
-     * @return $this
-     */
     public function countryField($name)
     {
         $this->countryField = $name;
@@ -72,62 +96,38 @@ class Phone
         return $this;
     }
 
-    /**
-     * Set the phone types.
-     *
-     * @param int|string|array $type
-     * @return $this
-     */
     public function type($type)
     {
         $types = is_array($type) ? $type : func_get_args();
 
-        $this->types = array_merge($this->types, $types);
+        $this->allowedTypes = array_merge($this->allowedTypes, $types);
 
         return $this;
     }
 
-    /**
-     * Shortcut method for mobile type restriction.
-     *
-     * @return $this
-     */
+    public function notType($type)
+    {
+        $types = is_array($type) ? $type : func_get_args();
+
+        $this->blockedTypes = array_merge($this->blockedTypes, $types);
+
+        return $this;
+    }
+
     public function mobile()
     {
-        $this->type(PhoneNumberType::MOBILE);
+        $this->type(libPhoneNumberType::MOBILE);
 
         return $this;
     }
 
-    /**
-     * Shortcut method for fixed line type restriction.
-     *
-     * @return $this
-     */
     public function fixedLine()
     {
-        $this->type(PhoneNumberType::FIXED_LINE);
+        $this->type(libPhoneNumberType::FIXED_LINE);
 
         return $this;
     }
 
-    /**
-     * Enable automatic country detection.
-     *
-     * @return $this
-     */
-    public function detect()
-    {
-        $this->detect = true;
-
-        return $this;
-    }
-
-    /**
-     * Enable lenient number checking.
-     *
-     * @return $this
-     */
     public function lenient()
     {
         $this->lenient = true;
@@ -135,21 +135,53 @@ class Phone
         return $this;
     }
 
-    /**
-     * Convert the rule to a validation string.
-     *
-     * @return string
-     */
-    public function __toString()
+    public function international()
     {
-        $parameters = implode(',', array_merge(
-            $this->countries,
-            static::parseTypes($this->types),
-            ($this->countryField ? [$this->countryField]: []),
-            ($this->detect ? ['AUTO'] : []),
-            ($this->lenient ? ['LENIENT'] : [])
-        ));
+        $this->international = true;
 
-        return 'phone' . (! empty($parameters) ? ":$parameters" : '');
+        return $this;
+    }
+
+    protected function getCountryFieldValue(string $attribute)
+    {
+        // Using Arr::get() enables support for nested data.
+        return Arr::get($this->data, $this->countryField ?: $attribute.'_country');
+    }
+
+    protected function isDataKey($attribute): bool
+    {
+        // Using Arr::has() enables support for nested data.
+        return Arr::has($this->data, $attribute);
+    }
+
+    public function setParameters($parameters)
+    {
+        $parameters = is_array($parameters) ? $parameters : func_get_args();
+
+        foreach ($parameters as $parameter) {
+            if (str_starts_with($parameter, '!')) {
+                $parameter = substr($parameter, 1);
+
+                if (ctype_digit($parameter) && PhoneNumberType::isValid((int) $parameter)) {
+                    $this->notType((int) $parameter);
+                } elseif (PhoneNumberType::isValidName($parameter)) {
+                    $this->notType($parameter);
+                }
+            } elseif (strcasecmp('lenient', $parameter) === 0) {
+                $this->lenient();
+            } elseif (strcasecmp('international', $parameter) === 0) {
+                $this->international();
+            } elseif (ctype_digit($parameter) && PhoneNumberType::isValid((int) $parameter)) {
+                $this->type((int) $parameter);
+            } elseif (PhoneNumberType::isValidName($parameter)) {
+                $this->type($parameter);
+            } elseif ($this->isDataKey($parameter)) {
+                $this->countryField = $parameter;
+            } elseif (PhoneNumberCountry::isValid($parameter)) {
+                $this->country($parameter);
+            }
+        }
+
+        return $this;
     }
 }

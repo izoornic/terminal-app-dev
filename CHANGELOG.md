@@ -160,7 +160,10 @@ V 1.0.1.8 (10.2.2025.)
 V 1.0.1.9 (23.2.2025.)
     - Menadzeru licenci dodata opcija dodavanja novog terminala na stranivi "Terminali". Terminale dodaje na fixnu lokaciju "Centralni servis" 
     
- 
+V 1.0.2.0 (27.2.2025.)
+    - LARAVEL UPDATE 10.48.28 0 prelazak na noviu verziju #k fajlova update - branch "Stanje-terminala-po-modelu"
+
+
  //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre
 
 
