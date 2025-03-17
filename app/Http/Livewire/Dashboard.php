@@ -7,6 +7,12 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public $too = 50;
+    public $is_admin = false;
+
+    public function mount()
+    {
+        $this->is_admin = auth()->user()->pozicija_tipId == 1;
+    }
 
     public function render()
     {

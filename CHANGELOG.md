@@ -163,7 +163,7 @@ V 1.0.1.9 (23.2.2025.)
 V 1.0.2.0 (27.2.2025.)
     - LARAVEL UPDATE 10.48.28 0 prelazak na noviu verziju 3k fajlova update - branch "Stanje-terminala-po-modelu"
 
-V 1.0.2.4 (17.3.2025.)
+V 1.0.2.5 (17.3.2025.)
     - Dodata funkcija za brisanje distributera
     - Dodata stranica "Terminali stanje" za Admina 
 
