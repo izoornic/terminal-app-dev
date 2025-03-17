@@ -161,17 +161,16 @@ V 1.0.1.9 (23.2.2025.)
     - Menadzeru licenci dodata opcija dodavanja novog terminala na stranivi "Terminali". Terminale dodaje na fixnu lokaciju "Centralni servis" 
     
 V 1.0.2.0 (27.2.2025.)
-    - LARAVEL UPDATE 10.48.28 0 prelazak na noviu verziju #k fajlova update - branch "Stanje-terminala-po-modelu"
+    - LARAVEL UPDATE 10.48.28 0 prelazak na noviu verziju 3k fajlova update - branch "Stanje-terminala-po-modelu"
+
+V 1.0.2.4 (17.3.2025.)
+    - Dodata funkcija za brisanje distributera
+    - Dodata stranica "Terminali stanje" za Admina 
 
 
  //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre
 
 
-    //==== Upit za proveru slicnosti tabela 'licenca_naplatas' i 'licenca_distributer_terminals' ====//
-    SELECT ln.licenca_dist_terminalId, ldt.id, ln.* FROM licenca_naplatas ln
-    LEFT JOIN licenca_distributer_terminals ldt ON ln.licenca_dist_terminalId = ldt.id
-    WHERE ln.aktivna > 0
-    ORDER BY ln.licenca_dist_terminalId;
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

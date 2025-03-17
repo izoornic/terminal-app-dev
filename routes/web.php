@@ -163,4 +163,7 @@ Route::group(['middleware' => [
 
     Route::get('/dist-pdf-predracun', [DistPredracunControler::class, 'index'])->name('dist-pdf-predracun');
 
+    Route::get('/terminali-stanje', function(){
+        return view('statistika.stanje-terminali');
+        })->name('terminali-stanje');
 });

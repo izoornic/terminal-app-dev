@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
+use App\Models\TerminalLokacija;
 use Illuminate\Support\Facades\Config;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -216,7 +217,7 @@ class Distributeri extends Component
      */
     private function deletePosible()
     {
-        return false;
+        return TerminalLokacija::where('distributerId', $this->modelId)->count() == 0 ? true : false;
     }
 
     /**
@@ -270,13 +271,5 @@ class Distributeri extends Component
             'data' => $this->read(),
         ]);
     }
-
-    //DODAVANJE TERMINALA MTS-u
-    /* INSERT INTO `licenca_distributer_terminals` (`id`, `distributerId`, `terminal_lokacijaId`,  `datum_pocetak`, `datum_kraj`, `created_at`, `updated_at`) 
-    SELECT '4', tl.id, '2023-03-01', '2023-04-01', '2023-03-13 06:50:40', '2023-03-13 06:50:40'
-    FROM terminal_lokacijas as tl 
-    LEFT JOIN lokacijas as l ON tl.lokacijaId = l.id
-    LEFT JOIN lokacija_tips as lt ON l.lokacija_tipId = lt.id
-    WHERE lt.id = 3; */
 
 }
