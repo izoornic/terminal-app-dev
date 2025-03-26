@@ -166,4 +166,8 @@ Route::group(['middleware' => [
     Route::get('/terminali-stanje', function(){
         return view('statistika.stanje-terminali');
         })->name('terminali-stanje');
+
+    Route::get('/distributer-licence-grafik', function(){
+        return view('admin.distributer-term-lic-graph');
+        })->name('distributer-licence-grafik');
 });

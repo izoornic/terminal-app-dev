@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 //use App\Models\Terminal;
 use App\Models\LicencaParametar;
 use App\Models\LicenceZaTerminal;
+use App\Models\LicencaNaplata;
 use App\Models\LicencaParametarTerminal;
 use App\Models\LicencaDistributerTerminal;
 
@@ -17,6 +18,11 @@ class LicenceController extends Controller
 {
 
     public $terminal_data;
+    public const LICENCA_POREKLO = [
+        1 => 'permanent',
+        2 => 'temp',
+        3 => 'provisional'
+    ];
     //
      /**
      * Display the specified resource.
@@ -72,12 +78,14 @@ class LicenceController extends Controller
         if(count($termina_licence)){
             $termina_licence->each(function ($item, $key){
                 $each_data = [
-                    'licenca'   => $item->naziv_licence,
-                    'sn'        => $item->terminal_sn,
-                    'datum_kraj'=> $item->datum_kraj,
-                    'datum_prekoracenja' => $item->datum_prekoracenja,
-                    'signature' => $item->signature,
-                    'parametars' =>[]
+                    'licenca'               => $item->naziv_licence,
+                    'sn'                    => $item->terminal_sn,
+                    'datum_kraj'            => $item->datum_kraj,
+                    'datum_prekoracenja'    => $item->datum_prekoracenja,
+                    'signature'             => $item->signature,
+                    'tip'                   => self::LICENCA_POREKLO[$item->licenca_poreklo],
+                    'datum_trajne'          => ($item->licenca_poreklo == 3) ? self::getGatumKrajLicence($item->terminal_lokacijaId, $item->distributerId, $item->licenca_distributer_cenaId) : '',
+                    'parametars'            =>[]
                 ];
                 
                 //$item->parametars = [];
@@ -105,5 +113,16 @@ class LicenceController extends Controller
             $retval['data'] = [];
         }
         return response()->json($retval);
+    }
+
+    private function getGatumKrajLicence($terminal_lokacijaId, $distributerId, $licenca_distributer_cenaId){
+        return LicencaNaplata::select('datum_kraj_licence')
+                ->where([
+                    'terminal_lokacijaId' => $terminal_lokacijaId, 
+                    'distributerId' => $distributerId, 
+                    'licenca_distributer_cenaId' => $licenca_distributer_cenaId, 
+                    'aktivna' => 1
+                ])
+                ->first()->datum_kraj_licence;
     }
 }

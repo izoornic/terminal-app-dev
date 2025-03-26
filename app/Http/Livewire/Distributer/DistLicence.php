@@ -470,6 +470,7 @@ class DistLicence extends Component
     {
         $signature_cripted =  CryptoSign::criptSignature($vals_ins);
         $vals_ins['signature'] = $signature_cripted;
+        $vals_ins['licenca_poreklo'] = 3;
 
         LicenceZaTerminal::updateOrCreate( $key_arr, $vals_ins );
     }
