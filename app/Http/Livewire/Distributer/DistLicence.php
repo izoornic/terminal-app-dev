@@ -360,6 +360,12 @@ class DistLicence extends Component
                 $licenca_tip_id = $licenceInf->id;
                
                 $datum_prekoracenja = Helpers::addDaysToDate($this->datum_kraja_licence, $this->ditributer_info->dani_prekoracenja_licence);
+                $datum_prekoracenja = Helpers::moveWikendToMonday($datum_prekoracenja);
+                //niz samo za API tabelu
+                $kraj_licence_za_api = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
+                $datum_prekoracenja_privremene = Helpers::addDaysToDate($kraj_licence_za_api, $this->ditributer_info->dani_prekoracenja_licence);
+                $datum_prekoracenja_privremene = Helpers::moveWikendToMonday($datum_prekoracenja_privremene);
+
                 //dodaj licence terminalu za prezimanje
                 $key_arr = [
                     'terminal_lokacijaId' => $this->modelId,
@@ -367,14 +373,13 @@ class DistLicence extends Component
                     'licenca_distributer_cenaId' => $lc,
                 ];
                 
-                //niz samo za API tabelu
-                $kraj_licence_za_api = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
+                
                 $vals_ins = [
                     'mesecId'=> 0,
                     'terminal_sn' => $terminal_info->sn,
                     'datum_pocetak' => $this->datum_pocetka_licence,
                     'datum_kraj' =>  $kraj_licence_za_api,
-                    'datum_prekoracenja' => Helpers::addDaysToDate($kraj_licence_za_api, $this->ditributer_info->dani_prekoracenja_licence),
+                    'datum_prekoracenja' => $datum_prekoracenja_privremene,
                     'naziv_licence' => $nazivLicence
                 ];
 
