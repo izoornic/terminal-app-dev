@@ -43,12 +43,29 @@ class Dashboard extends Component
     public $testUserDistributer;
     public $promeniDitributeraModalVisible;
 
+    //Statistika graph
+    public $broj_istekilh;
+    public $broj_aktivnih;
+    public $broj_privremenih;
+
+    public $broj_istekilh_2;
+    public $broj_aktivnih_2;
+    public $broj_privremenih_2;
+
 
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
         $this->ditributerData = LicencaDistributerTip::where('id', '=', $this->distId)->first();
         $this->is_user_zeta = auth()->user()->id == 29 ? true : false;
+
+        $this->broj_aktivnih = 0;
+        $this->broj_istekilh = 0;
+        $this->broj_privremenih = 0;
+
+        $this->broj_aktivnih_2 = 0;
+        $this->broj_istekilh_2 = 0;
+        $this->broj_privremenih_2 = 0;
     }
 
     /**

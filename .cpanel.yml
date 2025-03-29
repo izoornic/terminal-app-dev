@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/eposrs/servis-epos-app/
+    - export DEPLOYPATH=/home/eposrs/develop-servis-epos-app/
     - /bin/cp -a * $DEPLOYPATH
     #- /bin/cp -R app $DEPLOYPATH
     #- /bin/cp -R bootstrap  $DEPLOYPATH

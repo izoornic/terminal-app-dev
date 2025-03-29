@@ -101,10 +101,6 @@ class RazduzenjeDistributerMesec extends Component
                 DB::transaction(function()use($item){
                     LicencaNaplata::where('id', '=', $item->id)
                             ->update(['razduzeno' => 0, 'datum_razduzenja' => $this->datumUplate, 'nenaplativ' => 1]);
-                    /* LicencaDistributerTerminal::where('distributerId', '=', $this->did)
-                            ->where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
-                            ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                            ->update(['nenaplativ' => 1]); */
                 });
             }else{
                 //RAZDUZENJE
@@ -130,6 +126,7 @@ class RazduzenjeDistributerMesec extends Component
 
                     $signature_cripted =  CryptoSign::criptSignature($vals_ins);
                     $vals_ins['signature'] = $signature_cripted;
+                    $vals_ins['licenca_poreklo'] = 1;
 
                     LicenceZaTerminal::updateOrCreate( $key_arr, $vals_ins );
                 });

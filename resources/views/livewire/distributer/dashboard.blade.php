@@ -164,6 +164,23 @@
 
    </div>
 
+   <div class="flex my-2  w-full">
+      <div class="mx-2 my-2 w-full border rounded-b">
+         <div class="bg-amber-50 border-t-4 border-amber-500 rounded-b text-amber-900 mb-4 w-full">
+            <div>
+               <div class="bg-amber-100 text-lg font-bold uppercase px-4 py-3 mb-4">
+                     <svg class="float-left w-6 h-6 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v15a1 1 0 0 0 1 1h15M8 16l2.5-5.5 3 3L17.273 7 20 9.667"/></svg>
+                     Statistika licenci:                  
+               </div>
+            </div>
+         </div>
+         <div class="shadow-md p-4">
+            @livewire('statistika.licence-grafik', ['distId' => $distId, 'grafikNaslov' => 'Naplata'])
+         </div>
+            
+      </div>
+   </div>
+
    {{-- Modal Form --}}
     <x-jet-dialog-modal wire:model="modalLicencaFormVisible">
     <x-slot name="title">

@@ -148,7 +148,10 @@ class DistributerTerminal extends Component
             'licenca_naplatas.id as lnid', 
             'licenca_naplatas.datum_pocetka_licence', 
             'licenca_naplatas.datum_kraj_licence',
-            'licenca_naplatas.nenaplativ', 
+            'licenca_naplatas.nenaplativ',
+            'licenca_naplatas.zaduzeno', 
+            'licenca_naplatas.razduzeno',
+            'licenca_naplatas.nenaplativ',
             'licenca_tips.licenca_naziv', 
             'licenca_tips.id as ltid', 
             'licenca_tips.broj_parametara_licence')

@@ -155,4 +155,13 @@ class Helpers
         else return 'err';
     }
 
+    public static function moveWikendToMonday($date)
+    {
+        $d = Carbon::parse($date);
+        if($d->isWeekend()){
+            return $d->next(Carbon::MONDAY)->format('Y-m-d');
+        }
+        return $d->format('Y-m-d');
+    }
+
 }

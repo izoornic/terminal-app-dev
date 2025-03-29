@@ -1,11 +1,11 @@
 # Laravel Phone
 
-![Tests](https://github.com/Propaganistas/Laravel-Phone/workflows/Tests/badge.svg?branch=master)
+[![Tests](https://github.com/Propaganistas/Laravel-Phone/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/Propaganistas/Laravel-Phone/actions/workflows/tests.yml)
 [![Latest Stable Version](https://poser.pugx.org/propaganistas/laravel-phone/v/stable)](https://packagist.org/packages/propaganistas/laravel-phone)
 [![Total Downloads](https://poser.pugx.org/propaganistas/laravel-phone/downloads)](https://packagist.org/packages/propaganistas/laravel-phone)
 [![License](https://poser.pugx.org/propaganistas/laravel-phone/license)](https://packagist.org/packages/propaganistas/laravel-phone)
 
-Adds phone number functionality to Laravel based on the [PHP port](https://github.com/giggsey/libphonenumber-for-php) of [Google's libphonenumber API](https://github.com/googlei18n/libphonenumber) by [giggsey](https://github.com/giggsey).
+Adds phone number functionality to Laravel based on the [PHP port](https://github.com/giggsey/libphonenumber-for-php-lite) of [libphonenumber by Google](https://github.com/googlei18n/libphonenumber).
 
 ## Table of Contents
 
@@ -17,7 +17,6 @@ Adds phone number functionality to Laravel based on the [PHP port](https://githu
     - [Formatting](#formatting)
     - [Number information](#number-information)
     - [Equality comparison](#equality-comparison)
-    - [Helper function](#helper-function)
 - [Database considerations](#database-considerations)
 
 ## Demo
@@ -37,59 +36,65 @@ The Service Provider gets discovered automatically by Laravel.
 In your languages directory, add an extra translation in every `validation.php` language file:
 
 ```php
-'phone' => 'The :attribute field contains an invalid number.',
+'phone' => 'The :attribute field must be a valid number.',
 ```
 
 ## Validation
 
-To validate a phone number, use the `phone` keyword in your validation rules array or use the `Phone` rule class to define the rule in an expressive way. The phone validator is able to operate in **three** ways.
+Use the `phone` keyword in your validation rules array or use the `Propaganistas\LaravelPhone\Rules\Phone` rule class to define the rule in an expressive way.
 
-- You either specify [*ISO 3166-1 alpha-2 compliant*](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) country codes yourself as parameters for the validator, e.g.:
+To put constraints on the allowed originating countries, you can explicitly specify the allowed country codes.
 
-    ```php
-    'phonefield'       => 'phone:US,BE',
-    // 'phonefield'    => Rule::phone()->country(['US', 'BE'])
-    ```
+```php
+'phonefield'       => 'phone:US,BE',
+// 'phonefield'    => (new Phone)->country(['US', 'BE'])
+```
 
-  The validator will check if the number is valid in at least one of provided countries, so feel free to add as many country codes as you like.
+Or to make things more dynamic, you can also match against another data field holding a country code. For example, to require a phone number to match the provided country of residence.
+Make sure the country field has the same name as the phone field but with `_country` appended for automatic discovery, or provide your custom country field name as a parameter to the validator:
 
-- You provide a dedicated country input field (keyed by *ISO 3166-1 compliant* country codes) to allow end users to supply a country on their own. Make sure the country field has the same name as the phone field but with *_country* appended for automatic discovery, or provide your custom country field name as a parameter to the validator:
+```php
+'phonefield'            => 'phone',
+// 'phonefield'         => (new Phone)
+'phonefield_country'    => 'required_with:phonefield',
+```
 
-    ```php
-    'phonefield'            => 'phone',
-    // 'phonefield'         => Rule::phone()
-    'phonefield_country'    => 'required_with:phonefield',
-    ```
+```php
+'phonefield'            => 'phone:custom_country_field',
+// 'phonefield'         => (new Phone)->countryField('custom_country_field')
+'custom_country_field'  => 'required_with:phonefield',
+```
 
-    ```php
-    'phonefield'            => 'phone:custom_country_field',
-    // 'phonefield'         => Rule::phone()->countryField('custom_country_field')
-    'custom_country_field'  => 'required_with:phonefield',
-    ```
+Note: country codes should be [*ISO 3166-1 alpha-2 compliant*](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements).
 
-- You instruct the validator to detect which country the number belongs to using the `AUTO` keyword (and optionally any fallback countries):
+To support _any valid internationally formatted_ phone number next to the whitelisted countries, use the `INTERNATIONAL` parameter. This can be useful when you're expecting locally formatted numbers from a specific country but also want to accept any other foreign number entered properly:
 
-    ```php
-    'phonefield'       => 'phone:AUTO,US',
-    // 'phonefield'    => Rule::phone()->detect()->country('US')
-    ```
-
-  The validator will try to extract the country from the number itself and then check if the number is valid for that country. If the country could not be guessed it will be validated using the fallback countries if provided. Note that country guessing will only work when phone numbers are entered in *international format* (prefixed with a `+` sign, e.g. +32 ....). Leading double zeros will **NOT** be parsed correctly as this isn't an established consistency.
+```php
+'phonefield'            => 'phone:INTERNATIONAL,BE',
+// 'phonefield'         => (new Phone)->international()->country('BE')
+```
 
 To specify constraints on the number type, just append the allowed types to the end of the parameters, e.g.:
 
 ```php
-'phonefield'       => 'phone:US,BE,mobile',
-// 'phonefield'    => Rule::phone()->country(['US', 'BE'])->type('mobile')
-// 'phonefield'    => Rule::phone()->country('US', 'BE')->mobile()
+'phonefield'       => 'phone:mobile',
+// 'phonefield'    => (new Phone)->type('mobile')
 ```
 The most common types are `mobile` and `fixed_line`, but feel free to use any of the types defined [here](https://github.com/giggsey/libphonenumber-for-php/blob/master/src/PhoneNumberType.php).
 
-You can also enable more lenient validation (for example, fixed lines without area codes) by using the `LENIENT` parameter. This feature inherently doesn't play well with country autodetection and number type validation, so use such combo at own risk.
+Prepend a type with an exclamation mark to blacklist it instead. Note that you can never use whitelisted *and* blacklisted types at the same time.
 
 ```php
-'phonefield'       => 'phone:LENIENT,US',
-// 'phonefield'    => Rule::phone()->lenient()->country('US')
+'phonefield'       => 'phone:!mobile',
+// 'phonefield'    => (new Phone)->notType('mobile')
+```
+
+You can also enable lenient validation by using the `LENIENT` parameter.
+With leniency enabled, only the length of the number is checked instead of actual carrier patterns.
+
+```php
+'phonefield'       => 'phone:LENIENT',
+// 'phonefield'    => (new Phone)->lenient()
 ```
 
 ## Attribute casting
@@ -104,8 +109,8 @@ use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 class User extends Model
 {
     public $casts = [
-        'phone' => RawPhoneNumberCast::class.':BE',
-        'another_phone' => E164PhoneNumberCast::class.':BE',
+        'phone_1' => RawPhoneNumberCast::class.':BE',
+        'phone_2' => E164PhoneNumberCast::class.':BE',
     ];
 }
 ```
@@ -128,12 +133,12 @@ Both classes accept cast parameters in the same way:
 
 ```php
 public $casts = [
-    'phone' => RawPhoneNumberCast::class.':country_field',
-    'another_phone' => E164PhoneNumberCast::class.':BE',
+    'phone_1' => RawPhoneNumberCast::class.':country_field',
+    'phone_2' => E164PhoneNumberCast::class.':BE',
 ];
 ```
 
-In order to not encounter any unexpected issues when using these casts, please always validate any input using the [validation](#validation) rules previously described.
+**Important note:** Both casts expect __valid__ phone numbers in order to smoothly convert from/to PhoneNumber objects. Please validate phone numbers before setting them on a model. Refer to the [validation documentation](#validation) to learn how to validate phone numbers.
 
 #### ⚠️ Attribute assignment and `E164PhoneNumberCast`
 Due to the nature of `E164PhoneNumberCast` a valid country attribute is expected if the number is not passed in international format. Since casts are applied in the order of the given values, be sure to set the country attribute _before_ setting the phone number attribute. Otherwise `E164PhoneNumberCast` will encounter an empty country value and throw an unexpected exception.
@@ -167,21 +172,28 @@ A phone number can be wrapped in the `Propaganistas\LaravelPhone\PhoneNumber` cl
 ```php
 use Propaganistas\LaravelPhone\PhoneNumber;
 
-(string) PhoneNumber::make('+3212/34.56.78');              // +3212345678
-(string) PhoneNumber::make('012 34 56 78', 'BE');          // +3212345678
-(string) PhoneNumber::make('012345678')->ofCountry('BE');  // +3212345678
+(string) new PhoneNumber('+3212/34.56.78');                // +3212345678
+(string) new PhoneNumber('012 34 56 78', 'BE');            // +3212345678
+```
+
+Alternatively you can use the `phone()` helper function. It returns a `Propaganistas\LaravelPhone\PhoneNumber` instance or the formatted string if `$format` was provided:
+
+```php
+phone('+3212/34.56.78');                // PhoneNumber instance
+phone('012 34 56 78', 'BE');            // PhoneNumber instance
+phone('012 34 56 78', 'BE', $format);   // string
 ```
 
 ### Formatting
 A PhoneNumber can be formatted in various ways:
 
 ```php
-$phone = PhoneNumber::make('012/34.56.78', 'BE');
+$phone = new PhoneNumber('012/34.56.78', 'BE');
 
 $phone->format($format);       // See libphonenumber\PhoneNumberFormat
 $phone->formatE164();          // +3212345678
 $phone->formatInternational(); // +32 12 34 56 78
-$phone->formatRFC3966();       // +32-12-34-56-78
+$phone->formatRFC3966();       // tel:+32-12-34-56-78
 $phone->formatNational();      // 012 34 56 78
 
 // Formats so the number can be called straight from the provided country.
@@ -199,7 +211,7 @@ $phone->formatForMobileDialingInCountry('US'); // +3212345678
 Get some information about the phone number:
 
 ```php
-$phone = PhoneNumber::make('012 34 56 78', 'BE');
+$phone = new PhoneNumber('012 34 56 78', 'BE');
 
 $phone->getType();              // 'fixed_line'
 $phone->isOfType('fixed_line'); // true
@@ -211,7 +223,7 @@ $phone->isOfCountry('BE');      // true
 Check if a given phone number is (not) equal to another one:
 
 ```php
-$phone = PhoneNumber::make('012 34 56 78', 'BE');
+$phone = new PhoneNumber('012 34 56 78', 'BE');
 
 $phone->equals('012/34.56.76', 'BE')       // true
 $phone->equals('+32 12 34 56 78')          // true
@@ -220,14 +232,6 @@ $phone->equals( $anotherPhoneObject )      // true/false
 $phone->notEquals('045 67 89 10', 'BE')    // true
 $phone->notEquals('+32 45 67 89 10')       // true
 $phone->notEquals( $anotherPhoneObject )   // true/false
-```
-
-### Helper function
-
-The package exposes the `phone()` helper function that returns a `Propaganistas\LaravelPhone\PhoneNumber` instance or the formatted string if `$format` was provided:
-
-```php
-phone($number, $country = [], $format = null)
 ```
 
 ## Database considerations
@@ -285,8 +289,8 @@ Example:
   public function saving(User $user)
   {
       if ($user->isDirty('phone') && $user->phone) {
-          $user->phone_normalized = preg_replace('[^0-9]', '', $user->phone);
-          $user->phone_national = preg_replace('[^0-9]', '', phone($user->phone, $user->phone_country)->formatNational());
+          $user->phone_normalized = preg_replace('/[^0-9]/', '', $user->phone);
+          $user->phone_national = preg_replace('/[^0-9]/', '', phone($user->phone, $user->phone_country)->formatNational());
           $user->phone_e164 = phone($user->phone, $user->phone_country)->formatE164();
       }
   }
@@ -299,8 +303,8 @@ Example:
   ```php
   // $search holds the search term
   User::where(function($query) use ($search) {
-    $query->where('phone_normalized', 'LIKE', preg_replace('[^0-9]', '', $search) . '%')
-          ->orWhere('phone_national', 'LIKE', preg_replace('[^0-9]', '', $search) . '%')
-          ->orWhere('phone_e164', 'LIKE', preg_replace('[^+0-9]', '', $search) . '%')
+    $query->where('phone_normalized', 'LIKE', preg_replace('/[^0-9]/', '', $search) . '%')
+          ->orWhere('phone_national', 'LIKE', preg_replace('/[^0-9]/', '', $search) . '%')
+          ->orWhere('phone_e164', 'LIKE', preg_replace('/[^+0-9]/', '', $search) . '%')
   });
   ```
