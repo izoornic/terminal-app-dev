@@ -172,9 +172,12 @@ V 1.0.2.6 (26.3.2025.) @stanje-terminala branch
     - Update dodavanje i produzetak licenci dodat update u polju "licenca_poreklo" za sva tri tipa licence
     - Izmenjen LicencaControler za API sada prikayur dva nova noda "tip" i "datum_trajne"
 
-V 1.0.2.7 (26.3.2025.) @stanje-terminala branch
+V 1.0.2.7 (29.3.2025.) @stanje-terminala branch
     - Grafici odvojeni u posebne fajlove
     - Dodat grafik za "Distributera" na pocetnoj stranici
+
+v 1.0.3.0 (29.3.2025.) @Dodatna-oprema
+    - Composer update PHP 8.2
 
  //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre
 
