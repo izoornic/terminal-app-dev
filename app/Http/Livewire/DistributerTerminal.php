@@ -125,12 +125,6 @@ class DistributerTerminal extends Component
         $this->modalTerminalInfoVisible = false;
    }
 
-    private function deleteParams($distributer_terminal_licId)
-        {
-            //TODO - ova tabela ne postoji u bazi!!!
-            LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $distributer_terminal_licId)->delete();
-        }
-
      /**
      * The read function. searchTipLicence
      *

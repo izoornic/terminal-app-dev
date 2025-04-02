@@ -179,8 +179,9 @@ V 1.0.2.7 (29.3.2025.) @stanje-terminala branch
 v 1.0.3.0 (29.3.2025.) @Dodatna-oprema
     - Composer update PHP 8.2
 
- //TODO proveri dali kada distributer gazi servisnu licencu, brise sve parametre
-
+V 1.0.3.1 (2.4.2025.)
+    - ispravljen prikaz "privremene" licence na stranicama "terminali" i "Distributer-terminali"
+ 
 
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
