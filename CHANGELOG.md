@@ -181,6 +181,11 @@ v 1.0.3.0 (29.3.2025.) @Dodatna-oprema
 
 V 1.0.3.1 (2.4.2025.)
     - ispravljen prikaz "privremene" licence na stranicama "terminali" i "Distributer-terminali"
+
+V 1.0.3.2 ()
+    - Pomeren kraj isteka servisne licence sa wikenda na ponedeljak
+    - Servisna licenca moze da se doda preko istekle trajne licence 
+    - Dodata funkcionalnos za produzetak privremene licence 
  
 
 

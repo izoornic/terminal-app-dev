@@ -170,7 +170,7 @@
                             <p class="text-sm">Poslednja promena: <span class="font-bold">{{ App\Http\Helpers::datumFormat($selectedTerminal->updated_at) }}</span></p>
                         </div>
                     </div>
-                </div> 
+                </div>
                 @foreach ($licencaData as $licenca)
                     <div class="bg-stone-100 border-t-4 border-stone-500 rounded-b text-stone-900 px-4 py-3 shadow-md mb-6" role="alert">
                         <div class="flex">
@@ -187,6 +187,15 @@
                                         <p class="text-sm pt-2">Status:  <span class="font-bold text-red-700"> Privremena </span> </p>
                                         <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj) }}</span></p>
                                         <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_prekoracenja) }}</span></p> 
+                                        @if(App\Http\Helpers::dateGratherOrEqualThan(App\Http\Helpers::datumKalendarNow(), $licenca->datum_prekoracenja))
+                                            <div class="h-12">
+                                                <div class="float-right">
+                                                    <x-jet-secondary-button class="ml-2 mt-2" wire:click="pomeriPrekoracenjePrivremenoj('{{$licenca->naziv_licence}}', {{$licenca->distributerId}}, {{$licenca->licenca_distributer_cenaId}})" >
+                                                        {{ __('Pomeri datum prekoračenja') }}
+                                                    </x-jet-secondary-button>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                     <p class="text-sm pt-2 mt-2 font-bold">Predviđeno trajanje:</p>
                                 @else
@@ -201,6 +210,16 @@
                                     <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj_licence) }}</span></p>
                                     <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_isteka_prekoracenja) }}</span></p>
                                 @endif
+                                <!-- AKO JE TRAJNA I ISTEKLA PRIKAZI DUGME DODAJ SERVISNU -->
+                                 @if(App\Http\Helpers::dateGratherOrEqualThan(App\Http\Helpers::datumKalendarNow(), $licenca->datum_isteka_prekoracenja) && $licenca->licenca_poreklo == 1)
+                                    <div class="">
+                                        <div class="float-right">
+                                            <x-jet-secondary-button class="ml-2 mt-2" wire:click="novaServisnaIzPregleda('{{$licenca->naziv_licence}}', {{$licenca->distributerId}}, {{$licenca->licenca_distributer_cenaId}})" >
+                                                {{ __('Dodaj SERVISNU licencu') }}
+                                            </x-jet-secondary-button>
+                                        </div>
+                                    </div>
+                                 @endIF
                             </div>
                         </div>
                     </div>
@@ -671,7 +690,7 @@
     {{-- NOVA SERVISNA LICENCA --}}
     <x-jet-dialog-modal wire:model="novaServisnaModalVisible">
         <x-slot name="title">
-            {{ __('Dodaj licence terminalu') }}
+            {{ __('Dodaj servisne licence terminalu') }}
         </x-slot>
         <x-slot name="content"> 
             @if($novaServisnaModalVisible)
@@ -705,24 +724,46 @@
 
             <div class="my-4">
                 <div>
-                    @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId) as $licenca_dodatak)
+                    @if($nazivZaServisnu)
+                        @php
+                            $licenca_dodatak = App\Models\LicencaDistributerCena::nazivServisneKojaGaziTrajnu($distId ,$nazivZaServisnu)
+                        @endphp
                         <div class="my-4 border-y py-2 bg-gray-50">
-                            <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
-                            <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
-                            @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
-                                
-                                <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
-                                    @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
-                                        <div class="px-1 rounded-md text-center">
-                                            <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
-                                            <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                                <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
+                                @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
+                                    
+                                    <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
+                                        @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
+                                            <div class="px-1 rounded-md text-center">
+                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
+                                                <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                    @else
+                        @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId) as $licenca_dodatak)
+                            
+                            <div class="my-4 border-y py-2 bg-gray-50">
+                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                                <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
+                                @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
+                                    
+                                    <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
+                                        @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
+                                            <div class="px-1 rounded-md text-center">
+                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
+                                                <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @endforeach
-                    </div>
+                    @endif
+                </div>
             </div>
            @endif 
         </x-slot>
@@ -739,5 +780,83 @@
             @endif
         </x-slot>
     </x-jet-dialog-modal>
+
+    {{-- PRODUZI PREKORACENJE --}}
+    <x-jet-dialog-modal wire:model="pomeriPrekoracenjeModalVisible">
+        <x-slot name="title">
+            {{ __('Produzi trajanje privremene licence') }} - {{ $nazivZaServisnu }}
+        </x-slot>
+        <x-slot name="content"> 
+            @if($pomeriPrekoracenjeModalVisible)
+            <div class="my-4">
+                <div class="border-y py-2 bg-gray-50">
+                    <p class="ml-4 font-bold">Trajanje licence:</p>
+                    <div class="flex justify-between">
+                        <div class="pl-4 my-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-blue-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM288 437v11H96V437c0-25.5 10.1-49.9 28.1-67.9L192 301.3l67.9 67.9c18 18 28.1 42.4 28.1 67.9z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_pocetka_licence" value="Datum početka licence" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($licencaZaProduzetak->datum_pocetak) }}</p>
+                            </div>
+                        </div>
+                        <div class="pr-4 mt-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-blue-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM96 75V64H288V75c0 25.5-10.1 49.9-28.1 67.9L192 210.7l-67.9-67.9C106.1 124.9 96 100.4 96 75z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_kraja_licence" value="Datum isteka licence" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($licencaZaProduzetak->datum_kraj) }}</p>
+                            </div>
+                        </div>
+                        <div class="pr-4 mt-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-red-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM96 75V64H288V75c0 25.5-10.1 49.9-28.1 67.9L192 210.7l-67.9-67.9C106.1 124.9 96 100.4 96 75z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_prekoracenja" value="Datum prekoracenja" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($licencaZaProduzetak->datum_prekoracenja) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="border-y py-2 bg-gray-50">
+                    
+                    <div class="flex justify-between">
+                        
+                        <div class="pl-4 my-4 flex">
+                            <p class="ml-4 font-bold">Produžetak prekoračenja:</p>
+                        </div>
+                        <div class="pr-4 mt-4 flex">
+                            <div class="mt-4 px-4">
+                                <svg class="fill-green-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM96 75V64H288V75c0 25.5-10.1 49.9-28.1 67.9L192 210.7l-67.9-67.9C106.1 124.9 96 100.4 96 75z"/></svg>
+                            </div>
+                            <div>
+                                <x-jet-label for="datum_prekoracenja" value="Novi datum prekoračenja" />
+                                <p>{{ App\Http\Helpers::datumFormatDanFullYear($datum_prekoracenja) }}</p>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            
+           @endif 
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('pomeriPrekoracenjeModalVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+            <x-jet-button class="ml-2" wire:click="produziPrekoracenjePrivremenoj" wire:loading.attr="disabled">
+                {{ __('Produži trajanje') }}
+            </x-jet-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
 
 </div>

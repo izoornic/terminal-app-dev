@@ -30,6 +30,8 @@ class LicenceZaTerminal extends Model
     public static function sveAktivneLicenceTerminala($terminal_lokacija_id)
     {
         $retval = LicenceZaTerminal::select(
+                                'licence_za_terminals.distributerId',
+                                'licence_za_terminals.licenca_distributer_cenaId',
                                 'naziv_licence',
                                 'datum_pocetak',
                                 'datum_kraj',
