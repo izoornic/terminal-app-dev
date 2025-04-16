@@ -182,12 +182,15 @@ v 1.0.3.0 (29.3.2025.) @Dodatna-oprema
 V 1.0.3.1 (2.4.2025.)
     - ispravljen prikaz "privremene" licence na stranicama "terminali" i "Distributer-terminali"
 
-V 1.0.3.2 ()
+V 1.0.3.2 (10.4.2025.) @stanje-terminala branch
     - Pomeren kraj isteka servisne licence sa wikenda na ponedeljak
     - Servisna licenca moze da se doda preko istekle trajne licence 
     - Dodata funkcionalnos za produzetak privremene licence 
  
+V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
+    - Dodata opcija Export Excel za izvoz licenci koje su istekle ili uskoro isticu ya uloge Menadzer licenci i Distributer
 
+    
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

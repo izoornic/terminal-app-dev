@@ -30,4 +30,9 @@ class LicencaNaplata extends Model
         'aktivna',
         'nenaplativ'
     ];
+
+    protected $casts = [
+        'datum_pocetka_licence' => 'datetime:d-m-Y',
+        'datum_kraj_licence' => 'datetime:d-m-Y',
+    ];
 }

@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Query\Builder;
 
+use App\Exports\LicencaNaplataExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class DistLicence extends Component
 {
     use WithPagination;
@@ -626,6 +629,11 @@ class DistLicence extends Component
         LicencaNaplata::where('id', '=', $this->naplata_podaci_licence->id)->update(['dist_razduzeno' => $this->razduzi_iznos, 'dist_datum_razduzenja' => $this->razduzi_datum]);
         
         $this->pregledLicencaShowModal = false;
+    }
+
+    public function downloadExcel()
+    {
+        return Excel::download(new LicencaNaplataExport($this->distId), 'licenca_naplata.xlsx');
     }
 
     /**
