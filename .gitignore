@@ -6,7 +6,7 @@
 /public/bl/blacklist.txt
 /storage/*.key
 .env
-.env.backup
+.cpanel.yml
 .phpunit.result.cache
 docker-compose.yml
 docker-compose.override.yml

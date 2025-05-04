@@ -18,6 +18,7 @@ class LicencaServisna extends Model
         'licenca_distributer_cenaId',
         'datum_pocetka_licence',
         'datum_kraj_licence',
-        'datum_isteka_prekoracenja'
+        'datum_isteka_prekoracenja',
+        'tip'
     ];
 }

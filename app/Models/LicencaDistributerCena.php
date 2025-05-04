@@ -115,6 +115,22 @@ class LicencaDistributerCena extends Model
     }
 
     /**
+       * 
+       * Naziv licence koja gazi trajnu
+       *
+       * @param integer $did
+       * 
+    */
+    public static function nazivServisneKojaGaziTrajnu($distId, $naziv)
+    {
+        return LicencaTip::select('licenca_distributer_cenas.id', 'licenca_tips.licenca_naziv', 'licenca_distributer_cenas.licenca_tipId')
+        ->leftJoin('licenca_distributer_cenas', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
+        ->where('licenca_distributer_cenas.distributerId', '=', $distId)
+        ->where('licenca_tips.licenca_naziv', '=', $naziv)
+        ->first();
+    }
+
+    /**
      * [Description for nazivLicence]
      *
      * @param mixed $licencaCenaId

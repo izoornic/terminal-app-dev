@@ -22,6 +22,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LicencaNaplataExport;
+
 class DistributerTerminal extends Component
 {
     use WithPagination;
@@ -124,6 +127,11 @@ class DistributerTerminal extends Component
         }
         $this->modalTerminalInfoVisible = false;
    }
+
+   public function downloadExcel()
+    {
+        return Excel::download(new LicencaNaplataExport($this->distId), 'licenca_naplata_ml.xlsx');
+    }
 
      /**
      * The read function. searchTipLicence

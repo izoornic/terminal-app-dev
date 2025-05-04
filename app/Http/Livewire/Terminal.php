@@ -118,6 +118,16 @@ class Terminal extends Component
     public $datum_prekoracenja;
     public $parametri;
 
+    //servicne koje gaze trajnu isteklu
+    public $nazivZaServisnu;
+    public $terminal_dist_id;
+    public $terminal_dist_cena_id;
+
+    //Pomeranje prekoracenja za privremenu licencu
+    public $pomeriPrekoracenjeModalVisible;
+    public $licencaZaProduzetak;
+    public $selectedTerminalSn;
+
     public function newTiketShowModal($tid)
     {
         $this->zatvorioId = 0;
@@ -362,7 +372,7 @@ class Terminal extends Component
             //ovo sluzi za check ALL box
             array_push($this->allInPage,  $item->tid);
         });
-
+        
         return $terms;
     }
 
@@ -619,9 +629,9 @@ class Terminal extends Component
      * @return [type]
      * 
      */
-    public function licencaShowModal($id, $tpl=0)
+    public function licencaShowModal($id)
     {
-        //dd($tpl);
+        //dd($tpl);        
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->licencaData = LicenceZaTerminal::sveAktivneLicenceTerminala($id);
@@ -629,14 +639,21 @@ class Terminal extends Component
         $this->licencaModalVisible = true;
     }
     
-    public function novaServisnaShowwModal($id)
+    public function novaServisnaShowwModal($id, $naziv='', $dist_id=0, $dist_cena_id=0)
     {
+        /* if($naziv){
+            dd(LicencaDistributerCena::nazivServisneKojaGaziTrajnu(2, $naziv), $dist_id, $dist_cena_id);
+        } */
+        $this->nazivZaServisnu = $naziv;
+        $this->terminal_dist_id = $dist_id;
+        $this->terminal_dist_cena_id = $dist_cena_id;
         $this->parametri = [];
         $this->distId = 2;
         $this->licence_dodate_terminalu = [];
         $this->datum_pocetka_licence = Helpers::datumKalendarNow();
         $this->datum_kraja_licence = Helpers::addDaysToDate($this->datum_pocetka_licence, 4);
         $this->datum_prekoracenja = Helpers::addDaysToDate($this->datum_pocetka_licence, 5);
+        $this->datum_prekoracenja = Helpers::moveWikendToMonday($this->datum_prekoracenja);
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->licence_za_dodavanje = [];
@@ -646,7 +663,26 @@ class Terminal extends Component
     public function dodajServisnueLicence()
     {
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-       
+        if($this->nazivZaServisnu){
+            //Servisna gazi trajnu
+            //Ocisti Licenca_naplatas tabelu
+            
+            foreach($this->licence_za_dodavanje as $lc){
+                DB::transaction(function(){
+                    LicencaNaplata::where([
+                        'terminal_lokacijaId' => $this->modelId,
+                        'distributerId' => $this->terminal_dist_id,
+                        'licenca_distributer_cenaId' =>$this->terminal_dist_cena_id
+                    ])->update(['aktivna' => 0]);
+                    LicenceZaTerminal::where([
+                        'terminal_lokacijaId' => $this->modelId,
+                        'distributerId' => $this->terminal_dist_id,
+                        'licenca_distributer_cenaId' =>$this->terminal_dist_cena_id
+                    ])->delete();
+                });
+            }
+
+        }
         foreach($this->licence_za_dodavanje as $lc){
             
             DB::transaction(function()use($lc) {
@@ -703,6 +739,105 @@ class Terminal extends Component
         $this->novaServisnaModalVisible = false;
 
         //dd($values, $signature_vals, $model_za_lic);
+    }
+
+   
+
+    public function novaServisnaIzPregleda($naziv, $dist_id, $dist_cena_id)
+    {
+        $this->licencaModalVisible = false;
+        //dd($naziv, $dist_id, $dist_cena_id);
+        $this->novaServisnaShowwModal($this->modelId, $naziv, $dist_id, $dist_cena_id);
+    }
+
+    public function pomeriPrekoracenjePrivremenoj($naziv, $dist_id, $dist_cena_id)
+    {
+        $this->licencaModalVisible = false;
+        //dd($naziv, $dist_id, $dist_cena_id);
+        $this->pomeriPrekoracenjeShowwModal($naziv, $dist_id, $dist_cena_id);
+    }
+    
+    /**
+     * Pomeri prekoracenje
+     *
+     * @param mixed $id
+     * @param mixed $naziv
+     * @param mixed $dist_id
+     * @param mixed $dist_cena_id
+     * 
+     * @return [type]
+     * 
+     */
+    
+    public function pomeriPrekoracenjeShowwModal($naziv, $dist_id=0, $dist_cena_id=0)
+    {
+        $this->nazivZaServisnu = $naziv;
+        $this->terminal_dist_id = $dist_id;
+        $this->terminal_dist_cena_id = $dist_cena_id;
+        $this->parametri = [];
+        $this->licencaData = LicenceZaTerminal::sveAktivneLicenceTerminala($this->modelId);
+        $this->licencaZaProduzetak = $this->licencaData->where('licenca_distributer_cenaId', '=', $dist_cena_id)->first();
+        $this->datum_pocetka_licence = $this->licencaZaProduzetak->datum_pocetak;
+        $this->datum_kraja_licence = $this->licencaZaProduzetak->datum_kraj;
+        //dd($this->licencaZaProduzetak);
+        $this->datum_prekoracenja = Helpers::moveWikendToMonday(Helpers::addDaysToDate(Helpers::datumKalendarNow(), 5));
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalSn = $this->selectedTerminal->sn;
+
+        $this->pomeriPrekoracenjeModalVisible = true;
+    }
+
+    public function produziPrekoracenjePrivremenoj()
+    {
+        $this->validate([
+            'datum_prekoracenja' => 'required'
+        ]);
+       
+        $key_arr = [
+            'terminal_lokacijaId' => $this->modelId,
+            'distributerId' => $this->terminal_dist_id,
+            'licenca_distributer_cenaId' => $this->terminal_dist_cena_id,
+        ];
+
+        $signature_vals = [
+            'mesecId'=> 0,
+            'terminal_sn' => $this->selectedTerminalSn,
+            'datum_pocetak' => $this->datum_pocetka_licence,
+            'datum_kraj' => $this->datum_kraja_licence,
+            'datum_prekoracenja' => $this->datum_prekoracenja,
+            'naziv_licence' => $this->nazivZaServisnu
+        ];
+
+        LicencaServisna::create([
+            'userId' => auth()->user()->id,
+            'terminal_lokacijaId' => $this->modelId,
+            'distributerId' => $this->terminal_dist_id,
+            'licenca_naziv' => $this->nazivZaServisnu,
+            'terminal_sn' => $this->selectedTerminalSn,
+            'licenca_distributer_cenaId' => $this->terminal_dist_cena_id,
+            'datum_pocetka_licence' => $this->datum_pocetka_licence,
+            'datum_kraj_licence' => $this->datum_kraja_licence,
+            'datum_isteka_prekoracenja' => $this->datum_prekoracenja,
+            'tip' => 2
+        ]);
+        LicenceZaTerminal::updateOrCreate($key_arr,
+        [
+            'terminal_lokacijaId' => $this->modelId,
+            'distributerId' => $this->terminal_dist_id,
+            'licenca_distributer_cenaId' => $this->terminal_dist_cena_id,
+            'naziv_licence' => $this->nazivZaServisnu,
+            'mesecId' => 0,
+            'terminal_sn' => $this->selectedTerminalSn,
+            'datum_pocetak' => $this->datum_pocetka_licence,
+            'datum_kraj' => $this->datum_kraja_licence,
+            'datum_prekoracenja' => $this->datum_prekoracenja,
+            'licenca_poreklo' => 3,
+            'signature' => CryptoSign::criptSignature($signature_vals)
+        ]);
+
+
+
+        $this->pomeriPrekoracenjeModalVisible = false;
     }
 
     public function render()
