@@ -16,7 +16,7 @@ class DistributeriPregled extends Component
     public $searchPib;
 
     //OREDER BY
-    public $orderBy = 'broj_licenci';
+    public $orderBy = 'broj_licenci_count';
     public $orderDirection = 'desc';
 
     //protected $listeners = ['sortClick'];
@@ -32,7 +32,7 @@ class DistributeriPregled extends Component
             $this->orderDirection = $this->orderDirection === 'asc' ? 'desc' : 'asc';
         } else {
             $this->orderBy = $field;
-            $this->orderDirection = 'asc';
+            $this->orderDirection = 'desc';
             $this->emit('fieldChange', $field);
         }
         $this->emit('sortChange', $this->orderDirection);
@@ -44,7 +44,11 @@ class DistributeriPregled extends Component
      */
     public function read() 
     {
+        //Ovde može da se doda filter koji 'e da izuzme istekle licence u selectRow WHERE - "AND licence_za_terminals.datum_kraj > now()"
        return LicencaDistributerTip::select('licenca_distributer_tips.*')
+            ->leftJoin('licence_za_terminals', 'licenca_distributer_tips.id', '=', 'licence_za_terminals.distributerId')
+            ->selectRaw('(SELECT COUNT(*) FROM licence_za_terminals WHERE licenca_distributer_tips.id = licence_za_terminals.distributerId AND licence_za_terminals.datum_kraj > now()) as broj_licenci_count')
+            ->groupBy('licenca_distributer_tips.id')
             ->where('distributer_naziv', 'like', '%'.$this->searchName.'%')
             ->where('distributer_mesto', 'like', '%'.$this->searchMesto.'%')
             ->where('distributer_pib', 'like', '%'.$this->searchPib.'%')

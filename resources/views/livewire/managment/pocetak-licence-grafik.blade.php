@@ -4,17 +4,18 @@
     <div class="flex flex-col mb-10">
         <div class="flex items-center justify-between px-4 py-3 text-right sm:px-6">
             <div class="flex font-semibold text-xl">
-                <!-- <div class="flex ml-2 pr-2 text-red-800">
-                    <svg class="fill-red-800 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
-                    Istekle licence {{ $broj_istekilh }}
-                </div>  -->
+                
                 <div class="flex ml-4 pr-2 text-emerald-600">
                     <svg class="fill-emerald-600 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
-                    Produžene licence {{ $broj_istekilh }}
+                    Produžene licence {{ $broj_produzenih }}
                 </div> 
                 <div class="flex ml-4 pr-2 text-yellow-300">
                     <svg class="fill-yellow-300 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
-                    Nove licence {{ $broj_privremenih }}
+                    Nove licence {{ $broj_novih }}
+                </div> 
+                <div class="flex ml-2 pr-2 text-red-800">
+                    <svg class="fill-red-800 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
+                    Istekle licence {{ $broj_istekilh }}
                 </div> 
             </div>
         </div>
@@ -38,11 +39,13 @@
         const labels = [];
         const dataset = [];
         const dataset2 = [];
+        const dataset3 = [];
         const bgcollors = [];
         @foreach($data as $item)
             labels.push("{{ $item->month }} - {{ $item->year }}");
             dataset.push("{{ $item->data }}");
             dataset2.push("{{ $item->nove }}");
+            dataset3.push("{{ $item->istekla }}");
             //bgcollors.push( @if($item->istekla) color1 @else color2 @endif );                
         @endforeach
 
@@ -63,6 +66,15 @@
                     data: dataset2 ,
                     //borderColor: ["rgb(75, 75, 75)"],
                     backgroundColor: [color3],
+                    borderWidth: 0,
+                    borderRadius: 2,
+                    borderSkipped: false,
+                },
+                {
+                    label: [],
+                    data: dataset3 ,
+                    //borderColor: ["rgb(75, 75, 75)"],
+                    backgroundColor: [color2],
                     borderWidth: 0,
                     borderRadius: 2,
                     borderSkipped: false,
