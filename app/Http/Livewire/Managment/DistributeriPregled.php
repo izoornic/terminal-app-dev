@@ -47,7 +47,7 @@ class DistributeriPregled extends Component
         //Ovde može da se doda filter koji 'e da izuzme istekle licence u selectRow WHERE - "AND licence_za_terminals.datum_kraj > now()"
        return LicencaDistributerTip::select('licenca_distributer_tips.*')
             ->leftJoin('licence_za_terminals', 'licenca_distributer_tips.id', '=', 'licence_za_terminals.distributerId')
-            ->selectRaw('(SELECT COUNT(*) FROM licence_za_terminals WHERE licenca_distributer_tips.id = licence_za_terminals.distributerId AND licence_za_terminals.datum_kraj > now()) as broj_licenci_count')
+            ->selectRaw('(SELECT COUNT(*) FROM licence_za_terminals WHERE licenca_distributer_tips.id = licence_za_terminals.distributerId AND licence_za_terminals.licenca_poreklo <> 2) as broj_licenci_count')
             ->groupBy('licenca_distributer_tips.id')
             ->where('distributer_naziv', 'like', '%'.$this->searchName.'%')
             ->where('distributer_mesto', 'like', '%'.$this->searchMesto.'%')

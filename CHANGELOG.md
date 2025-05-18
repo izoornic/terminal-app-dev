@@ -190,6 +190,9 @@ V 1.0.3.2 (10.4.2025.) @stanje-terminala branch
 V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
     - Dodata opcija Export Excel za izvoz licenci koje su istekle ili uskoro isticu ya uloge Menadzer licenci i Distributer
 
+V 1.0.3.4 (15.5.2025.) @main
+    - Dodata opcija "Obrisi sve licence" ya Menadzera licenci
+
     
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
