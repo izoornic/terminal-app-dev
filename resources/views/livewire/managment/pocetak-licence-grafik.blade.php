@@ -1,27 +1,26 @@
 <div>
-<div class="font-semibold text-xl text-gray-800 ml-4"> Statistika licenci - prikaz prema datumu isteka licence <span class="text-gray-600 ml-2">( {{$grafikNaslov}} )</span></div>
-<div>Privremene licence su prikazane u mesecima u kojima će isteći trajna licenca (aktivna) kada privremene licence budu razdužene od strane Zeta Systema i postanu trajne. Sve privremene licence traju od dana izdavanja do kraja kalendarskog meseca, plus period prekoračenja.</div>
+<div class="font-semibold text-xl text-gray-800 ml-4"> Statistika licenci - prikaz prema datumu početka licence</div>
+<div>Istekle licence ne ulaze u ukupni broj licenci već su samo dodatak (informacija) o tome koliko je licenci koje su istekle od ukupnog broja licenci koje su dodate/produžene u datom mesecu.<br /></div>
     <div class="flex flex-col mb-10">
         <div class="flex items-center justify-between px-4 py-3 text-right sm:px-6">
             <div class="flex font-semibold text-xl">
-                
-                <div class="flex ml-4 pr-2 text-emerald-600">
-                    <svg class="fill-emerald-600 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
-                    Produžene licence {{ $broj_produzenih }}
-                </div> 
-                <div class="flex ml-4 pr-2 text-yellow-300">
-                    <svg class="fill-yellow-300 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
+                <a class="cursor-pointer flex ml-4 pr-2 text-emerald-600 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 0')">
+                        <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
+                        Produžene licence {{ $broj_produzenih }}
+                </a>
+                <a class="cursor-pointer flex ml-4 pr-2 text-yellow-300 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 1')">
+                    <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                     Nove licence {{ $broj_novih }}
-                </div> 
-                <div class="flex ml-2 pr-2 text-red-800">
-                    <svg class="fill-red-800 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
+                </a> 
+                <a class="cursor-pointer flex ml-4 pr-2 text-red-800 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 2')">
+                    <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                     Istekle licence {{ $broj_istekilh }}
-                </div> 
+                </a> 
             </div>
         </div>
             <div class="">
                 <div class="">
-                <canvas class="p-1" id="NaplataGrafik"></canvas>
+                <canvas class="p-1" id="NaplataGrafik" ></canvas>
             </div>
         </div>
     </div>
@@ -105,6 +104,17 @@
                     }
                 },
             },
+        };
+
+        ctx.onclick = function(e) {
+            const points = NaplataGrafik.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+            if (points.length) {
+                const firstPoint = points[0];
+                const label = NaplataGrafik.data.labels[firstPoint.index];
+                const value = NaplataGrafik.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
+                Livewire.emit('chartClicked', label+'-'+firstPoint.datasetIndex);
+                //console.log(label + ': ' + value + ' - ' + firstPoint.datasetIndex);
+            }
         };
 
         var NaplataGrafik = new Chart(ctx, config);

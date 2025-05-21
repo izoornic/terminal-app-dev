@@ -18,6 +18,7 @@ class PocetakLicenceGrafik extends Component
 
     public $broj_istekilh;
 
+
     /**
      * mount
      *
@@ -29,8 +30,6 @@ class PocetakLicenceGrafik extends Component
         $this->broj_produzenih = 0;
         $this->broj_novih = 0;
         $this->broj_istekilh = 0;
-
-        $this->grafikNaslov = 'Broj licenci po mesecima';
     }
 
     public function read()
@@ -90,17 +89,19 @@ class PocetakLicenceGrafik extends Component
         //dd($l_data_istek);
         //Objedinjena tabela sa svim licencama grupisana po mesecima
         $l_data->each(function ($item, $key) use ($nove_licence, $l_data_istek) {
+            //Nove licence
             $item->nove = $nove_licence->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
-            $item->istekla = $l_data_istek->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
             if($item->nove > 0){
                 $item->data = $item->data - $item->nove;
             }
 
+            //Istekle licence
+            $item->istekla = $l_data_istek->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
+
             //Labele na X osi
             $item->month = Helpers::nameOfTheMounth($item->year.'-'.$item->month.'-01');
 
-            //$item->istekla = Helpers::dateGratherOrEqualThan($item->year.'-'.$item->month.'-01', Helpers::datumKalendarNow());
-
+            //Broj licenci
             $this->broj_produzenih += $item->data;
             $this->broj_novih += $item->nove;
             $this->broj_istekilh += $item->istekla;

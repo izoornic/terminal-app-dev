@@ -193,6 +193,14 @@ V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
 V 1.0.3.4 (15.5.2025.) @main
     - Dodata opcija "Obrisi sve licence" ya Menadzera licenci
 
+V 1.0.3.7 (21.5.2025.) @Statistika-licenci-prodaja
+    - Statistika licenci za menagment dodate stranice:
+        managment-distributeri (lista distributera)
+            -- komponenta "komponente.sort-button" - sortiranje sa eventom
+        managment-distributer-licence (grafik licenci prema datumu pocetka sa prikazom pojedinacnih na klik)
+            -- komponenta "managment.pocetak-licence-grafik"  - grafik 
+            -- komponenta "managment.prikaz-izabranih-licenci"  - Tabela licenci posle klika na grafik        
+
     
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
