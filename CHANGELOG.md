@@ -201,7 +201,11 @@ V 1.0.3.8 (21.5.2025.) @Statistika-licenci-prodaja
             -- komponenta "managment.pocetak-licence-grafik"  - grafik 
             -- komponenta "managment.prikaz-izabranih-licenci"  - Tabela licenci posle klika na grafik        
 
-    
+ V 1.0.3.9 (24.5.2025.) @Statistika-licenci-prodaja  
+    - Dodati check boxovi (toogle) za prikay kategorija na grafiku
+
+
+
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

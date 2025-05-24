@@ -15,7 +15,6 @@ class PocetakLicenceGrafik extends Component
     
     public $broj_produzenih;
     public $broj_novih;
-
     public $broj_istekilh;
 
 
@@ -31,6 +30,7 @@ class PocetakLicenceGrafik extends Component
         $this->broj_novih = 0;
         $this->broj_istekilh = 0;
     }
+
 
     public function read()
     {

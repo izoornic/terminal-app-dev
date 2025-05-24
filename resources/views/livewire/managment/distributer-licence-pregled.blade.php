@@ -5,7 +5,6 @@
         <div class="text-red-600 float-left">{{ $dist_name }}</div>
         </div>
     </div>
-    
     <livewire:managment.pocetak-licence-grafik :distId="$distId" />    
     
     <livewire:managment.prikaz-izabranih-licenci :dataClicked="$dataDisp" :distId="$distId" :wire:key="$wkey" />

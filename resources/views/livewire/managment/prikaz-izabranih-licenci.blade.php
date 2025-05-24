@@ -1,14 +1,15 @@
 <div>
-    <div class="flex font-semibold text-xl text-gray-800 ml-4">{{ $heading }}
-        @php
+     @php
             $ico_color = [
-                0 => 'text-emerald-600',
-                1 => 'text-yellow-300',
+                0 => 'text-yellow-400',
+                1 => 'text-emerald-600',
                 2 => 'text-red-800',
                 100 => 'text-gray-600',
             ];
         @endphp
-        <span class="{{$ico_color[$vrstaLicence]}}"><svg class="fill-current w-6 h-6 ml-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg></span>
+    <div class="flex font-semibold text-xl {{$ico_color[$vrstaLicence]}} ml-4">       
+        <span class="{{$ico_color[$vrstaLicence]}}"><svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg></span>
+        {{ $heading }}
     </div>
     <div class="text-sm text-gray-500 ml-4">Prikaz pojedinačnih licenci za izabrani opseg</div>
 
