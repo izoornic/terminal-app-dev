@@ -44,10 +44,14 @@ class PocetakLicenceGrafik extends Component
                 ->get();
         
         //Tabela sa novim licencama full
-        $nove_licence_sinle = LicencaNaplata::whereIn('terminal_lokacijaId', $nove_licence_index->pluck('terminal_lokacijaId'))
+        $nove_licence_sinle = LicencaNaplata::select('licenca_naplatas.*')
+                ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
+                ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
+                ->where('licenca_tips.id', '=', 1) // samo licence tipa ESIR
+                ->whereIn('terminal_lokacijaId', $nove_licence_index->pluck('terminal_lokacijaId'))
                 ->whereIn('licenca_distributer_cenaId', $nove_licence_index->pluck('licenca_distributer_cenaId'))
                 ->when($this->distId, function ($query) {
-                    return $query->where('distributerId', $this->distId);
+                    return $query->where('licenca_naplatas.distributerId', $this->distId);
                 })
                 ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                 ->get();

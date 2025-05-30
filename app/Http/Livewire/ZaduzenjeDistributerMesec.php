@@ -7,7 +7,6 @@ use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerMesec;
-//use App\Models\LicencaDistributerTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -101,12 +100,10 @@ class ZaduzenjeDistributerMesec extends Component
                         'licenca_naplatas.nenaplativ',
                         'licenca_tips.licenca_naziv', 
                         'licenca_tips.id as ltid',
-                        //'licenca_distributer_terminals.licenca_broj_dana',
                         'licenca_naplatas.licenca_distributer_cenaId',
                         'licenca_distributer_cenas.id as ldcid',
                         'licenca_naplatas.dist_zaduzeno'
                         )
-                //->leftJoin('licenca_naplatas', 'licenca_naplatas.licenca_dist_terminalId', '=', 'licenca_distributer_terminals.id')
                 ->leftJoin('terminal_lokacijas', 'licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
                 ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                 ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
@@ -168,14 +165,11 @@ class ZaduzenjeDistributerMesec extends Component
             if(!in_array($item->lnid, $this->ne_zaduzuju_se) && $item->cenaLicence > 0){ 
                 $model_data = [
                     'mesecId'           => $this->mid,
-                    //'broj_dana'         => $item->licenca_broj_dana,
                     'zaduzeno'          => $item->cenaLicence,
                     'datum_zaduzenja'   => $datum_zaduzenja
                 ];
                 LicencaNaplata::where('id', '=', $item->lnid)->update($model_data);
-            }/* elseif(in_array($item->lnid, $this->ne_zaduzuju_se)){
-                LicencaDistributerTerminal::find($item->ldtid)->update(['nenaplativ' => 1]);
-            } */
+            }
 
         });
 

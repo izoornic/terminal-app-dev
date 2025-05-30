@@ -794,7 +794,6 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Models\\KursEvra' => __DIR__ . '/../..' . '/app/Models/KursEvra.php',
         'App\\Models\\LicencaDistributerCena' => __DIR__ . '/../..' . '/app/Models/LicencaDistributerCena.php',
         'App\\Models\\LicencaDistributerMesec' => __DIR__ . '/../..' . '/app/Models/LicencaDistributerMesec.php',
-        'App\\Models\\LicencaDistributerTerminal' => __DIR__ . '/../..' . '/app/Models/LicencaDistributerTerminal.php',
         'App\\Models\\LicencaDistributerTip' => __DIR__ . '/../..' . '/app/Models/LicencaDistributerTip.php',
         'App\\Models\\LicencaMesec' => __DIR__ . '/../..' . '/app/Models/LicencaMesec.php',
         'App\\Models\\LicencaNaplata' => __DIR__ . '/../..' . '/app/Models/LicencaNaplata.php',

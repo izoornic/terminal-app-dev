@@ -9,7 +9,6 @@ use App\Models\TerminalLokacija;
 use App\Models\DistributerUserIndex;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-//use App\Models\LicencaDistributerTerminal;
 
 use Illuminate\Support\Facades\Config;
 

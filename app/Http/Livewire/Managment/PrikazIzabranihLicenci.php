@@ -86,6 +86,8 @@ class PrikazIzabranihLicenci extends Component
                     ->groupby('terminal_lokacijaId','distributerId', 'licenca_distributer_cenaId')
                     ->having('ctn', '=', 1)
                     ->get();
+
+                    
                 //Tabela sa novim licencama full
                 $nove_licence_sinle = LicencaNaplata::whereIn('terminal_lokacijaId', $nove_licence_index->pluck('terminal_lokacijaId'))
                     ->whereIn('licenca_distributer_cenaId', $nove_licence_index->pluck('licenca_distributer_cenaId'))
@@ -98,6 +100,8 @@ class PrikazIzabranihLicenci extends Component
                     })
                     ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                     ->get();
+
+                    
                 //Tabela sa produzenim licencama
                 $produzene_licence_sinle = LicencaNaplata::when($this->distId, function ($query) {
                         return $query->where('distributerId', $this->distId);
@@ -150,6 +154,7 @@ class PrikazIzabranihLicenci extends Component
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
         ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
         ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
+        ->where('licenca_tips.id', '=', 1) // samo licence tipa ESIR
         ->when($this->distId, function ($query) {
                     return $query->where('terminal_lokacijas.distributerId', '=', $this->distId);
                 })
@@ -162,6 +167,13 @@ class PrikazIzabranihLicenci extends Component
         ->when(($this->vrstaLicence == 2), function ($query)use($l_data_istek) {
             return $query->whereIn('licenca_naplatas.id', $l_data_istek->pluck('id'));
         })
+        ->when($this->searchTerminalSn, function ($query) {
+            return $query->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%');
+        })
+        ->when($this->searchMesto, function ($query) {
+            return $query->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%');
+        })
+        
         ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
         ->orderBy('terminal_lokacijas.id')
         ->orderBy('licenca_distributer_cenas.licenca_tipId')

@@ -7,12 +7,10 @@ use App\Models\LicencaNaplata;
 use App\Models\TerminalLokacija;
 use App\Models\LicencaParametar;
 use App\Models\LicenceZaTerminal;
-//use App\Models\DistLicencaNaplata;
 use App\Models\DistributerUserIndex;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaParametarTerminal;
-//use App\Models\LicencaDistributerTerminal;
 
 use App\Http\Helpers;
 
@@ -131,7 +129,6 @@ class DistLicence extends Component
      * [Description for pregledLicenceShovModal]
      *
      * @param mixed $tre_loc_id - TerminalLokacija ID
-     * @param mixed $ldtidd - LicencaDistributerTerminal ID
      * 
      * @return [type]
      * 
@@ -142,7 +139,6 @@ class DistLicence extends Component
         $this->resetTerm();
         $this->licenca_naplata_id = $lnid;
         
-        //$this->distrib_terminal_id = $ldtidd;
         $this->modelId = $tre_loc_id;
 
         $this->podaci_licence = $this->licencaInfo();
@@ -167,7 +163,6 @@ class DistLicence extends Component
 
         $this->resetTerm();
         $this->licenca_naplata_id = $lnid;
-        //$this->distrib_terminal_id = $ldtidd;
         $this->modelId = $tre_loc_id;
         $this->podaci_licence = $this->licencaInfo();
         $this->naziv_licence = $this->podaci_licence->licenca_naziv;
@@ -208,7 +203,6 @@ class DistLicence extends Component
             'licenca_broj_dana' => $this->dani_trajanja,
         ];
         
-        //LicencaDistributerTerminal::where('id', '=', $this->distrib_terminal_id)->update($model_data);
 
         $datum_prekoracenja = Helpers::addDaysToDate($this->datum_kraja_licence, $this->ditributer_info->dani_prekoracenja_licence);
         $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($this->licenca_distributer_cena_id);
@@ -234,16 +228,17 @@ class DistLicence extends Component
         $this->AddToLicenceZaTerminal($key_arr, $vals_ins);
 
         //oslobodi stari zapis u tabelu 'licenca_naplatas'
-        LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->update(['licenca_dist_terminalId' => 0, 'aktivna' => 0]);
+        LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->update(['aktivna' => 0]);
 
         //dodaj red u tabelu 'licenca_naplatas'
         $model_lic_nap = [
-        //'licenca_dist_terminalId' => $this->distrib_terminal_id,
         'datum_pocetka_licence' => $this->datum_pocetka_licence,
         'datum_kraj_licence'  => $this->datum_kraja_licence,
         'datum_isteka_prekoracenja' => $datum_prekoracenja,
         'dist_zaduzeno' => $this->produzenje_cena_licence,
-        'dist_datum_zaduzenja' => Helpers::datumKalendarNow()
+        'dist_datum_zaduzenja' => Helpers::datumKalendarNow(),
+        'licenca_naziv' => $this->naziv_licence,
+        'terminal_sn' => $terminal_info->sn,
         ];
         foreach($key_arr as $key=>$val){
             $model_lic_nap[$key] = $val;
@@ -388,19 +383,29 @@ class DistLicence extends Component
 
                 //dodaj licence terminalu za prezimanje
                 $this->AddToLicenceZaTerminal($key_arr, $vals_ins); 
-
+               
                 //dodaj red u tabelu 'licenca_naplatas'
                 $model_lic_nap = [
-                //'licenca_dist_terminalId' => $new_licence,
                 'datum_pocetka_licence' => $this->datum_pocetka_licence,
                 'datum_kraj_licence'  => $this->datum_kraja_licence,
                 'datum_isteka_prekoracenja' => $datum_prekoracenja,
                 'dist_zaduzeno' => $this->unete_cene_licenci[$lc],
-                'dist_datum_zaduzenja' => Helpers::datumKalendarNow()
+                'dist_datum_zaduzenja' => Helpers::datumKalendarNow(),
+                'licenca_naziv' => $nazivLicence,
+                'terminal_sn' => $terminal_info->sn,
                 ];
 
                 foreach($key_arr as $key=>$val){
                     $model_lic_nap[$key] = $val;
+                }
+
+                 //proveri da li je licenca nova ili je postojala u proslosti pa obrisana
+                $licenca_postoji = LicencaNaplata::where($key_arr)
+                    ->first();
+                if(!$licenca_postoji){
+                    //ako ne postoji, obelezi novu licencu
+                    $model_lic_nap['nova_licenca'] = 1; //nova licenca
+
                 }
                 
                 LicencaNaplata::create($model_lic_nap);
@@ -514,7 +519,6 @@ class DistLicence extends Component
         DB::transaction(function(){
             $naplata_row = LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->first();
             
-            //LicencaDistributerTerminal::destroy($this->distrib_terminal_id);
             LicencaParametarTerminal::where('terminal_lokacijaId', '=', $naplata_row->terminal_lokacijaId)
                                         ->where('distributerId', '=', $naplata_row->distributerId)
                                         ->where('licenca_distributer_cenaId', '=', $naplata_row->licenca_distributer_cenaId)
@@ -567,7 +571,6 @@ class DistLicence extends Component
     /**
      * Parametri Licence
      *
-     * @param mixed $licencaDistributerTerminalid
      * @param mixed $naziv
      * 
      * @return [type]

@@ -37,8 +37,7 @@
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Licenca</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum početak</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum kraj</th>
-                                <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
-                                <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
+                                <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Prekoračenje</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Iznos</th>
                             </tr>
                         </thead>
@@ -59,7 +58,6 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -109,9 +107,6 @@
                                         </td>
                                         <td class="px-2 py-2">
                                             {{ App\Http\Helpers::datumFormatDan($item->datum_isteka_prekoracenja) }}
-                                        </td>
-                                        <td class="px-2 py-2">
-                                            {{$item->broj_dana}}
                                         </td>
                                         <td class="px-2 py-2">
                                             @money($item->zaduzeno) RSD

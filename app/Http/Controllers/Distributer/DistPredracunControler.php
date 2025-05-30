@@ -11,7 +11,6 @@ use App\Models\LicencaNaplata;
 use App\Models\TerminalLokacija;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-//use App\Models\LicencaDistributerTerminal;
 
 use PDF;
 use Response;
@@ -55,11 +54,6 @@ class DistPredracunControler extends Controller
 
         $this->terminal_lokacija_id = $this->lic_naplata_row->terminal_lokacijaId;
 
-        //provera dali du get vars autenticne
-        /* $this->lic_naplata_row = LicencaNaplata::where('licenca_dist_terminalId', '=', $this->licenca_distributer_terminal_id)
-                        ->where('distributerId', '=', $this->did)
-                        ->first(); */
-        
         $this->lokacija_row = TerminalLokacija::select('lokacijas.*', 'terminals.sn')
                         ->leftJoin('lokacijas', 'lokacijas.id', '=','terminal_lokacijas.lokacijaId')
                         ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')

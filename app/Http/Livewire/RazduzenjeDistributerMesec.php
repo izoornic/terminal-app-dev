@@ -8,7 +8,6 @@ use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerMesec;
-//use App\Models\LicencaDistributerTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -150,7 +149,6 @@ class RazduzenjeDistributerMesec extends Component
         $this->ukupno_zaduzenje = 0;
         $this->dataAll = LicencaNaplata::select(
             'licenca_naplatas.id',
-            'licenca_naplatas.broj_dana',
             'licenca_naplatas.datum_pocetka_licence',
             'licenca_naplatas.datum_kraj_licence',
             'licenca_naplatas.datum_isteka_prekoracenja',

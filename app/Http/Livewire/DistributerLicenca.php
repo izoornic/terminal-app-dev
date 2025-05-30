@@ -6,7 +6,6 @@ use App\Models\LicencaTip;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-use App\Models\LicencaDistributerTerminal;
 
 
 
