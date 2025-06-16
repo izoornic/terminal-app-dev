@@ -116,7 +116,7 @@ class LicenceController extends Controller
     }
 
     private function getGatumKrajLicence($terminal_lokacijaId, $distributerId, $licenca_distributer_cenaId){
-        return LicencaNaplata::select('datum_kraj_licence')
+        $datum_kraj = LicencaNaplata::select('datum_kraj_licence')
                 ->where([
                     'terminal_lokacijaId' => $terminal_lokacijaId, 
                     'distributerId' => $distributerId, 
@@ -124,5 +124,6 @@ class LicenceController extends Controller
                     'aktivna' => 1
                 ])
                 ->first()->datum_kraj_licence;
+         return  ($datum_kraj) ? $datum_kraj->format('Y-m-d') : '';  
     }
 }
