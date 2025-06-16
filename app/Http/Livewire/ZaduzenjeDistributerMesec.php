@@ -129,7 +129,7 @@ class ZaduzenjeDistributerMesec extends Component
                 $item->iskljucen = true;
                 $item->cenaLicence = 0;
             }else{
-                $cena_obj = new CenaLicence($item->ldcid, $item->datum_pocetak, $item->datum_kraj, $this->srednjiKurs);
+                $cena_obj = new CenaLicence($item->ldcid, $item->datum_pocetka_licence, $item->datum_kraj_licence, $this->srednjiKurs);
                 $item->cenaLicence = $cena_obj->zeta_cena_din;
                 $item->cenaLicenceEur = $cena_obj->zeta_cena_eur;
             }

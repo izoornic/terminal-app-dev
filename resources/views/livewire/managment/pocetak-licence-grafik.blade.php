@@ -1,6 +1,6 @@
 <div>
 
-<div class="font-semibold text-xl text-gray-800 ml-4"> Statistika licenci - prikaz prema datumu početka licence</div>
+<div class="font-semibold text-xl text-gray-800 ml-4"> Statistika licenci, prikaz prema datumu početka licence <span> - ukupno licenci: {{ $broj_aktivnih }}</span></div>
 <div>Istekle licence ne ulaze u ukupni broj licenci već su samo dodatak (informacija) o tome koliko je licenci koje su istekle od ukupnog broja licenci koje su dodate/produžene u datom mesecu.<br /></div>
     <div class="flex flex-col mb-10">
         <div class=""> 
@@ -56,8 +56,8 @@
         const dataset3 = [];
         const bgcollors = [];
         @foreach($data as $item)
-            labels.push("{{ $item->month }} - {{ $item->year }}");
-            dataset.push("{{ $item->data }}");
+            labels.push("{{ $item->label }}");
+            dataset.push("{{ $item->produzene }}");
             dataset2.push("{{ $item->nove }}");
             dataset3.push("{{ $item->istekla }}");
             //bgcollors.push( @if($item->istekla) color1 @else color2 @endif );                

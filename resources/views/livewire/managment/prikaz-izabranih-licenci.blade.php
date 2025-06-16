@@ -4,7 +4,7 @@
                 0 => 'text-yellow-400',
                 1 => 'text-emerald-600',
                 2 => 'text-red-800',
-                100 => 'text-gray-600',
+                -1 => 'text-gray-600',
             ];
         @endphp
     <div class="flex font-semibold text-xl {{$ico_color[$vrstaLicence]}} ml-4">       
@@ -38,15 +38,10 @@
                                     <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži lokaciju" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="0">---</option>
-                                        @foreach (App\Models\LicencaDistributerCena::LicenceDistributera($distId) as $key => $value)    
-                                            <option value="{{ $key }}">{{ $value }}</option>
-                                        @endforeach
-                                    </select>
+                                    
                                 </td>
                                 <td></td>
                                 <td></td>
@@ -55,23 +50,8 @@
                                 <td></td>
                                 <td></td>
                             </tr>
-                            @php
-                                $olditem = new stdClass();
-                                $olditem->id = '';
-                            @endphp
                             @if ($data->count())
                                 @foreach ($data as $item)
-
-                                    @if($olditem->id == $item->id)
-                                        @php
-                                            $item->isDuplicate = true;
-                                        @endphp
-                                    @else
-                                        @php
-                                            $item->isDuplicate = false;
-                                        @endphp
-                                    @endif
-
                                     @php
                                         $item->month_diff = App\Http\Helpers::monthDifference($item->datum_kraj_licence);
                                     @endphp
@@ -89,27 +69,14 @@
                                             @endif
                                         </td>
                                         <td class="px-2 py-2">  
-                                            @if($item->isDuplicate)
-                                                <span class=""> <svg class="fill-red-400 w-5 h-5 ml-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410.1 512"><path d="M401.3,327.3L270.8,196.8c-11.7-11.7-30.7-11.7-42.4,0c-11.7,11.7-11.7,30.7,0,42.4l78.3,78.3H117.1 c-0.8,0-1.6,0-2.5,0.1c-0.2,0-25.7,1.2-40.9-12.8c-9.2-8.5-13.7-21.7-13.7-40.3V31.7c0-16.6-13.4-30-30-30S0,15.1,0,31.7v232.9 c0,44.6,18,70.5,33.1,84.4c27.9,25.7,63.9,28.8,79.3,28.8c2.4,0,4.4-0.1,5.7-0.2h190.5l-80.2,80.2c-11.7,11.7-11.7,30.7,0,42.4 c5.9,5.9,13.5,8.8,21.2,8.8s15.4-2.9,21.2-8.8l130.5-130.5C413,358,413,339,401.3,327.3z"/></svg></span> 
-                                            @else
-                                                {{ $item->sn }}
-                                            @endif 
+                                                {{ $item->terminal_sn }}
                                         </td>
                                         <td class="px-2 py-2 w-96"> 
-                                            @if($item->isDuplicate)
-                                                <span class=""> <svg class="fill-red-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg></span> 
-                                            @else
-                                                {{ $item->l_naziv }}<br />{{ $item->adresa }}, {{ $item->mesto }}
-                                            @endif   
+                                                {{ $item->l_naziv }}<br />{{ $item->adresa }}, {{ $item->mesto }} 
                                         </td>
                                         <td class="px-2 py-2">
-                                            @if($item->isDuplicate) 
-                                                <span class="float-left pr-2"><svg class="fill-red-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M240 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H176V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H384c17.7 0 32-14.3 32-32s-14.3-32-32-32H240V80z"/></svg></span>
-                                            @endif
                                             {{ $item->licenca_naziv }}
                                         </td>  
-                                        
-                                        
                                         <td class="px-2 py-2">@if($item->datum_pocetka_licence != '') {{ App\Http\Helpers::datumFormatDan($item->datum_pocetka_licence) }} @endif</td>
                                         <td>
                                             <div class="float-right">
@@ -132,9 +99,6 @@
                                                 </x-jet-secondary-button> -->
                                         </td>
                                     </tr>
-                                    @php
-                                        $olditem = $item;
-                                    @endphp
                                 @endforeach
                             @else 
                                 <tr>

@@ -16,6 +16,7 @@ class PocetakLicenceGrafik extends Component
     public $broj_produzenih;
     public $broj_novih;
     public $broj_istekilh;
+    PUBLIC $broj_aktivnih;
 
 
     /**
@@ -34,7 +35,7 @@ class PocetakLicenceGrafik extends Component
 
     public function read()
     {
-        //Tabela sa novim licencama koja sadrži samo tri polja koja su kljuc
+        /* //Tabela sa novim licencama koja sadrži samo tri polja koja su kljuc
         $nove_licence_index = LicencaNaplata::select(DB::raw('count(*) as `ctn`'), 'terminal_lokacijaId', 'distributerId', 'licenca_distributer_cenaId')
                 ->when($this->distId, function ($query) {
                     return $query->where('distributerId', $this->distId);
@@ -55,7 +56,8 @@ class PocetakLicenceGrafik extends Component
                 })
                 ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                 ->get();
-        
+
+
         //Tabela sa novim licencama grupisana po mesecima
         $nove_licence = LicencaNaplata::select(DB::raw('count(id) as `data`'), DB::raw('YEAR(datum_pocetka_licence) year, MONTH(datum_pocetka_licence) month'))
                 ->whereIn('id', $nove_licence_sinle->pluck('id'))
@@ -66,6 +68,19 @@ class PocetakLicenceGrafik extends Component
                 ->groupby('year','month')
                 ->orderBy('year', 'asc')
                 ->orderBy('month', 'asc')
+                ->get(); */
+        
+        //Tabela sa novim licencama grupisana po mesecima
+        $nove_licence = LicencaNaplata::select(DB::raw('count(id) as `data`'), DB::raw('YEAR(datum_pocetka_licence) year, MONTH(datum_pocetka_licence) month'))
+                ->where('nova_licenca', '=', DB::raw("1"))
+                ->where('licenca_naziv', '=', DB::raw('"esir"'))
+                ->when($this->distId, function ($query) {
+                    return $query->where('distributerId', $this->distId);
+                })
+                ->where('aktivna', '=', DB::raw("1"))
+                ->groupby('year','month')
+                ->orderBy('year', 'asc')
+                ->orderBy('month', 'asc')
                 ->get();
         
        //Tabela sa svim licencama grupisana po mesecima
@@ -73,6 +88,7 @@ class PocetakLicenceGrafik extends Component
                 ->when($this->distId, function ($query) {
                     return $query->where('distributerId', $this->distId);
                 })
+                ->where('licenca_naziv', '=', DB::raw('"esir"'))
                 ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                 ->groupby('year','month')
                 ->orderBy('year', 'asc')
@@ -84,6 +100,7 @@ class PocetakLicenceGrafik extends Component
                 ->when($this->distId, function ($query) {
                     return $query->where('distributerId', $this->distId);
                 })
+                ->where('licenca_naziv', '=', DB::raw('"esir"'))
                 ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                 ->where('datum_kraj_licence', '<', DB::raw("now()"))
                 ->groupby('year','month')
@@ -91,24 +108,28 @@ class PocetakLicenceGrafik extends Component
                 ->orderBy('month', 'asc')
                 ->get();
         //dd($l_data_istek);
+
+
         //Objedinjena tabela sa svim licencama grupisana po mesecima
         $l_data->each(function ($item, $key) use ($nove_licence, $l_data_istek) {
             //Nove licence
             $item->nove = $nove_licence->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
-            if($item->nove > 0){
-                $item->data = $item->data - $item->nove;
-            }
 
+            //Proizvedene licence
+            $item->produzene = ($item->nove > 0) ? $item->data - $item->nove : $item->data;
+            
             //Istekle licence
             $item->istekla = $l_data_istek->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
 
             //Labele na X osi
             $item->month = Helpers::nameOfTheMounth($item->year.'-'.$item->month.'-01');
+            $item->label = $item->month.' - '. $item->year .' ('.$item->data.')'; //dodavanje broja licenci u labelu
 
             //Broj licenci
-            $this->broj_produzenih += $item->data;
+            $this->broj_produzenih += $item->produzene;
             $this->broj_novih += $item->nove;
             $this->broj_istekilh += $item->istekla;
+            $this->broj_aktivnih += $item->data;
         });
 
         return $l_data;

@@ -204,7 +204,15 @@ V 1.0.3.8 (21.5.2025.) @Statistika-licenci-prodaja
  V 1.0.3.9 (24.5.2025.) @Statistika-licenci-prodaja  
     - Dodati check boxovi (toogle) za prikay kategorija na grafiku
 
+V 1.0.3.7 (21.5.2025.) @main
+    - Ispravljen bug na stranici "ZaduzenjeDistributerMesec" gde je zaduzenje bilo 0
 
+V 1.0.3.9 () @Statistika-licenci-prodaja  
+    - Izmena u bazi "licenca_naplatas" dodata polja: 'nova_licenca', 'terminal_sn', 'licenca_naziv'
+    - Refaktor koda na svoim stranicama za statistiku licenci za menagment
+        
+//TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
+        posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
 
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
