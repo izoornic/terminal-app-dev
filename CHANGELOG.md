@@ -190,6 +190,9 @@ V 1.0.3.2 (10.4.2025.) @stanje-terminala branch
 V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
     - Dodata opcija Export Excel za izvoz licenci koje su istekle ili uskoro isticu ya uloge Menadzer licenci i Distributer
 
+V 1.0.3.7.2 (20.6.2025.) @main
+    - Dodtata tabela `licenca_sign_logs` logovanje potpisa u clasi "CryptoSign"
+
     
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
