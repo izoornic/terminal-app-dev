@@ -120,7 +120,30 @@ class DistributerTerminal extends Component
     */
    public function deleteLicenceTerminala()
    {
-        dd($this->licenceDodateTerminalu());
+        //dd($this->licenceDodateTerminalu());
+        $licence_za_brisanje = LicenceZaTerminal::where('terminal_lokacijaId', '=', $this->modelId)->get();
+        foreach ($licence_za_brisanje as $key => $value) {
+            $key_arr = [
+                'terminal_lokacijaId' => $value->terminal_lokacijaId,
+                'distributerId' => $value->distributerId,
+                'licenca_distributer_cenaId' => $value->licenca_distributer_cenaId
+            ];
+            // brisanje parametara licence
+            LicencaParametarTerminal::deleteParametars($key_arr);
+            $licenca_naplata = LicencaNaplata::where($key_arr)->where('aktivna', '=', 1)->first();
+            //dd($licenca_naplata);
+            $licenca_naplata->zaduzeno          = $licenca_naplata->zaduzeno ?? 0;
+            $licenca_naplata->datum_zaduzenja   = $licenca_naplata->datum_zaduzenja ?? Helpers::datumKalendarNow();
+            $licenca_naplata->razduzeno         = $licenca_naplata->razduzeno ?? 0;
+            $licenca_naplata->datum_razduzenja  = $licenca_naplata->datum_razduzenja ?? Helpers::datumKalendarNow();
+            $licenca_naplata->aktivna = 0;
+            //dd($licenca_naplata);
+            $licenca_naplata->save();
+
+            // brisanje licence
+            $value->delete();
+        }
+
         foreach ($this->licenceDodateTerminalu() as $key => $value) { 
             
         }

@@ -1,7 +1,9 @@
 <?php
 namespace App\Ivan;
 
+use App\Models\LicencaSignLog;
 use Spatie\Crypto\Rsa\PrivateKey;
+use Illuminate\Support\Carbon; 
 
 class CryptoSign 
 {
@@ -22,8 +24,16 @@ class CryptoSign
      * 
      */
     public static function criptSignature($vals_ins)
-    {    
-        $string_signature = $vals_ins['naziv_licence'].'-'.$vals_ins['terminal_sn'].'-'.$vals_ins['datum_kraj'].'-'.$vals_ins['datum_prekoracenja'];
+    {  
+        $datum_kraj = Carbon::parse($vals_ins['datum_kraj'])->format('Y-m-d');
+        $datum_prekoracenja = Carbon::parse($vals_ins['datum_prekoracenja'])->format('Y-m-d');
+        //dd($vals_ins, $datum_kraj, $datum_prekoracenja);
+        $string_signature = $vals_ins['naziv_licence'].'-'.$vals_ins['terminal_sn'].'-'.$datum_kraj.'-'.$datum_prekoracenja;
+        LicencaSignLog::create([
+            'terminal_sn' => $vals_ins['terminal_sn'],
+            'signature' => $string_signature
+        ]);
+        //dd($string_signature);
         $pathToPrivateKey = base_path().'/storage/app/lickey/lic_private';
         return PrivateKey::fromFile($pathToPrivateKey)->sign($string_signature);
     }

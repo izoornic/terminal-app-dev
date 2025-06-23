@@ -207,6 +207,9 @@ V 1.0.3.8 (21.5.2025.) @Statistika-licenci-prodaja
 V 1.0.3.7 (21.5.2025.) @main
     - Ispravljen bug na stranici "ZaduzenjeDistributerMesec" gde je zaduzenje bilo 0
 
+V 1.0.3.7.2 (20.6.2025.) @main
+    - Dodtata tabela `licenca_sign_logs` logovanje potpisa u clasi "CryptoSign"
+
 V 1.0.3.9 () @Statistika-licenci-prodaja  
     - Izmena u bazi "licenca_naplatas" dodata polja: 'nova_licenca', 'terminal_sn', 'licenca_naziv'
     - Refaktor koda na svoim stranicama za statistiku licenci za menagment
