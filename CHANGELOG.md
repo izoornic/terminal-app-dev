@@ -213,6 +213,8 @@ V 1.0.3.7.2 (20.6.2025.) @main
 V 1.0.3.9 () @Statistika-licenci-prodaja  
     - Izmena u bazi "licenca_naplatas" dodata polja: 'nova_licenca', 'terminal_sn', 'licenca_naziv'
     - Refaktor koda na svoim stranicama za statistiku licenci za menagment
+
+V 1.0.3.11 (23.6.2025.) @main merged @Statistika-licenci-prodaja
         
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
