@@ -103,7 +103,6 @@ class PredracunPdfControler extends Controller
                         'lokacijas.l_naziv', 
                         'lokacijas.mesto', 
                         'lokacijas.adresa',
-                        'licenca_naplatas.broj_dana',
                         'licenca_naplatas.zaduzeno',
                         'licenca_naplatas.datum_pocetka_licence', 
                         'licenca_naplatas.datum_kraj_licence', 

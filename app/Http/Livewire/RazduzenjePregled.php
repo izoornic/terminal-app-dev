@@ -59,7 +59,6 @@ class RazduzenjePregled extends Component
                         'lokacijas.l_naziv', 
                         'lokacijas.mesto', 
                         'lokacijas.adresa',
-                        'licenca_naplatas.broj_dana',
                         'licenca_naplatas.razduzeno',
                         'licenca_naplatas.datum_pocetka_licence', 
                         'licenca_naplatas.datum_kraj_licence', 

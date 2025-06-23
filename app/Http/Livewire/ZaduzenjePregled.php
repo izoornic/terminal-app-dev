@@ -5,7 +5,6 @@ namespace App\Http\Livewire;
 use App\Models\LicencaMesec;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
-//use App\Models\LicencaDistributerTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -102,7 +101,6 @@ class ZaduzenjePregled extends Component
                         'lokacijas.l_naziv', 
                         'lokacijas.mesto', 
                         'lokacijas.adresa',
-                        'licenca_naplatas.broj_dana',
                         'licenca_naplatas.zaduzeno',
                         'licenca_naplatas.datum_pocetka_licence', 
                         'licenca_naplatas.datum_kraj_licence', 
@@ -136,7 +134,6 @@ class ZaduzenjePregled extends Component
             'lokacijas.l_naziv', 
             'lokacijas.mesto', 
             'lokacijas.adresa',
-            'licenca_naplatas.broj_dana',
             'licenca_naplatas.zaduzeno',
             'licenca_naplatas.datum_pocetka_licence', 
             'licenca_naplatas.datum_kraj_licence', 
@@ -162,14 +159,6 @@ class ZaduzenjePregled extends Component
             ->orderBy('terminal_lokacijas.id')
             ->orderBy('licenca_distributer_cenas.licenca_tipId')
             ->paginate(Config::get('global.paginate'));
-
-        /* $filter = [
-            'searchTerminalSnNpl'   =>  $this->searchTerminalSnNpl,
-            'searchMestoNpl'        =>  $this->searchMestoNpl,
-            'searchTipLicenceNpl'   =>  $this->searchTipLicenceNpl
-        ];
-
-        return LicencaDistributerTerminal::nenaplativeLicenceDistributera($this->did, $filter); */
     }
 
     public function render()

@@ -89,7 +89,6 @@ return array(
     'App\\Models\\KursEvra' => $baseDir . '/app/Models/KursEvra.php',
     'App\\Models\\LicencaDistributerCena' => $baseDir . '/app/Models/LicencaDistributerCena.php',
     'App\\Models\\LicencaDistributerMesec' => $baseDir . '/app/Models/LicencaDistributerMesec.php',
-    'App\\Models\\LicencaDistributerTerminal' => $baseDir . '/app/Models/LicencaDistributerTerminal.php',
     'App\\Models\\LicencaDistributerTip' => $baseDir . '/app/Models/LicencaDistributerTip.php',
     'App\\Models\\LicencaMesec' => $baseDir . '/app/Models/LicencaMesec.php',
     'App\\Models\\LicencaNaplata' => $baseDir . '/app/Models/LicencaNaplata.php',

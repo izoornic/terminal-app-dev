@@ -190,10 +190,33 @@ V 1.0.3.2 (10.4.2025.) @stanje-terminala branch
 V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
     - Dodata opcija Export Excel za izvoz licenci koje su istekle ili uskoro isticu ya uloge Menadzer licenci i Distributer
 
+V 1.0.3.4 (15.5.2025.) @main
+    - Dodata opcija "Obrisi sve licence" ya Menadzera licenci
+
+V 1.0.3.8 (21.5.2025.) @Statistika-licenci-prodaja
+    - Statistika licenci za menagment dodate stranice:
+        managment-distributeri (lista distributera)
+            -- komponenta "komponente.sort-button" - sortiranje sa eventom
+        managment-distributer-licence (grafik licenci prema datumu pocetka sa prikazom pojedinacnih na klik)
+            -- komponenta "managment.pocetak-licence-grafik"  - grafik 
+            -- komponenta "managment.prikaz-izabranih-licenci"  - Tabela licenci posle klika na grafik        
+
+ V 1.0.3.9 (24.5.2025.) @Statistika-licenci-prodaja  
+    - Dodati check boxovi (toogle) za prikay kategorija na grafiku
+
+V 1.0.3.7 (21.5.2025.) @main
+    - Ispravljen bug na stranici "ZaduzenjeDistributerMesec" gde je zaduzenje bilo 0
+
 V 1.0.3.7.2 (20.6.2025.) @main
     - Dodtata tabela `licenca_sign_logs` logovanje potpisa u clasi "CryptoSign"
 
-    
+V 1.0.3.9 () @Statistika-licenci-prodaja  
+    - Izmena u bazi "licenca_naplatas" dodata polja: 'nova_licenca', 'terminal_sn', 'licenca_naziv'
+    - Refaktor koda na svoim stranicama za statistiku licenci za menagment
+        
+//TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
+        posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
+
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

@@ -72,6 +72,26 @@ class Helpers
         return strtr($name,$tr);
     }
 
+    public static function monthNameToNumber($mesecNaSrpskom)
+    {
+        $tr = [
+            'januar'=>'01',
+            'februar'=>'02',
+            'mart' => '03',
+            'april'=>'04',
+            'maj'=>'05',
+            'jun'=>'06',
+            'jul'=>'07',
+            'avgust'=>'08',
+            'septembar'=>'09',
+            'oktobar'=>'10',
+            'novembar'=>'11',
+            'decembar'=>'12'
+        ];
+        return strtr($mesecNaSrpskom,$tr);
+    }
+    
+
     public static function yearNumber($date)
     {
         return Carbon::parse($date)->format('Y');

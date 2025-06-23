@@ -170,4 +170,13 @@ Route::group(['middleware' => [
     Route::get('/distributer-licence-grafik', function(){
         return view('admin.distributer-term-lic-graph');
         })->name('distributer-licence-grafik');
+
+    Route::get('/managment-distributeri', function(){
+        return view('managment.man-distributeri-pregled');
+        })->name('managment-distributeri');
+
+    Route::get('/managment-distributer-licence', function(){
+        return view('managment.man-distributer-licence');
+        })->name('managment-distributer-licence');
+
 });

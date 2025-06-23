@@ -9,7 +9,6 @@ use App\Models\LicencaParametar;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaParametarTerminal;
-use App\Models\LicencaDistributerTerminal;
 
 use Illuminate\Http\Request;
 //use Spatie\Crypto\Rsa\PrivateKey;

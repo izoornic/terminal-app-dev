@@ -9,7 +9,6 @@ use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaParametarTerminal;
-//use App\Models\LicencaDistributerTerminal;
 
 use App\Http\Helpers;
 use App\Ivan\CryptoSign;
