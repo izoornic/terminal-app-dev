@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\LicencaNaplata;
+use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
 use App\Models\LicencaParametar;
 use App\Models\LicenceZaTerminal;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Config;
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LicencaNaplataExport;
+use App\Actions\Lokacije\LokacijaInfo;
 
 class DistributerTerminal extends Component
 {
@@ -55,6 +57,13 @@ class DistributerTerminal extends Component
     public $terminalInfo;
     public $licenceNaziviInfo;
 
+    // koordinate
+    public $latLogVisible;
+    public $latLogValue;
+    public $lat_value;
+    public $long_value;
+    public $lokacijalId; // ID lokacije
+
    /**
      * mount
      *
@@ -76,7 +85,7 @@ class DistributerTerminal extends Component
         $this->broj_licenci = $ter_and_lic_info['br_licenci'];
         if($ter_and_lic_info['br_terminala'] != $this->broj_terminala){
             $this->broj_terminala = $ter_and_lic_info['br_terminala'];
-            //LicencaDistributerTip::where('id', '=', $this->distId)->update(['broj_terminala' => $this->broj_terminala ]);
+            LicencaDistributerTip::where('id', '=', $this->distId)->update(['broj_terminala' => $this->broj_terminala ]);
         }
     }
 
@@ -169,6 +178,9 @@ class DistributerTerminal extends Component
             'lokacijas.l_naziv', 
             'lokacijas.mesto', 
             'lokacijas.adresa', 
+            'lokacijas.latitude', 
+            'lokacijas.longitude',
+            'lokacijas.id as lokid',
             'licenca_naplatas.id as lnid', 
             'licenca_naplatas.datum_pocetka_licence', 
             'licenca_naplatas.datum_kraj_licence',
@@ -203,6 +215,48 @@ class DistributerTerminal extends Component
     ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
         
     }
+
+    public function showLatLogModal($id)
+    {
+        $this->resetValidation();
+        $this->lokacijalId = $id;
+        $this->odabranaLokacija = LokacijaInfo::getInfo($this->lokacijalId);
+        $this->latLogValue = Str::of($this->odabranaLokacija->latitude . ', ' . $this->odabranaLokacija->longitude);
+        $this->latLogValue = ($this->latLogValue == ', ') ? '' : $this->latLogValue;
+        $this->latLogVisible = true;
+    }
+
+    public function addOrUpdateLatLog()
+    {
+        $this->latLogValue = preg_replace('/\s+/', '', $this->latLogValue);
+        $exp = Str::of($this->latLogValue)->explode(delimiter: ',');
+        if(count($exp) < 2 || count($exp) > 2){
+            $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
+            return;
+        }
+        // Check if the latitude and longitude values are numeric
+        if(!is_numeric($exp[0]) || !is_numeric($exp[1])){
+            $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
+            return;
+        }
+        $this->lat_value = $exp[0];
+        $this->long_value = $exp[1];
+        
+        // Validate the latitude and longitude values
+        $this->validate([
+            'lat_value' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+            'long_value' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+        ]);
+        //dd(Lokacija::find($this->modelId));
+        Lokacija::find($this->lokacijalId)->update(['latitude' => $exp[0], 'longitude' => $exp[1]]);
+        $this->latLogVisible = false;
+    }
+
+    public function removeLatLog()
+    {
+        Lokacija::find($this->lokacijalId)->update(['latitude' => NULL, 'longitude' => NULL]);
+        $this->latLogVisible = false;
+    }   
     
     public function render()
     {

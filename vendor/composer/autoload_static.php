@@ -17,11 +17,11 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '3bd81c9b8fcc150b69d8b63b4d2ccf23' => __DIR__ . '/..' . '/spatie/flare-client-php/src/helpers.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
-        'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
@@ -152,6 +152,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
             'League\\Flysystem\\' => 17,
             'League\\Config\\' => 14,
             'League\\CommonMark\\' => 18,
+            'Larswiegers\\LaravelMaps\\' => 24,
             'Laravel\\Tinker\\' => 15,
             'Laravel\\SerializableClosure\\' => 28,
             'Laravel\\Sanctum\\' => 16,
@@ -177,6 +178,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
             'GrahamCampbell\\ResultType\\' => 26,
+            'Gajus\\Dindent\\' => 14,
         ),
         'F' => 
         array (
@@ -525,6 +527,10 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         array (
             0 => __DIR__ . '/..' . '/league/commonmark/src',
         ),
+        'Larswiegers\\LaravelMaps\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/larswiegers/laravel-maps/src',
+        ),
         'Laravel\\Tinker\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/tinker/src',
@@ -590,6 +596,10 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
+        ),
+        'Gajus\\Dindent\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/gajus/dindent/src',
         ),
         'Fruitcake\\Cors\\' => 
         array (
@@ -722,6 +732,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Console\\Commands\\ServisnaLicencaDel' => __DIR__ . '/../..' . '/app/Console/Commands/ServisnaLicencaDel.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Exports\\LicencaNaplataExport' => __DIR__ . '/../..' . '/app/Exports/LicencaNaplataExport.php',
         'App\\Helpers\\PaginationHelper' => __DIR__ . '/../..' . '/app/Helpers/PaginationHelper.php',
         'App\\Http\\Controllers\\ApiDataController' => __DIR__ . '/../..' . '/app/Http/Controllers/ApiDataController.php',
         'App\\Http\\Controllers\\Api\\LicenceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/LicenceController.php',
@@ -743,11 +754,16 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Http\\Livewire\\Distributer\\DistTerminal' => __DIR__ . '/../..' . '/app/Http/Livewire/Distributer/DistTerminal.php',
         'App\\Http\\Livewire\\Distributeri' => __DIR__ . '/../..' . '/app/Http/Livewire/Distributeri.php',
         'App\\Http\\Livewire\\Frontpage' => __DIR__ . '/../..' . '/app/Http/Livewire/Frontpage.php',
+        'App\\Http\\Livewire\\Komponente\\SortButton' => __DIR__ . '/../..' . '/app/Http/Livewire/Komponente/SortButton.php',
         'App\\Http\\Livewire\\LicencaLokacija' => __DIR__ . '/../..' . '/app/Http/Livewire/LicencaLokacija.php',
         'App\\Http\\Livewire\\LicencaParametars' => __DIR__ . '/../..' . '/app/Http/Livewire/LicencaParametars.php',
         'App\\Http\\Livewire\\LicencaTerminal' => __DIR__ . '/../..' . '/app/Http/Livewire/LicencaTerminal.php',
         'App\\Http\\Livewire\\Licence' => __DIR__ . '/../..' . '/app/Http/Livewire/Licence.php',
         'App\\Http\\Livewire\\Lokacijes' => __DIR__ . '/../..' . '/app/Http/Livewire/Lokacijes.php',
+        'App\\Http\\Livewire\\Managment\\DistributerLicencePregled' => __DIR__ . '/../..' . '/app/Http/Livewire/Managment/DistributerLicencePregled.php',
+        'App\\Http\\Livewire\\Managment\\DistributeriPregled' => __DIR__ . '/../..' . '/app/Http/Livewire/Managment/DistributeriPregled.php',
+        'App\\Http\\Livewire\\Managment\\PocetakLicenceGrafik' => __DIR__ . '/../..' . '/app/Http/Livewire/Managment/PocetakLicenceGrafik.php',
+        'App\\Http\\Livewire\\Managment\\PrikazIzabranihLicenci' => __DIR__ . '/../..' . '/app/Http/Livewire/Managment/PrikazIzabranihLicenci.php',
         'App\\Http\\Livewire\\Prijava' => __DIR__ . '/../..' . '/app/Http/Livewire/Prijava.php',
         'App\\Http\\Livewire\\Razduzenje' => __DIR__ . '/../..' . '/app/Http/Livewire/Razduzenje.php',
         'App\\Http\\Livewire\\RazduzenjeDistributerMesec' => __DIR__ . '/../..' . '/app/Http/Livewire/RazduzenjeDistributerMesec.php',
@@ -800,6 +816,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Models\\LicencaParametar' => __DIR__ . '/../..' . '/app/Models/LicencaParametar.php',
         'App\\Models\\LicencaParametarTerminal' => __DIR__ . '/../..' . '/app/Models/LicencaParametarTerminal.php',
         'App\\Models\\LicencaServisna' => __DIR__ . '/../..' . '/app/Models/LicencaServisna.php',
+        'App\\Models\\LicencaSignLog' => __DIR__ . '/../..' . '/app/Models/LicencaSignLog.php',
         'App\\Models\\LicencaTip' => __DIR__ . '/../..' . '/app/Models/LicencaTip.php',
         'App\\Models\\LicenceZaTerminal' => __DIR__ . '/../..' . '/app/Models/LicenceZaTerminal.php',
         'App\\Models\\Lokacija' => __DIR__ . '/../..' . '/app/Models/Lokacija.php',
@@ -1897,6 +1914,10 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'FontLib\\WOFF\\TableDirectoryEntry' => __DIR__ . '/..' . '/phenx/php-font-lib/src/FontLib/WOFF/TableDirectoryEntry.php',
         'Fruitcake\\Cors\\CorsService' => __DIR__ . '/..' . '/fruitcake/php-cors/src/CorsService.php',
         'Fruitcake\\Cors\\Exceptions\\InvalidOptionException' => __DIR__ . '/..' . '/fruitcake/php-cors/src/Exceptions/InvalidOptionException.php',
+        'Gajus\\Dindent\\Exception\\DindentException' => __DIR__ . '/..' . '/gajus/dindent/src/Exception/DindentException.php',
+        'Gajus\\Dindent\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/gajus/dindent/src/Exception/InvalidArgumentException.php',
+        'Gajus\\Dindent\\Exception\\RuntimeException' => __DIR__ . '/..' . '/gajus/dindent/src/Exception/RuntimeException.php',
+        'Gajus\\Dindent\\Indenter' => __DIR__ . '/..' . '/gajus/dindent/src/Indenter.php',
         'GrahamCampbell\\ResultType\\Error' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Error.php',
         'GrahamCampbell\\ResultType\\Result' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Result.php',
         'GrahamCampbell\\ResultType\\Success' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Success.php',
@@ -3798,6 +3819,11 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'Laravel\\Tinker\\Console\\TinkerCommand' => __DIR__ . '/..' . '/laravel/tinker/src/Console/TinkerCommand.php',
         'Laravel\\Tinker\\TinkerCaster' => __DIR__ . '/..' . '/laravel/tinker/src/TinkerCaster.php',
         'Laravel\\Tinker\\TinkerServiceProvider' => __DIR__ . '/..' . '/laravel/tinker/src/TinkerServiceProvider.php',
+        'Larswiegers\\LaravelMaps\\Components\\Google' => __DIR__ . '/..' . '/larswiegers/laravel-maps/src/Components/Google.php',
+        'Larswiegers\\LaravelMaps\\Components\\Leaflet' => __DIR__ . '/..' . '/larswiegers/laravel-maps/src/Components/Leaflet.php',
+        'Larswiegers\\LaravelMaps\\LaravelMaps' => __DIR__ . '/..' . '/larswiegers/laravel-maps/src/LaravelMaps.php',
+        'Larswiegers\\LaravelMaps\\LaravelMapsFacade' => __DIR__ . '/..' . '/larswiegers/laravel-maps/src/LaravelMapsFacade.php',
+        'Larswiegers\\LaravelMaps\\LaravelMapsServiceProvider' => __DIR__ . '/..' . '/larswiegers/laravel-maps/src/LaravelMapsServiceProvider.php',
         'League\\CommonMark\\CommonMarkConverter' => __DIR__ . '/..' . '/league/commonmark/src/CommonMarkConverter.php',
         'League\\CommonMark\\ConverterInterface' => __DIR__ . '/..' . '/league/commonmark/src/ConverterInterface.php',
         'League\\CommonMark\\Delimiter\\Bracket' => __DIR__ . '/..' . '/league/commonmark/src/Delimiter/Bracket.php',
