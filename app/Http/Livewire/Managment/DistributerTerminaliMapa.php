@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaNaplata;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
+
 
 class DistributerTerminaliMapa extends Component
 {
@@ -22,21 +24,7 @@ class DistributerTerminaliMapa extends Component
         $this->dist_name = LicencaDistributerTip::where('id', '=', $this->distId)->first()->distributer_naziv ?? 'Sve licence';
 
         // Initialize the pin colors array with some example data
-        $this->pin_colors = [
-            'red'           => 'img/map-pins/red-dot.png',
-            'blue'          => 'img/map-pins/blue-dot.png',
-            'green'         => 'img/map-pins/green-dot.png',
-            'orange'        => 'img/map-pins/orange-dot.png',
-            'purple'        => 'img/map-pins/purple-dot.png',
-            'brown'         => 'img/map-pins/brown-dot.png',
-            'gray'          => 'img/map-pins/gray-dot.png',
-            'yellow'        => 'img/map-pins/yellow-dot.png',
-            'pink'          => 'img/map-pins/pink-dot.png',
-            'lightblue'     => 'img/map-pins/lightblue-dot.png',
-            'lightred'      => 'img/map-pins/lightred-dot.png',
-            'lightgreen'    => 'img/map-pins/lightgreen-dot.png',
-            'lightyellow'   => 'img/map-pins/lightyellow-dot.png',
-        ];
+        $this->pin_colors = Config::get('global.pin_colors');
 
         $this->read(); // Call the read method to populate the pins array
     }  

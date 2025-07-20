@@ -183,4 +183,8 @@ Route::group(['middleware' => [
         return view('managment.man-distributer-terminali-mapa');
         })->name('managment-distributer-mapa');
 
+    Route::get('/managment-distributeri-mapa', function(){
+        return view('managment.man-distributeri-licence-mapa');
+        })->name('managment-distributeri-mapa');
+
 });

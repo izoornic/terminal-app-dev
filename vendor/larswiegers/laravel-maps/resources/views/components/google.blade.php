@@ -131,11 +131,11 @@ function buildContent(p_property) {
     </div>
     <div class="details">
         <div class="address">${property.address}</div>
-       
+
         <div class="sn">
-            <strong>SN: </strong>
-            ${terminals.length > 0 ? terminals.map(term => `<span class="sn">${term}</span>`).join(', ') : 'No SN available'}
+            ${terminals.length > 0 ? 'SN: ' + terminals.map(term => `<span class="sn">${term}</span>`).join(', ') : ''}
         </div>
+
         <div class="kontakt_osoba">
             <div class="name">${property.ko_name}</div>
             <div class="tel">${property.ko_tel}</div>
