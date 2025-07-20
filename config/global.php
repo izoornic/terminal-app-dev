@@ -4,7 +4,7 @@ return [
 
 	'siteFooter' => '© '.date("Y").' Copyright: Zeta System EPOS',
 
-	'version' => 'V 1.0.4.2.2',
+	'version' => 'V 1.0.4.3',
 
 	'paginate' => 10,
 
@@ -62,6 +62,7 @@ return [
 		14	=> 'img/map-pins/dot-red-14.png',
 		15	=> 'img/map-pins/dot-red-15.png',
 		16	=> 'img/map-pins/dot-red-16.png',
+		17	=> 'img/map-pins/yellow-dot.png',
 	],
 
 ];

@@ -8,6 +8,7 @@ use App\Models\LicencaDistributerTip;
 use App\Models\LicencaNaplata;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use App\Http\Helpers; // Import the Helpers class
 
 class DistirbuteriLicenceMapa extends Component
 {
@@ -132,6 +133,7 @@ class DistirbuteriLicenceMapa extends Component
 
         $ldatAll = LicencaDistributerTip::select(
             'licenca_distributer_tips.distributer_naziv',
+            'licenca_distributer_tips.created_at',
             'licenca_distributer_tips.id',
             'lokacijas.l_naziv',
             'lokacijas.mesto',
@@ -144,28 +146,27 @@ class DistirbuteriLicenceMapa extends Component
             ->leftJoin('lokacijas', 'distributer_lokacija_indices.lokacijaId', '=', 'lokacijas.id')
             ->where('licenca_distributer_tips.id', '!=', 2)
             ->get()
+            //dd($ldatAll);
             // Process the fetched data to populate the pins array
             ->each(function ($pin) use( $ldat) {
                 // Ensure that the pin is valid
                 if(!$pin->lat || !$pin->long) {
                     return; // Skip invalid pins
                 }
+                $novi_distributer = (Helpers::dateGratherOrEqualThan($pin->created_at, now()->modify($this->filterMeseciValue))) ? 1 : 0; // Check if the distributer is new based on the created_at date
                 $nove_count = $ldat->where('id', $pin->id)->first();
-                if($nove_count) {
-                    $pin->nove_count = $nove_count->nove_count;
-                } else {
-                    $pin->nove_count = 0; // Default to 0 if no count found
-                }
+                $pin->nove_count = ($nove_count) ? $nove_count->nove_count : 0; // Get the count of new licenses for this distributer
+                
                 $this->pins[] = [
                     'lat' => $pin->lat,
                     'long' => $pin->long,
-                    'icon' => $this->GetMyPinNumberIcon($pin->nove_count),
+                    'icon' => $this->GetMyPinNumberIcon($pin->nove_count, $novi_distributer),
                     'terminal_count' => $pin->nove_count, 
                     //'terminal_sn' => [1,2,3], // Example terminal serial numbers, adjust as needed
                     'info' => json_encode([
                                 'p_name' => $pin->distributer_naziv,
                                 'address' => $pin->adresa.' '.$pin->mesto,
-                                'ko_tel' => ' ',
+                                'ko_tel' => ($novi_distributer) ? 'Novi distributer, dodat: '.Helpers::datumFormatDanFullYear($pin->created_at) : ' ',
                                 'ko_name' => 'Ukupno novih licenci: '.$pin->nove_count,
                             ])
                     ];
@@ -184,15 +185,18 @@ class DistirbuteriLicenceMapa extends Component
         return $this->pin_colors['red']; // Default icon if no match found
     } */
 
-    private function GetMyPinNumberIcon($count)
+    private function GetMyPinNumberIcon($count, $new)
     {
+        if((int)$new === 1 && (int)$count === 0)  {
+            return $this->pin_numbers[17]; // Return red icon for new distributers
+        }
+        if($count > 15) {
+            return $this->pin_numbers[16]; // Return red icon for counts greater than 15
+        }
        foreach ($this->pin_numbers as $key => $icon) {
             if ((int)$count === (int)$key) {
                 return $icon; // Return the icon for the first matching count
             }
-        }
-        if($count > 15) {
-            return $this->pin_numbers[16]; // Return red icon for counts greater than 15
         }
         return $this->pin_numbers[0]; // Default icon if no match found
     }
