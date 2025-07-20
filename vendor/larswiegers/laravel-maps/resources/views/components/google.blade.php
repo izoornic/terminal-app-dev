@@ -64,7 +64,8 @@ class='{{ $attributes["class"] }}'
         map{{$mapId}} = new google.maps.Map(document.getElementById("{{$mapId}}"), {
             center: { lat: {{$centerPoint['lat'] ?? $centerPoint[0]}}, lng: {{$centerPoint['long'] ?? $centerPoint[1]}} },
             zoom: {{$zoomLevel}},
-            mapTypeId: '{{$mapType}}'
+            mapTypeId: '{{$mapType}}',
+            zoomControl: true
         });
 
     function addInfoWindow(marker, message) {

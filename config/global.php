@@ -4,7 +4,7 @@ return [
 
 	'siteFooter' => '© '.date("Y").' Copyright: Zeta System EPOS',
 
-	'version' => 'V 1.0.4.1',
+	'version' => 'V 1.0.4.2',
 
 	'paginate' => 10,
 
@@ -42,6 +42,26 @@ return [
 		'lightred'      => 'img/map-pins/lightred-dot-num.png',
 		'lightgreen'    => 'img/map-pins/lightgreen-dot-num.png',
 		'lightyellow'   => 'img/map-pins/lightyellow-dot-num.png',
+	],
+
+	'pin_red_numbers' => [
+		0	=> 'img/map-pins/gray-dot.png',
+		1	=> 'img/map-pins/dot-red-1.png',
+		2	=> 'img/map-pins/dot-red-2.png',
+		3	=> 'img/map-pins/dot-red-3.png',
+		4	=> 'img/map-pins/dot-red-4.png',
+		5	=> 'img/map-pins/dot-red-5.png',
+		6	=> 'img/map-pins/dot-red-6.png',
+		7	=> 'img/map-pins/dot-red-7.png',
+		8	=> 'img/map-pins/dot-red-8.png',
+		9	=> 'img/map-pins/dot-red-9.png',
+		10	=> 'img/map-pins/dot-red-10.png',
+		11	=> 'img/map-pins/dot-red-11.png',
+		12	=> 'img/map-pins/dot-red-12.png',
+		13	=> 'img/map-pins/dot-red-13.png',
+		14	=> 'img/map-pins/dot-red-14.png',
+		15	=> 'img/map-pins/dot-red-15.png',
+		16	=> 'img/map-pins/dot-red-16.png',
 	],
 
 ];
