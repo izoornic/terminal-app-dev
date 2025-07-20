@@ -194,7 +194,7 @@ class DistirbuteriLicenceMapa extends Component
         if($count > 15) {
             return $this->pin_numbers[16]; // Return red icon for counts greater than 15
         }
-        return $this->pin_colors[0]; // Default icon if no match found
+        return $this->pin_numbers[0]; // Default icon if no match found
     }
 
 
