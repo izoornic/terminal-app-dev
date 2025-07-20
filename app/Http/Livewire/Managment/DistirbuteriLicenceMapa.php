@@ -187,7 +187,7 @@ class DistirbuteriLicenceMapa extends Component
     private function GetMyPinNumberIcon($count)
     {
        foreach ($this->pin_numbers as $key => $icon) {
-            if ($count === $key) {
+            if ((int)$count === (int)$key) {
                 return $icon; // Return the icon for the first matching count
             }
         }
