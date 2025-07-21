@@ -510,7 +510,7 @@ class LicencaTerminal extends Component
         
         if($this->selectedTerminalComments->count() != $this->selectedTerminalCommentsCount){
             $this->selectedTerminalCommentsCount = $this->selectedTerminalComments->count();
-            TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount]);
+            TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount, 'last_comment_userId' => auth()->user()->id, 'last_comment_at' => now()]);
         }
         
         $this->newKoment = '';
