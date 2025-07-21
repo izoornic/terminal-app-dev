@@ -88,6 +88,7 @@ class PocetakLicenceGrafik extends Component
                 ->when($this->distId, function ($query) {
                     return $query->where('distributerId', $this->distId);
                 })
+                //->where('nova_licenca', '=', DB::raw("0"))
                 ->where('licenca_naziv', '=', DB::raw('"esir"'))
                 ->where('licenca_naplatas.aktivna', '=', DB::raw("1"))
                 ->groupby('year','month')
@@ -115,7 +116,7 @@ class PocetakLicenceGrafik extends Component
             //Nove licence
             $item->nove = $nove_licence->where('year', $item->year)->where('month', $item->month)->first()->data ?? 0;
 
-            //Proizvedene licence
+            //Produzene licence
             $item->produzene = ($item->nove > 0) ? $item->data - $item->nove : $item->data;
             
             //Istekle licence

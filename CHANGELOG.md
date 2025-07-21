@@ -215,6 +215,18 @@ V 1.0.3.9 () @Statistika-licenci-prodaja
     - Refaktor koda na svoim stranicama za statistiku licenci za menagment
 
 V 1.0.3.11 (23.6.2025.) @main merged @Statistika-licenci-prodaja
+
+V 1.0.4 (1.7.2025.) @mapa-terminala-distibutera
+    - Izmenjene stranice "Lokacije" (za Admina i Menadgera licenci) i stranica "distributer-tremina" dodata funkcija ya dodavanje koordinata
+    - Za Admina dodata stranica "managment-distributer-mapa" na kojoj se na goole mapi prikazuju terminali
+
+V 1.0.4.1 (20.7.2025.) @mapa-terminala-distibutera
+    - Dodata mapa svih distributera sa pinovima koji pokayuju brog novih licenci prema kriterijumu iz filtera
+
+V 1.0.4.3.1 (21.7.2025.) @mapa-terminala-distibutera
+    - Promenjen izgled pinova (nijanse crvene boje) sa brojevima od 1 do 15+ sivi pinovi ya 0 i zuti za nove distributere sa 0 licenci
+
+    
         
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru

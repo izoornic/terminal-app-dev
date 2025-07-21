@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Lokacije\LokacijaInfo;
 
 class Lokacijes extends Component
 {
@@ -106,6 +107,12 @@ class Lokacijes extends Component
     public $mb;
     public $email;
     public $email_is_set;
+
+    // koordinate
+    public $latLogVisible;
+    public $latLogValue;
+    public $lat_value;
+    public $long_value;
 
     /**
      * The validation rules
@@ -351,7 +358,7 @@ class Lokacijes extends Component
     public function deleteShowModal($id)
     {
         $this->modelId = $id;
-        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId); //$this->lokacijaInfo();
        
         $this->deletePosible = false;
         
@@ -430,7 +437,7 @@ class Lokacijes extends Component
         $this->new_terminal_tip = 0;
 
         $this->modelId = $id;
-        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId); //$this->lokacijaInfo();
         $this->errAddMsg = '';
         $this->t_status = 0;
         $this->addingType = 'location';
@@ -449,28 +456,28 @@ class Lokacijes extends Component
      *
      * @return object
      */
-    private function lokacijaInfo()
+   /*  private function lokacijaInfo()
     {
         return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->where('lokacijas.id', '=', $this->modelId)
         ->first();
-    }
+    } */
     
     /**
      * lokacjaSaKojeUzimaInfo
      *
      * @return void
      */
-    private function lokacjaSaKojeUzimaInfo()
+   /*  private function lokacjaSaKojeUzimaInfo()
     {
         return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
             ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->where('lokacijas.id', '=', $this->p_lokacijaId)
             ->first();
-    }
+    } */
     /**
      * terminaliZaLokaciju
      *
@@ -598,11 +605,9 @@ class Lokacijes extends Component
     public function showKontaktOsobaModal($id)
     {
         $this->modelId = $id;
-        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId);
+        //dd($this->odabranaLokacija);
         $this->kontaktOsobaInfo = $this->kontaktOsobaGetInfo();
-
-
-
         $this->kontaktOsobaVisible = true;
     }
 
@@ -611,6 +616,49 @@ class Lokacijes extends Component
         return LokacijaKontaktOsoba::where('lokacijaId', '=', $this->modelId)
                                 ->first();
     }
+
+    public function showLatLogModal($id)
+    {
+        $this->resetValidation();
+        $this->modelId = $id;
+        $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId);
+        $this->latLogValue = Str::of($this->odabranaLokacija->latitude . ', ' . $this->odabranaLokacija->longitude);
+        $this->latLogValue = ($this->latLogValue == ', ') ? '' : $this->latLogValue;
+        $this->latLogVisible = true;
+    }
+
+    public function addOrUpdateLatLog()
+    {
+        $this->latLogValue = preg_replace('/\s+/', '', $this->latLogValue);
+        $exp = Str::of($this->latLogValue)->explode(delimiter: ',');
+        if(count($exp) < 2 || count($exp) > 2){
+            $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
+            return;
+        }
+        // Check if the latitude and longitude values are numeric
+        if(!is_numeric($exp[0]) || !is_numeric($exp[1])){
+            $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
+            return;
+        }
+        $this->lat_value = $exp[0];
+        $this->long_value = $exp[1];
+        
+        // Validate the latitude and longitude values
+        $this->validate([
+            'lat_value' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+            'long_value' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+        ]);
+        
+        Lokacija::find($this->modelId)->update(['latitude' => $exp[0], 'longitude' => $exp[1]]);
+        $this->latLogVisible = false;
+    }
+
+    public function removeLatLog()
+    {
+        Lokacija::find($this->modelId)->update(['latitude' => NULL, 'longitude' => NULL]);
+        $this->latLogVisible = false;
+    }   
+
     /**
      * updated
      *
@@ -633,11 +681,11 @@ class Lokacijes extends Component
         }
 
         if($this->modalAddTerminalVisible || $this->kontaktOsobaVisible){
-            $this->odabranaLokacija = $this->lokacijaInfo();
+            $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId);
         }
 
         if($this->modalAddTerminalVisible && $this->p_lokacijaId){
-            $this->lokacijaSaKojeUzima = $this->lokacjaSaKojeUzimaInfo();
+            $this->lokacijaSaKojeUzima = LokacijaInfo::getInfo($this->p_lokacijaId); //$this->lokacjaSaKojeUzimaInfo();   
         }
     }
 }
