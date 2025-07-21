@@ -94,6 +94,16 @@ class DistirbuteriLicenceMapa extends Component
         }
     }
 
+    // ===================== LEGENDA BLADE =========================
+    // This section is commented out as it is not used in the current implementation.
+    /* <div class="flex">
+         <div class="text-lg mr-2">Legenda</div>
+         @foreach($terminal_count_colors_ico as $key => $ico)
+            <div class="flex ml-4"><img width="20px" src="{{$ico}}" /><span class="mt-1">&nbsp; @if ($key <= 5) =@else < @endif {{$key}}</span></div>
+         @endforeach
+      </div> */
+    // ===================== LEGENDA BLADE =========================
+    
     /**
      * Read data and populate the pins array.
      *
