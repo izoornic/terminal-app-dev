@@ -226,8 +226,15 @@ V 1.0.4.1 (20.7.2025.) @mapa-terminala-distibutera
 V 1.0.4.3.1 (21.7.2025.) @mapa-terminala-distibutera
     - Promenjen izgled pinova (nijanse crvene boje) sa brojevima od 1 do 15+ sivi pinovi ya 0 i zuti za nove distributere sa 0 licenci
 
-    
-        
+V 1.0.4.4  () @ Termina-kutija-komentar-lokacija-duplikat 
+    - Promenjen Cron job za brisanje servisnih licenci... sada brise dan posle isteka prekoracenja...
+    - Dodati komentari na terminal za Menagra licenci
+
+
+
+
+
+
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
 

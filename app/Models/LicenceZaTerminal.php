@@ -60,7 +60,9 @@ class LicenceZaTerminal extends Model
 
     public static function deleteExpiredServiceLicences()
     {
-        $istekLimit = Helpers::addDaysToDate(Helpers::datumKalendarNow(), -3);
+        //$istekLimit = Helpers::addDaysToDate(Helpers::datumKalendarNow(), -3);
+        // Brise se dan posle isteka na ne 3 dana kasnije...
+        $istekLimit = Helpers::datumKalendarNow();
 
         $retval = LicenceZaTerminal::where('datum_prekoracenja', '<', $istekLimit)
                                     ->where('licenca_poreklo', '=', 2)
