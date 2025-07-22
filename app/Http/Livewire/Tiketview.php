@@ -72,6 +72,13 @@ class Tiketview extends Component
     public $kreiranOlineInfo;
 
     private $mailToUser;
+
+    //komentari na terminalu
+    public $modelId;
+    public $selectedTerminal;
+    public $modalKomentariVisible;
+    public $selectedTerminalComments;
+    public $selectedTerminalCommentsCount;
     
     /**
      * mount
@@ -141,7 +148,22 @@ class Tiketview extends Component
     
     private function TiketInfo()
     {
-       return Tiket::select('tikets.id as tkid', 'tikets.korisnik_prijavaId', 'tikets.opis', 'tikets.tremina_lokacijalId', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara', 'tikets.opis_kvaraId', 'users.name', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_hover_collor', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'tiket_opis_kvara_tips.tok_naziv', 'tiket_opis_kvara_tips.id as tokid', 'tikets.korisnik_zatvorio_id')
+       return Tiket::select(
+                            'tikets.id as tkid', 
+                            'tikets.korisnik_prijavaId', 
+                            'tikets.opis', 
+                            'tikets.tremina_lokacijalId', 
+                            'tikets.created_at', 'tikets.updated_at', 
+                            'tikets.br_komentara', 'tikets.opis_kvaraId', 
+                            'users.name', 
+                            'tiket_status_tips.tks_naziv', 
+                            'tiket_prioritet_tips.tp_naziv', 
+                            'tiket_prioritet_tips.btn_hover_collor', 
+                            'tiket_prioritet_tips.btn_collor', 
+                            'tiket_prioritet_tips.tr_bg_collor', 
+                            'tiket_opis_kvara_tips.tok_naziv', 
+                            'tiket_opis_kvara_tips.id as tokid', 
+                            'tikets.korisnik_zatvorio_id')
                     ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
                     ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
                     ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')
@@ -158,6 +180,8 @@ class Tiketview extends Component
     {
         $this->newKoment = '';
         $this->tiket = $this->TiketInfo();
+
+        $this->selectedTerminalCommentsCount = TerminalLokacija::find($this->tiket->tremina_lokacijalId)->br_komentara;
         
         $this->kvarAkcijaId = $this->tiket->tokid;
         $this->brojKomentra = $this->tiket->br_komentara;
@@ -436,6 +460,17 @@ class Tiketview extends Component
                 $this->noviDodeljenUserInfo = $this->selectedNoviUserInfo();
             }
         }
+    }
+
+    public function commentsShowModal($id)
+    {
+        $this->selectedTerminalComments = [];
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        //dd($this->selectedTerminalComments);
+        $this->modalKomentariVisible = true;
     }
 
     public function render()

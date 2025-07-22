@@ -478,10 +478,7 @@ class LicencaTerminal extends Component
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
-        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)
-            ->comments()
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
         //dd($this->selectedTerminalComments);
         $this->modalKomentariVisible = true;
     }
@@ -491,26 +488,28 @@ class LicencaTerminal extends Component
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
         
-        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)
-            ->comments()
-            ->get();
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
         
         $this->validate([
             'newKoment' => 'required|min:3|max:1000',
         ]);
 
-        TerminalLokacija::find($this->modelId)->comments()->create([
-            'comment' => $this->newKoment,
-            'userId' => auth()->user()->id,
-        ]);
+        TerminalLokacija::find($this->modelId)->comments()
+            ->create([
+                'comment' => $this->newKoment,
+                'userId' => auth()->user()->id,
+            ]);
 
-        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)
-            ->comments()
-            ->get();
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
         
         if($this->selectedTerminalComments->count() != $this->selectedTerminalCommentsCount){
             $this->selectedTerminalCommentsCount = $this->selectedTerminalComments->count();
-            TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount, 'last_comment_userId' => auth()->user()->id, 'last_comment_at' => now()]);
+            TerminalLokacija::where('id', $this->modelId)
+                ->update([
+                    'br_komentara'          => $this->selectedTerminalCommentsCount, 
+                    'last_comment_userId'   => auth()->user()->id, 
+                    'last_comment_at'       => now()
+                ]);
         }
         
         $this->newKoment = '';
@@ -533,9 +532,7 @@ class LicencaTerminal extends Component
             $komentar->update(['is_active' => false, 'deleted_at' => now()]);
             $this->selectedTerminalCommentsCount--;
             TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount]);
-            $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)
-                ->comments()
-                ->get();
+            $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
         }
     }
 

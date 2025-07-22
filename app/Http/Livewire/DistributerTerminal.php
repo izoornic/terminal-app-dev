@@ -64,6 +64,12 @@ class DistributerTerminal extends Component
     public $long_value;
     public $lokacijalId; // ID lokacije
 
+    //komentari
+    public $modalKomentariVisible;
+    public $selectedTerminalComments;
+    public $selectedTerminalCommentsCount;
+    public $newKoment;
+    public $selectedTerminal;
    /**
      * mount
      *
@@ -174,6 +180,7 @@ class DistributerTerminal extends Component
         
         return TerminalLokacija::select(
             'terminal_lokacijas.id', 
+            'terminal_lokacijas.br_komentara',
             'terminals.sn', 
             'lokacijas.l_naziv', 
             'lokacijas.mesto', 
@@ -257,6 +264,73 @@ class DistributerTerminal extends Component
         Lokacija::find($this->lokacijalId)->update(['latitude' => NULL, 'longitude' => NULL]);
         $this->latLogVisible = false;
     }   
+
+    public function commentsShowModal($id)
+    {
+        
+        $this->newKoment = '';
+        $this->resetErrorBag();
+        $this->selectedTerminalComments = [];
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        //dd($this->selectedTerminalComments);
+        $this->modalKomentariVisible = true;
+    }
+
+    public function posaljiKomentar()
+    {
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        
+        $this->validate([
+            'newKoment' => 'required|min:3|max:1000',
+        ]);
+
+        TerminalLokacija::find($this->modelId)->comments()
+            ->create([
+                'comment' => $this->newKoment,
+                'userId' => auth()->user()->id,
+            ]);
+
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        
+        if($this->selectedTerminalComments->count() != $this->selectedTerminalCommentsCount){
+            $this->selectedTerminalCommentsCount = $this->selectedTerminalComments->count();
+            TerminalLokacija::where('id', $this->modelId)
+                ->update([
+                    'br_komentara'          => $this->selectedTerminalCommentsCount, 
+                    'last_comment_userId'   => auth()->user()->id, 
+                    'last_comment_at'       => now()
+                ]);
+        }
+        
+        $this->newKoment = '';
+    } 
+    
+    /**
+     * Obrisi komentar
+     *
+     * @param mixed $id
+     * 
+     * @return [type]
+     * 
+     */
+    public function obrisiKomentar($id)
+    {
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        $komentar = TerminalLokacija::find($this->modelId)->comments()->find($id);
+        if($komentar){
+            $komentar->update(['is_active' => false, 'deleted_at' => now()]);
+            $this->selectedTerminalCommentsCount--;
+            TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount]);
+            $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        }
+    }
     
     public function render()
     {
