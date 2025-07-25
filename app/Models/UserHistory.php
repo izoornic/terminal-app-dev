@@ -16,6 +16,7 @@ class UserHistory extends Model
     protected $fillable = [
         'korisnikId',
         'pozicija_tipId',
+        'vidi_komentare_na_terminalu',
         'lokacijaId',
         'telegramId',
         'tel',

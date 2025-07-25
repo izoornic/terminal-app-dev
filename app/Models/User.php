@@ -30,6 +30,7 @@ class User extends Authenticatable
         'email',
         'password',
         'pozicija_tipId',
+        'vidi_komentare_na_terminalu',
         'lokacijaId',
         'telegramId',
         'tel',

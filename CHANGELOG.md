@@ -235,7 +235,9 @@ V 1.0.4.5  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
         Menager licenci (add i edit) stranice: Terminali i distributer-terminali
         Admin, serviser, kol centar ( view ) stranice: Terminali i ticket-view
 
-
+V 1.0.4.6  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
+    - Dodata funkcija Adminu da može da uključi ili isključi komentare na terminalu za Distributera
+    
 
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
