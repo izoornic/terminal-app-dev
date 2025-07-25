@@ -34,38 +34,6 @@ class DistirbuteriLicenceMapa extends Component
         // Initialize the terminal count pin icons with specific colors 
         $this->pin_numbers = Config::get('global.pin_red_numbers');
 
-       /*  $this->terminal_count_numbers_ico = [
-            1 => $this->pin_numbers['lightyellow'],
-            2 => $this->pin_numbers['gray'],
-            3 => $this->pin_numbers['yellow'],
-            4 => $this->pin_numbers['lightred'],
-            5 => $this->pin_numbers['lightgreen'],
-            10 => $this->pin_numbers['lightblue'],
-            15 => $this->pin_numbers['orange'],
-            20 => $this->pin_numbers['red'],
-            25 => $this->pin_numbers['green'],
-            30 => $this->pin_numbers['blue'],
-            40 => $this->pin_numbers['pink'],
-            50 => $this->pin_numbers['brown'],
-            100 => $this->pin_numbers['purple'],
-        ]; */
-
-        /*  $this->terminal_count_colors_ico = [
-            1 => $this->pin_colors['lightyellow'],
-            2 => $this->pin_colors['gray'],
-            3 => $this->pin_colors['yellow'],
-            4 => $this->pin_colors['lightred'],
-            5 => $this->pin_colors['lightgreen'],
-            10 => $this->pin_colors['lightblue'],
-            15 => $this->pin_colors['orange'],
-            20 => $this->pin_colors['red'],
-            25 => $this->pin_colors['green'],
-            30 => $this->pin_colors['blue'],
-            40 => $this->pin_colors['pink'],
-            50 => $this->pin_colors['brown'],
-            100 => $this->pin_colors['purple'],
-        ]; */
-
         $this->fiterMeseci = [
             '-3 months' => '3 meseca',
             '-6 months' => '6 meseci',
@@ -178,6 +146,7 @@ class DistirbuteriLicenceMapa extends Component
                                 'address' => $pin->adresa.' '.$pin->mesto,
                                 'ko_tel' => ($novi_distributer) ? 'Novi distributer, dodat: '.Helpers::datumFormatDanFullYear($pin->created_at) : ' ',
                                 'ko_name' => 'Ukupno novih licenci: '.$pin->nove_count,
+                                'dist_id' => $pin->id,
                             ])
                     ];
             });

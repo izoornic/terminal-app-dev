@@ -237,7 +237,9 @@ V 1.0.4.5  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
 
 V 1.0.4.6  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
     - Dodata funkcija Adminu da može da uključi ili isključi komentare na terminalu za Distributera
-    
+
+V 1.0.4.6.1  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+    - Mapa svih distributera na pinu dodat link "Statistika licenci"
 
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
