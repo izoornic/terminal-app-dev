@@ -98,6 +98,13 @@ class DistLicence extends Component
     public $errorModalVisible;
     public $error_message;
 
+    //komentari na terminalima
+    public $komentariTerminalVisible;
+    public $modalKomentariVisible;
+    public $selectedTerminalComments;
+    public $selectedTerminalCommentsCount;
+    public $newKoment;
+
 
     public function mount()
     {
@@ -108,6 +115,7 @@ class DistLicence extends Component
             $this->unete_cene_licenci[$key] = 0;
             $this->unete_cene_error[$key] = '';
         }
+        $this->komentariTerminalVisible = auth()->user()->vidi_komentare_na_terminalu ?: 0;
         $this->kurs_evra = KursEvra::latest()->first();
         $this->produzenje_cene = [];
     }
@@ -640,6 +648,77 @@ class DistLicence extends Component
     }
 
     /**
+     * Prikazuje komentare na terminalu
+     * @param  mixed $id
+     * @return void
+     */
+     public function commentsShowModal($id)
+    {
+        $this->newKoment = '';
+        $this->resetErrorBag();
+        $this->selectedTerminalComments = [];
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        //dd($this->selectedTerminalComments);
+        $this->modalKomentariVisible = true;
+    }
+
+    public function posaljiKomentar()
+    {
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        
+        $this->validate([
+            'newKoment' => 'required|min:3|max:1000',
+        ]);
+
+        TerminalLokacija::find($this->modelId)->comments()
+            ->create([
+                'comment' => $this->newKoment,
+                'userId' => auth()->user()->id,
+            ]);
+
+        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        
+        if($this->selectedTerminalComments->count() != $this->selectedTerminalCommentsCount){
+            $this->selectedTerminalCommentsCount = $this->selectedTerminalComments->count();
+            TerminalLokacija::where('id', $this->modelId)
+                ->update([
+                    'br_komentara'          => $this->selectedTerminalCommentsCount, 
+                    'last_comment_userId'   => auth()->user()->id, 
+                    'last_comment_at'       => now()
+                ]);
+        }
+        
+        $this->newKoment = '';
+    } 
+    
+    /**
+     * Obrisi komentar
+     *
+     * @param mixed $id
+     * 
+     * @return [type]
+     * 
+     */
+    public function obrisiKomentar($id)
+    {
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
+        $komentar = TerminalLokacija::find($this->modelId)->comments()->find($id);
+        if($komentar){
+            $komentar->update(['is_active' => false, 'deleted_at' => now()]);
+            $this->selectedTerminalCommentsCount--;
+            TerminalLokacija::where('id', $this->modelId)->update(['br_komentara' => $this->selectedTerminalCommentsCount]);
+            $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
+        }
+    }
+
+    /**
      * The read function. searchTipLicence
      *
      * @return void
@@ -648,6 +727,7 @@ class DistLicence extends Component
     {
         return TerminalLokacija::select(
                             'terminal_lokacijas.id as tmlokId', 
+                            'terminal_lokacijas.br_komentara',
                             'terminals.sn', 
                             'lokacijas.l_naziv', 
                             'lokacijas.mesto', 
@@ -713,6 +793,7 @@ class DistLicence extends Component
             $this->produzenje_cene[0] = new CenaLicence($this->licenca_distributer_cena_id, $this->datum_pocetka_licence, $this->datum_kraja_licence);
         }
     }
+
     public function render()
     {
         return view('livewire.distributer.dist-licence', [

@@ -226,8 +226,21 @@ V 1.0.4.1 (20.7.2025.) @mapa-terminala-distibutera
 V 1.0.4.3.1 (21.7.2025.) @mapa-terminala-distibutera
     - Promenjen izgled pinova (nijanse crvene boje) sa brojevima od 1 do 15+ sivi pinovi ya 0 i zuti za nove distributere sa 0 licenci
 
-    
-        
+V 1.0.4.4  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+    - Promenjen Cron job za brisanje servisnih licenci... sada brise dan posle isteka prekoracenja...
+    - Dodati komentari na terminal za Menagra licenci
+
+V 1.0.4.5  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+    - komentari na terminalu zavrseni za sve uloge. 
+        Menager licenci (add i edit) stranice: Terminali i distributer-terminali
+        Admin, serviser, kol centar ( view ) stranice: Terminali i ticket-view
+
+V 1.0.4.6  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
+    - Dodata funkcija Adminu da može da uključi ili isključi komentare na terminalu za Distributera
+
+V 1.0.4.6.1  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+    - Mapa svih distributera na pinu dodat link "Statistika licenci"
+
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
 

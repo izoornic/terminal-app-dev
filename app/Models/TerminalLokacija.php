@@ -4,12 +4,15 @@ namespace App\Models;
 
 use App\Models\LicencaDistributerTip;
 use App\Models\TerminalLokacijaHistory;
+use App\Models\TerminalComment;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TerminalLokacija extends Model
 {
@@ -27,7 +30,10 @@ class TerminalLokacija extends Model
         'korisnikIme',
         'updated_at',
         'blacklist',
-        'distributerId'
+        'distributerId',
+        'br_komentara',
+        'last_comment_userId',
+        'last_comment_at',
     ];
 
     public static function brojTerminalaNalokaciji($id)
@@ -81,5 +87,17 @@ class TerminalLokacija extends Model
         }
         $retval = true;
         return $retval;
+    }
+
+    /**
+     * Get coments for terminal
+     */
+    public function comments():HasMany
+    {
+        return $this->hasMany(TerminalComment::class, 'terminal_lokacijaId')
+                    ->leftJoin('users', 'users.id', '=', 'terminal_comments.userId')
+                    ->select('terminal_comments.*', 'users.name as user_name')
+                    ->where('is_active', true)
+                    ->orderBy('created_at', 'asc');
     }
 }

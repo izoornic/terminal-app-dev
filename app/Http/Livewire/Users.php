@@ -39,6 +39,7 @@ class Users extends Component
     public $telegramId;
     public $tel;
     public $password;
+    public $vidi_komentare_na_terminalu;
 
     //Radni status
     public $modalRadniStatusVisible;
@@ -204,6 +205,7 @@ class Users extends Component
         //$this->reset();
         $this->modelId = $id;
         $this->loadModel();
+        
         //dd($this->distributerId);
 
         $this->modalFormVisible = true;
@@ -226,6 +228,7 @@ class Users extends Component
         $this->email        = $data->email;
         $this->telegramId   = ($data->telegramId > 0) ? $data->telegramId : "";
         $this->tel          = ($data->tel) ? ltrim($data->tel, '+381') : '';
+        $this->vidi_komentare_na_terminalu = ($data->pozicija_tipId === 8) ? $data->vidi_komentare_na_terminalu : 0;
 
         $radniOdnos = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
         $this->radniOdnosId = $radniOdnos->radni_odnosId;
@@ -300,6 +303,7 @@ class Users extends Component
             'lokacijaId' => $this->lokacijaId,
             'telegramId' => $this->telegramId,
             'tel' => $tell,
+            'vidi_komentare_na_terminalu' => ($this->pozicijaId == 8) ? ($this->vidi_komentare_na_terminalu) ? 1 : 0 : 0,
         ];
 
         if($this->newUser){

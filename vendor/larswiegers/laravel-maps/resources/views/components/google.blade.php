@@ -45,6 +45,16 @@
         color: #007bff;
         text-decoration: none;
     }
+
+    .details .statistika {
+        margin-top: 10px;
+        color: #438351ff;
+    }
+
+    .details .statistika:hover {
+        color: #143114ff;
+        text-decoration: underline;
+    }
     
 </style>
 
@@ -118,8 +128,13 @@ function buildContent(p_property) {
    let property = JSON.parse(p_property);
    let sn = property.terminal_sn ? property.terminal_sn : '';
    let terminals = sn.split(',').map(term => term.trim()).filter(term => term !== '');
+   let statistikaLink = " ";
     
-    if (terminals.length > 4) {
+   if(property.dist_id) {
+        statistikaLink = `<a href="/managment-distributer-licence?id=${property.dist_id}" target="_blank">Statistika licenci</a>`;
+   } 
+    
+   if (terminals.length > 4) {
         terminals = terminals.slice(0, 4); // Limit to 4 SNs
         terminals.push('...'); // Indicate more SNs available
     }
@@ -140,6 +155,10 @@ function buildContent(p_property) {
         <div class="kontakt_osoba">
             <div class="name">${property.ko_name}</div>
             <div class="tel">${property.ko_tel}</div>
+        </div>
+
+        <div class="statistika">
+            ${statistikaLink}
         </div>
     </div>
     `;
