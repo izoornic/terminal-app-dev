@@ -209,7 +209,11 @@ class DistributerTerminal extends Component
     ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
     ->where('terminal_lokacijas.distributerId', '=', $this->distId)
     ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
-    ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+    ->when($this->searchMesto > 0, function ($rtval){
+        return $rtval->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+            ->orWhere('lokacijas.adresa', 'like', '%'.$this->searchMesto.'%')
+            ->orWhere('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%');
+    })
     ->when($this->searchTipLicence > 0, function ($rtval){
         return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
     })
