@@ -76,9 +76,6 @@ class Tiketview extends Component
     //komentari na terminalu
     public $modelId;
     public $selectedTerminal;
-    public $modalKomentariVisible;
-    public $selectedTerminalComments;
-    public $selectedTerminalCommentsCount;
     
     /**
      * mount
@@ -467,9 +464,6 @@ class Tiketview extends Component
         $this->selectedTerminalComments = [];
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        $this->selectedTerminalCommentsCount = $this->selectedTerminal->br_komentara;
-        $this->selectedTerminalComments = TerminalLokacija::find($this->modelId)->comments()->get();
-        //dd($this->selectedTerminalComments);
         $this->modalKomentariVisible = true;
     }
 
