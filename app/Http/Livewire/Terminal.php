@@ -132,6 +132,13 @@ class Terminal extends Component
     //komentari
     public $modalKomentariVisible;
 
+    //edit terminal info
+    public $editTerminalInfoVisible;
+    public $info_sn;
+    public $kutija;
+    public $terminals_id;
+    public $terminalZaEditImaLicencu;
+
     public function newTiketShowModal($tid)
     {
         $this->zatvorioId = 0;
@@ -598,6 +605,10 @@ class Terminal extends Component
             $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         }
 
+        if($this->editTerminalInfoVisible){
+            $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        }
+
         if($this->multiSelected && ($this->modalFormVisible || $this->modalConfirmPremestiVisible)){
             $this->multiSelectedInfo = $this->multiSelectedTInfo();
         }
@@ -863,6 +874,34 @@ class Terminal extends Component
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->modalKomentariVisible = true;
+    }
+
+    public function editTerminalInfoShowModal($id)
+    {
+        $this->terminalHistoryVisible = false;
+        $this->resetErrorBag();
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->info_sn = $this->selectedTerminal->sn;
+        $this->kutija = $this->selectedTerminal->broj_kutije;
+        $this->terminals_id = $this->selectedTerminal->terminalsId;
+        $this->terminalZaEditImaLicencu = LicenceZaTerminal::where('terminal_lokacijaId', $this->modelId) -> first();
+        $this->editTerminalInfoVisible = true;
+    }
+
+    public function updateTerminalInfo()
+    {
+        $this->validate([
+            'info_sn' => 'required',
+            'kutija' => 'required',
+        ]);
+        SelectedTerminalInfo::updateTerminalInfo(
+            $this->terminals_id, 
+            $this->info_sn, 
+            $this->kutija
+        );
+
+        $this->editTerminalInfoVisible = false;
     }
 
    

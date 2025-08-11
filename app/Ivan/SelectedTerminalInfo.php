@@ -1,6 +1,7 @@
 <?php
 namespace App\Ivan;
 
+use App\Models\Terminal;
 use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaParametarTerminal;
@@ -48,7 +49,23 @@ class SelectedTerminalInfo
 
     public static function selectedTerminalInfoTerminalLokacijaId($tid)
     {
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacijas.pib','lokacijas.lokacija_tipId', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid', 'terminal_tips.model as treminal_model', 'terminal_tips.proizvodjac as treminal_proizvodjac', 'licenca_distributer_tips.distributer_naziv')
+        return TerminalLokacija::select(
+                        'terminal_lokacijas.*', 
+                        'terminals.id as terminalsId',
+                        'terminals.sn', 
+                        'terminals.broj_kutije',
+                        'terminals.terminal_tipId as tid', 
+                        'terminal_status_tips.ts_naziv', 
+                        'lokacijas.l_naziv', 'lokacijas.mesto', 
+                        'lokacijas.pib','lokacijas.lokacija_tipId', 
+                        'lokacija_kontakt_osobas.name', 
+                        'lokacija_kontakt_osobas.tel', 
+                        'regions.r_naziv', 
+                        'regions.id as rid', 
+                        'terminal_tips.model as treminal_model', 
+                        'terminal_tips.proizvodjac as treminal_proizvodjac', 
+                        'licenca_distributer_tips.distributer_naziv'
+                        )
                     ->where('terminal_lokacijas.id', $tid)            
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
@@ -104,6 +121,16 @@ class SelectedTerminalInfo
 
         return true;
         
+    }
+
+    public static function updateTerminalInfo($terminalId, $sn, $kutija)
+    {
+        $terminal = Terminal::where('id', $terminalId)->first();
+        if ($terminal) {
+            $terminal->sn = $sn;
+            $terminal->broj_kutije = $kutija;
+            $terminal->save();
+        }
     }
 
 }

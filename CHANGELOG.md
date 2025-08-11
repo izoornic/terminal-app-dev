@@ -253,6 +253,8 @@ V 1.0.4.6.4 (11.8.2025.) @main
 V 1.0.4.6.4 (11.8.2025.) @main 
     - Napravljena komponenta "Prikazzkomentara" i dodat prikay u vise redova
 
+V 1.0.4.7 (11.8.2025.) @main 
+    - Dodat modal edit terminal info za ulogu Admin na stranici "Terminali" -> History modal -> Edit
 
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
