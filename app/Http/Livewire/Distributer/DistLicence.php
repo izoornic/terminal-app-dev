@@ -771,7 +771,7 @@ class DistLicence extends Component
     }
 
     /**
-     * updated
+     * updated 
      *
      * @param  mixed $key
      * @param  mixed $value
