@@ -76,6 +76,7 @@ class Tiketview extends Component
     //komentari na terminalu
     public $modelId;
     public $selectedTerminal;
+    public $modalKomentariVisible;
     
     /**
      * mount
