@@ -42,6 +42,7 @@ class DistLicence extends Component
     public $searchTerminalSn;
     public $searchMesto;
     public $searchTipLicence;
+    public $searchPib;
 
     //DODAJ LICENCU MODAL
     public $dodajLicencuModalVisible;
@@ -732,6 +733,7 @@ class DistLicence extends Component
                             'lokacijas.l_naziv', 
                             'lokacijas.mesto', 
                             'lokacijas.adresa', 
+                            'lokacijas.pib',
                             'licenca_naplatas.id as lnid', 
                             'licenca_naplatas.datum_pocetka_licence', 
                             'licenca_naplatas.datum_kraj_licence',
@@ -758,6 +760,9 @@ class DistLicence extends Component
                     ->where('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%')
                     ->when($this->searchTipLicence > 0, function ($rtval){
                         return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
+                    })
+                    ->when($this->searchPib, function ($rtval){
+                        return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
                     })
                     ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
                     ->orderBy('terminal_lokacijas.id')

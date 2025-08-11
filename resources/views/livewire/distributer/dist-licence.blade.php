@@ -58,7 +58,9 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
+                                <td colspan="2">
+                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                </td>
                                 <td></td>
                                 <td></td>
                             </tr>

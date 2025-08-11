@@ -244,6 +244,12 @@ V 1.0.4.6.1  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
 V 1.0.4.6.2 (23.6.2025.) @main 
     - Menadzer licenci - Distributeri -> Terminali pretraga po nazivu: mesta, adresi, imenu lokacije
 
+V 1.0.4.6.3 (11.8.2025.) @main 
+    - Admin stranica "Terminali" dodata pretraga po Pib-u
+    - Menadzer licenci "Terminali" dodata pretraga po Pib-u
+    - Menadzer licenci "Distributeri" -> "Terminali" dodata pretraga po Pib-u
+    - Distributer  "Licence" dodata pretraga po Pib-u
+
 //TODO Mora update baze na serveru pa merge request na git-u. Pa deply na main...
         posle toga moze da se obrise polje "licenca_dit_terminalId" u tabeli "licenca_naplatas" na serveru
 

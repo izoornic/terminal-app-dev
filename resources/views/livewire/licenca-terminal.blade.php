@@ -22,7 +22,8 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Region</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Tip lokacije</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th colspan="4" class="px-1 py-3 bg-gray-50 text-right text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno: <span class="font-bold">{{ $data->total() }}</span></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pib</th>
+                                <th colspan="3" class="px-1 py-3 bg-gray-50 text-right text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno: <span class="font-bold">{{ $data->total() }}</span></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200"> 
@@ -60,7 +61,9 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td></td>
+                                <td>
+                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                </td>
                                 <td colspan="3" class="text-right text-sm pr-4">
                                     <select wire:model="searchBlackist" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="0">Blacklsta</option>

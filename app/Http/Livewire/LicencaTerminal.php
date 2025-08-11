@@ -66,6 +66,7 @@ class LicencaTerminal extends Component
     public $searchTipTeminal;
     public $searchStatus;
     public $searchBlackist;
+    public $searchPib;
 
     //multi selected
     public $multiSelected;
@@ -171,6 +172,9 @@ class LicencaTerminal extends Component
            }
            
         } )
+        ->when($this->searchPib, function ($query) {
+            return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
+        })
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
 
         $terms->each(function ($item, $key){

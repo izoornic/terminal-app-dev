@@ -45,6 +45,7 @@ class DistributerTerminal extends Component
     public $searchMesto;
     public $searchTipLicence;
     public $searchNenaplativ;
+    public $searchPib;
 
     public $licence_dodate_terminalu = [];
     public $distrib_terminal_id;
@@ -187,6 +188,7 @@ class DistributerTerminal extends Component
             'lokacijas.adresa', 
             'lokacijas.latitude', 
             'lokacijas.longitude',
+            'lokacijas.pib',
             'lokacijas.id as lokid',
             'licenca_naplatas.id as lnid', 
             'licenca_naplatas.datum_pocetka_licence', 
@@ -219,6 +221,9 @@ class DistributerTerminal extends Component
     })
     ->when($this->searchNenaplativ > 0, function ($rtval){
         return $rtval->where('licenca_naplatas.nenaplativ', '=', 1);
+    })
+    ->when($this->searchPib, function ($query) {
+        return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
     })
     ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
     ->orderBy('terminal_lokacijas.id')

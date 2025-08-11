@@ -69,6 +69,7 @@ class Terminal extends Component
     public $searchRegion;
     public $searchTip;
     public $searchStatus;
+    public $searchPib;
 
     //multi selected
     public $multiSelected;
@@ -369,6 +370,9 @@ class Terminal extends Component
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
         ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
         ->where('terminal_status_tips.id', ($this->searchStatus > 0) ? '=' : '<>', $this->searchStatus)
+        ->when($this->searchPib, function ($query) {
+            return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
+        })
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
         
         $terms->each(function ($item, $key){
