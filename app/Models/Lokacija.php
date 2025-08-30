@@ -14,9 +14,11 @@ class Lokacija extends Model
      * @var string[]
      */
     protected $fillable = [
+        'is_duplicate',
         'regionId',
         'lokacija_tipId',
         'l_naziv',
+        'l_naziv_sufix',
         'mesto',
         'adresa',
         'latitude',

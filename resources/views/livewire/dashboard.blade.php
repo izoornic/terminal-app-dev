@@ -34,17 +34,27 @@
 
 <!-- Chart pie -->
 <script>
+    const labels2 = [];
+    const dataset_1 = [];
+
+    @foreach($data as $item)
+        labels2.push("{{ $item->mesto}}");
+        dataset_1.push("{{ $item->total }}");
+    @endforeach
+
 const dataPie = {
-    labels: ["Magacin {{ 200 }}", "Instalirani", "Zamenski", "Neispravni"],
+
+    labels: labels2,
     datasets: [
     {
         label: "Terminali",
-        data: [{{ $too }}, 50, 100, 150],
+        data: dataset_1,
         backgroundColor: [
         "rgb(255, 99, 132)",
-        "rgb(225, 206, 86)",
+        "rgba(255, 230, 68, 1)",
         "rgb(153, 102, 255)",
         "rgb(120, 143, 241)",
+        "rgba(231, 155, 104, 1)",
         ],
         borderColor: "#333",
         borderWidth: 2,

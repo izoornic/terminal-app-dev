@@ -35,10 +35,15 @@ class DistLokacije extends Component
     public $modalFormVisible;
     public $modelId;
     public $l_naziv;
+    public $old_naziv;
     public $mesto;
     public $adresa;
     public $latitude;
     public $longitude;
+    public $l_naziv_sufix;
+    public $is_duplicate;
+    public $pib_count;
+    public $old_pib;
 
     public $regionId;
     public $lokacija_tipId;
@@ -51,6 +56,9 @@ class DistLokacije extends Component
     public $telKo;
 
     public $isUpdate;
+
+    //podlokacija modal
+    public $dodajLokacijuModalVisible;
 
     //kontakt osoba u prodavnici
     public $kontaktOsobaVisible;
@@ -89,10 +97,10 @@ class DistLokacije extends Component
         ];
     }
 
-    public function doajPostojecuLokacijuDistributeru()
+    public function doajPostojecuLokacijuDistributeru($id)
     {
        // dd($this->lokacija_row);
-        Lokacija::where('id', '=', $this->lokacija_row->id)->update(['distributerId' => $this->distId]);
+        Lokacija::where('id', '=', $id)->update(['distributerId' => $this->distId]);
         $this->modalSearchPIBFormVisible = false;
     }
 
@@ -106,7 +114,9 @@ class DistLokacije extends Component
     {
         // Assign the variables here
         $this->modelId = 0;
+        $this->is_duplicate = 0;
         $this->l_naziv = '';
+        $this->l_naziv_sufix = '';
         $this->mesto = '';
         $this->adresa = '';
         $this->latitude = '';
@@ -121,6 +131,73 @@ class DistLokacije extends Component
         $this->mb = '';
         $this->email = '';
         $this->email_is_set = false;
+
+        $this->old_pib = '';
+        $this->pib_count = 0;
+    }
+
+    /**
+     * Loads the model data
+     * of this component.
+     *
+     * @return void
+     */
+    public function loadModel()
+    {
+        $data = Lokacija::find($this->modelId);
+        // Assign the variables here
+        $this->l_naziv = $data->l_naziv;
+        $this->old_naziv = $data->l_naziv;
+        $this->l_naziv_sufix = $data->l_naziv_sufix;
+        $this->is_duplicate = $data->is_duplicate;
+        $this->mesto = $data->mesto;
+        $this->adresa = $data->adresa;
+        $this->latitude = $data->latitude;
+        $this->longitude = $data->longitude;
+        $this->pib = $data->pib;
+        $this->old_pib = $data->pib;
+        $this->mb = $data->mb;
+        $this->email = $data->email;
+        $this->email_is_set = isset($this->email);
+
+        $this->regionId = $data->regionId;
+        $this->lokacija_tipId = $data->lokacija_tipId;
+
+        if($this->kontaktOsobaInfo = $this->kontaktOsobaGetInfo()){
+            $this->nameKo = $this->kontaktOsobaInfo->name;
+            $this->telKo  = ($this->kontaktOsobaInfo->tel) ? ltrim($this->kontaktOsobaInfo->tel, '+381') : '';
+            //$this->telKo = $this->kontaktOsobaInfo->tel;
+        }else{
+            $this->nameKo = ''; 
+            $this->telKo = '';
+        }
+
+        $this->pib_count = Lokacija::where('pib', $data->pib)->count();
+    }
+
+    /**
+     * The data for the model mapped
+     * in this component.
+     *
+     * @return void
+     */
+    public function modelData()
+    {
+        return [  
+            'l_naziv'          => $this->l_naziv,
+            'l_naziv_sufix'    => $this->l_naziv_sufix,
+            'is_duplicate'     => $this->is_duplicate,
+            'mesto'            => $this->mesto,
+            'adresa'           => $this->adresa,
+            'latitude'         => ($this->latitude == '') ? NULL : $this->latitude,
+            'longitude'        => ($this->longitude == '') ? NULL : $this->longitude,
+            'regionId'         => $this->regionId,
+            'lokacija_tipId'   => $this->lokacija_tipId,
+            'pib'              => $this->pib, 
+            'mb'               => $this->mb, 
+            'distributerId'    => $this->distId,
+            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL
+        ];
     }
 
     /**
@@ -145,10 +222,10 @@ class DistLokacije extends Component
             $this->search_pib_error = 'Pib sadrži 9 cifara!';
             //DUZINA 9 karaktera
             if(strlen($this->search_pib) == 9){
-                $this->lokacija_row = Lokacija::where('pib', '=', $this->search_pib)->first();
+                $this->lokacija_row = Lokacija::where('pib', '=', $this->search_pib)->get();
                 $this->search_pib_error = '';
 
-                if($this->lokacija_row){
+                if(count($this->lokacija_row) > 0){
                     $this->nova_lokacija_postoji_u_bazi = 'da';
                 }else{
                     $this->nova_lokacija_postoji_u_bazi = 'ne';
@@ -200,37 +277,55 @@ class DistLokacije extends Component
     }
 
     /**
-     * Loads the model data
-     * of this component.
+     * Shows the create New podlokacija modal
      *
      * @return void
      */
-    public function loadModel()
+    public function dodajPodlokaciju()
     {
-        $data = Lokacija::find($this->modelId);
-        // Assign the variables here
-        $this->l_naziv = $data->l_naziv;
-        $this->mesto = $data->mesto;
-        $this->adresa = $data->adresa;
-        $this->latitude = $data->latitude;
-        $this->longitude = $data->longitude;
-        $this->pib = $data->pib;
-        $this->mb = $data->mb;
-        $this->email = $data->email;
-        $this->email_is_set = isset($this->email);
+        $this->modalFormVisible = false;
+        $this->resetValidation();
+        
+        $this->loadModel();
+        $this->adresa = '';
+        $this->latitude = '';
+        $this->longitude = '';
+        $this->dodajLokacijuModalVisible = true;
 
-        $this->regionId = $data->regionId;
-        $this->lokacija_tipId = $data->lokacija_tipId;
-
-        if($this->kontaktOsobaInfo = $this->kontaktOsobaGetInfo()){
-            $this->nameKo = $this->kontaktOsobaInfo->name;
-            $this->telKo  = ($this->kontaktOsobaInfo->tel) ? ltrim($this->kontaktOsobaInfo->tel, '+381') : '';
-            //$this->telKo = $this->kontaktOsobaInfo->tel;
-        }else{
-            $this->nameKo = ''; 
-            $this->telKo = '';
-        }
     }
+
+    /**
+     * The create function for podlokaciju.
+     *
+     * @return void
+     */
+    public function createPodlokaciju()
+    {
+        
+        $this->validate([
+            'adresa' => 'required',
+            'mesto' => 'required',
+            'regionId' => ['required', 'not_in:0'],
+            'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
+            'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+            'email' => (!$this->email_is_set) ?  ['string', 'email', 'max:255', 'unique:lokacijas', 'nullable'] : '',
+        ]);
+        //dd($this->modelData());
+        $this->is_duplicate = Lokacija::where('pib', $this->pib)->count();
+        $new_loc = Lokacija::create($this->modelData());
+       
+        if($this->lokacija_tipId == 3){
+            if($this->nameKo != ''){
+                //dd('Add new KO');
+                $tell = ($this->telKo != '') ? '+381'.$this->telKo : '';
+                LokacijaKontaktOsoba::create(['lokacijaId'=>$new_loc->id, 'name' => $this->nameKo, 'tel' => $tell]);
+            }
+        }
+
+        $this->dodajLokacijuModalVisible = false;
+        $this->loc_reset();
+    }
+
 
     /**
      * The create function.
@@ -274,31 +369,18 @@ class DistLokacije extends Component
                 );
             }
         }
+
+         if($this->pib_count > 1 && !$this->is_duplicate){
+            //update svih lokacija sa istim PIB-om samo ako je promenjen naziv
+            if($this->old_naziv != $this->l_naziv){
+                //samo naziv
+                Lokacija::where('pib', $this->pib)->where('id', '<>', $this->modelId)->update(['l_naziv' => $this->l_naziv] );
+            }
+        }
         $this->modalFormVisible = false;
     }
 
-    /**
-     * The data for the model mapped
-     * in this component.
-     *
-     * @return void
-     */
-    public function modelData()
-    {
-        return [  
-            'l_naziv'          => $this->l_naziv,
-            'mesto'            => $this->mesto,
-            'adresa'           => $this->adresa,
-            'latitude'         => ($this->latitude == '') ? NULL : $this->latitude,
-            'longitude'        => ($this->longitude == '') ? NULL : $this->longitude,
-            'regionId'         => $this->regionId,
-            'lokacija_tipId'   => $this->lokacija_tipId,
-            'pib'              => $this->pib, 
-            'mb'               => $this->mb, 
-            'distributerId'    => $this->distId,
-            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL
-        ];
-    }
+    
 
     /**
      * Prikazuje Kontakt osoba Modal

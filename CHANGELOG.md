@@ -256,6 +256,38 @@ V 1.0.4.6.4 (11.8.2025.) @main
 V 1.0.4.7 (11.8.2025.) @main 
     - Dodat modal edit terminal info za ulogu Admin na stranici "Terminali" -> History modal -> Edit
 
+V 1.0.4.8 (30.8.2025.) @main 
+    - Vise lokacija sa istim PIB-om za uloge Admin i Distributer. 
+        Kada se radi Edit lokacije koja je duplirana naziv je fixan plus sufix, opciono
+        Kada se edituje lokacija koja je duplirana naziv i pib se menjaju na svim duplikatima
+        Duplikati su obelezeni crvenom * u prikazu
+        U bazi je skinut index unique na polju email u tabeli lokacijas
+
+
+
+SELECT * 
+FROM lokacijas
+   INNER JOIN (SELECT pib
+               FROM   lokacijas
+               GROUP  BY pib
+               HAVING COUNT(id) > 1) dup
+           ON lokacijas.pib = dup.pib;
+
+51 lokacija
+108812629
+101517345
+110871136
+111700788 - 3 lokacije
+112990130
+102776993 - Obuća Pavle doo 31 lokacija - edituj naziv
+103079070 - 3 lokacije
+112457749 - Razliciti nazivi!!!
+114664893
+
+
+Poljoprivredno gazdinstvo Takač Dejan - nema PIB
+Radenko Cvanić  - nema PIB
+
 
     // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
     SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 

@@ -35,10 +35,15 @@ class Lokacijes extends Component
     public $modelId;
 
     public $l_naziv;
+    public $old_naziv;
     public $mesto;
     public $adresa;
     public $latitude;
     public $longitude;
+    public $l_naziv_sufix;
+    public $is_duplicate;
+    public $pib_count;
+    public $old_pib;
 
     public $regionId;
     public $lokacija_tipId;
@@ -46,6 +51,9 @@ class Lokacijes extends Component
     public $isUpdate;
 
     public $validation_modal;
+
+    // dodvanje lokacije korisniku
+    public $dodajLokacijuModalVisible;
 
     //pretraga
     public $searchName;
@@ -107,6 +115,7 @@ class Lokacijes extends Component
     public $mb;
     public $email;
     public $email_is_set;
+
 
     // koordinate
     public $latLogVisible;
@@ -171,13 +180,21 @@ class Lokacijes extends Component
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-        ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
-        ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+        ->when($this->searchName, function ($rtval){
+            return $rtval->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%');
+        } )
+        ->when($this->searchMesto, function ($rtval){
+            return $rtval->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%');
+        } )
         ->when($this->searchPib, function ($rtval){
             return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
         } )
-        ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
-        ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
+        ->when($this->searchRegion, function ($rtval){
+            return $rtval->where('lokacijas.regionId','=', $this->searchRegion);
+        } )
+        ->when($this->searchTip, function ($rtval){
+            return $rtval->where('lokacijas.lokacija_tipId','=', $this->searchTip);
+        } )
         ->orderBy($order)
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }
@@ -186,7 +203,9 @@ class Lokacijes extends Component
     {
         // Assign the variables here
         $this->modelId = 0;
+        $this->is_duplicate = 0;
         $this->l_naziv = '';
+        $this->l_naziv_sufix = '';
         $this->mesto = '';
         $this->adresa = '';
         $this->latitude = '';
@@ -201,6 +220,8 @@ class Lokacijes extends Component
         $this->mb = '';
         $this->email = '';
         $this->email_is_set = false;
+        $this->old_pib = '';
+        $this->pib_count = 0;
     }
 
     /**
@@ -231,8 +252,46 @@ class Lokacijes extends Component
         $this->loc_reset();
         $this->modelId = $id;
         $this->loadModel();
-
         $this->modalFormVisible = true;
+    }
+
+    public function dodajPodlokaciju()
+    {
+        $this->modalFormVisible = false;
+        $this->resetValidation();
+        $this->loadModel();
+        $this->adresa = '';
+        $this->latitude = '';
+        $this->longitude = '';
+        $this->dodajLokacijuModalVisible = true;
+
+    }
+
+    public function createPodlokaciju()
+    {
+        
+        $this->validate([
+            'adresa' => 'required',
+            'mesto' => 'required',
+            'regionId' => ['required', 'not_in:0'],
+            'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
+            'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+            'email' => (!$this->email_is_set) ?  ['string', 'email', 'max:255', 'unique:lokacijas', 'nullable'] : '',
+        ]);
+        //dd($this->modelData());
+        $this->is_duplicate = Lokacija::where('pib', $this->pib)->count();
+        $new_loc = Lokacija::create($this->modelData());
+       
+        if($this->lokacija_tipId == 3){
+            if($this->nameKo != ''){
+                //dd('Add new KO');
+                $tell = ($this->telKo != '') ? '+381'.$this->telKo : '';
+                LokacijaKontaktOsoba::create(['lokacijaId'=>$new_loc->id, 'name' => $this->nameKo, 'tel' => $tell]);
+            }
+        }
+
+        $this->dodajLokacijuModalVisible = false;
+        $this->loc_reset();
     }
 
     /**
@@ -245,12 +304,16 @@ class Lokacijes extends Component
     {
         $data = Lokacija::find($this->modelId);
         // Assign the variables here
+        $this->l_naziv_sufix = $data->l_naziv_sufix;
+        $this->is_duplicate = $data->is_duplicate;
         $this->l_naziv = $data->l_naziv;
+        $this->old_naziv = $data->l_naziv;
         $this->mesto = $data->mesto;
         $this->adresa = $data->adresa;
         $this->latitude = $data->latitude;
         $this->longitude = $data->longitude;
         $this->pib = $data->pib;
+        $this->old_pib = $data->pib;
         $this->mb = $data->mb;
         $this->email = $data->email;
         $this->email_is_set = isset($this->email);
@@ -266,6 +329,8 @@ class Lokacijes extends Component
             $this->nameKo = ''; 
             $this->telKo = '';
         }
+
+        $this->pib_count = Lokacija::where('pib', $data->pib)->count();
     }
 
     /**
@@ -278,6 +343,8 @@ class Lokacijes extends Component
     {
         return [  
             'l_naziv'          => $this->l_naziv,
+            'l_naziv_sufix'    => $this->l_naziv_sufix,
+            'is_duplicate'     => $this->is_duplicate,
             'mesto'            => $this->mesto,
             'adresa'           => $this->adresa,
             'latitude'         => ($this->latitude == '') ? NULL : $this->latitude,
@@ -318,6 +385,7 @@ class Lokacijes extends Component
     public function update()
     {
         $this->validate();
+        //dd($this->modelData());
         Lokacija::find($this->modelId)->update($this->modelData());
 
         if($this->lokacija_tipId == 3){
@@ -331,6 +399,23 @@ class Lokacijes extends Component
                 );
             }
         }
+
+        //
+        if($this->pib_count > 1 && !$this->is_duplicate){
+            //update svih lokacija sa istim PIB-om samo ako je promenjen naziv ili pib
+            if($this->old_naziv != $this->l_naziv && $this->old_pib != $this->pib){
+                //i naziv i pib
+                Lokacija::where('pib', $this->old_pib)->where('id', '<>', $this->modelId)->update(['l_naziv' => $this->l_naziv, 'pib' => $this->pib] );
+            }else if($this->old_naziv != $this->l_naziv){
+                //samo naziv
+                Lokacija::where('pib', $this->pib)->where('id', '<>', $this->modelId)->update(['l_naziv' => $this->l_naziv] );
+            }else if($this->old_pib != $this->pib){
+                //samo pib
+                Lokacija::where('pib', $this->old_pib)->where('id', '<>', $this->modelId)->update(['pib' => $this->pib] );
+            }
+        }
+
+        $this->loc_reset();
         $this->modalFormVisible = false;
     }
 
@@ -451,33 +536,6 @@ class Lokacijes extends Component
         $this->modalAddTerminalVisible = true;
     }
         
-    /**
-     * lokacijaInfo
-     *
-     * @return object
-     */
-   /*  private function lokacijaInfo()
-    {
-        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
-        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-        ->where('lokacijas.id', '=', $this->modelId)
-        ->first();
-    } */
-    
-    /**
-     * lokacjaSaKojeUzimaInfo
-     *
-     * @return void
-     */
-   /*  private function lokacjaSaKojeUzimaInfo()
-    {
-        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
-            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-            ->where('lokacijas.id', '=', $this->p_lokacijaId)
-            ->first();
-    } */
     /**
      * terminaliZaLokaciju
      *
