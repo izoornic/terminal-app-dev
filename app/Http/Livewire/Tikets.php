@@ -138,7 +138,24 @@ class Tikets extends Component
     public function read()
     {
        
-        return Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv', 'tiket_opis_kvara_tips.tok_naziv')
+        return Tiket::select(
+                    'tikets.id as tikid', 
+                    'tikets.created_at', 
+                    'tikets.updated_at', 
+                    'tikets.br_komentara',
+                    'lokacijas.l_naziv', 
+                    'lokacijas.l_naziv_sufix',
+                    'lokacijas.is_duplicate',
+                    'lokacijas.mesto', 
+                    'terminals.sn', 
+                    'users.name',
+                    'tiket_status_tips.id as tstid', 
+                    'tiket_status_tips.tks_naziv', 
+                    'tiket_prioritet_tips.tp_naziv', 
+                    'tiket_prioritet_tips.btn_collor', 
+                    'tiket_prioritet_tips.tr_bg_collor', 
+                    'regions.r_naziv', 
+                    'tiket_opis_kvara_tips.tok_naziv')
             ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
             ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
             ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')
@@ -245,7 +262,14 @@ class Tikets extends Component
      */
     public function searchTerminal() 
     {
-        return TerminalLokacija::select('terminal_lokacijas.id', 'terminal_lokacijas.terminalId' ,'lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn')
+        return TerminalLokacija::select(
+                    'terminal_lokacijas.id', 
+                    'terminal_lokacijas.terminalId' ,
+                    'lokacijas.l_naziv',
+                    'lokacijas.l_naziv_sufix',
+                    'lokacijas.is_duplicate', 
+                    'lokacijas.mesto', 
+                    'terminals.sn')
                 ->leftJoin('lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
                 ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
                 ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')

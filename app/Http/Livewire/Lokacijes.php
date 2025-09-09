@@ -444,7 +444,7 @@ class Lokacijes extends Component
     {
         $this->modelId = $id;
         $this->odabranaLokacija = LokacijaInfo::getInfo($this->modelId); //$this->lokacijaInfo();
-       
+        //dd($this->odabranaLokacija);
         $this->deletePosible = false;
         
         //check if lokacija zakacena za nekog
@@ -548,10 +548,16 @@ class Lokacijes extends Component
     { 
         $this->allInPage = [];
         
-        $terms =  TerminalLokacija::leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+        $terms =  TerminalLokacija::select(
+                                    'terminal_lokacijas.*', 
+                                    'terminals.sn', 
+                                    'terminals.broj_kutije', 
+                                    'terminal_status_tips.ts_naziv', 
+                                    'terminals.id as tid', 
+                                    'terminal_tips.model')
+                                ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                                 ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
                                 ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-                                ->select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminals.id as tid', 'terminal_tips.model')
                                 ->where('terminal_lokacijas.lokacijaId', $id)
                                 ->where('terminals.sn', 'like', '%'.$sn.'%')
                                 ->where('terminals.broj_kutije', 'like', '%'.$bk.'%')

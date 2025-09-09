@@ -574,7 +574,12 @@ class DistLokacije extends Component
      */
     private function prepareData()
     {        
-        $this->dataAll =  Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
+        $this->dataAll =  Lokacija::select(
+            'lokacijas.*', 
+            'lokacija_tips.lt_naziv',
+            'regions.r_naziv', 
+            'lokacija_kontakt_osobas.name as kontakt', 
+            'lokacija_tips.id as tipid')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')

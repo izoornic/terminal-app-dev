@@ -28,6 +28,8 @@ use Illuminate\Database\Query\Builder;
 use App\Exports\LicencaNaplataExport;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Actions\Terminali\TerminaliReadActions;
+
 class DistLicence extends Component
 {
     use WithPagination;
@@ -102,7 +104,7 @@ class DistLicence extends Component
     //komentari na terminalima
     public $komentariTerminalVisible;
     public $modalKomentariVisible;
-    public $selectedTerminal;
+    
 
 
     public function mount()
@@ -656,7 +658,7 @@ class DistLicence extends Component
         $this->newKoment = '';
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        
         $this->modalKomentariVisible = true;
     }
 
@@ -667,7 +669,19 @@ class DistLicence extends Component
      */
     public function read()
     {
-        return TerminalLokacija::select(
+        $search = [
+            'searchSB' => $this->searchTerminalSn,
+            'searchLokacija' => $this->searchMesto,
+            'searchTipLicence' => $this->searchTipLicence,
+            'searchPib' => $this->searchPib,
+        ];
+
+        $builder = TerminaliReadActions::DistributerTerminaliRead($this->distId, $search);
+
+        $perPage = Config::get('global.terminal_paginate');
+        return $builder->paginate($perPage, ['*'], 'terminali');   
+        
+        /* return TerminalLokacija::select(
                             'terminal_lokacijas.id as tmlokId', 
                             'terminal_lokacijas.br_komentara',
                             'terminals.sn', 
@@ -708,7 +722,7 @@ class DistLicence extends Component
                     ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
                     ->orderBy('terminal_lokacijas.id')
                     ->orderBy('licenca_distributer_cenas.licenca_tipId')
-                    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
+                    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali'); */
     }
 
     /**

@@ -1,12 +1,27 @@
 <div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex">
+            <div>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Licence terminala') }}
+            </h2>
+            <p class="mt-1 text-sm text-gray-600">
+                Pregled i dodavanje licenci terminalima.
+            </p></div>
+            <div class="ml-6">
+                <p class="mt-1 text-sm text-gray-600">
+                    Ukupno licenci: {{ $br_licenci }}<br /> Ukupno terminala {{$br_terminala}}
+                </p>
+            </div>
+        </div>
     <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
         <x-jet-secondary-button wire:click="downloadExcel" wire:loading.attr="disabled" class="ml-2">
-        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM155.7 250.2L192 302.1l36.3-51.9c7.6-10.9 22.6-13.5 33.4-5.9s13.5 22.6 5.9 33.4L221.3 344l46.4 66.2c7.6 10.9 5 25.8-5.9 33.4s-25.8 5-33.4-5.9L192 385.8l-36.3 51.9c-7.6 10.9-22.6 13.5-33.4 5.9s-13.5-22.6-5.9-33.4L162.7 344l-46.4-66.2c-7.6-10.9-5-25.8 5.9-33.4s25.8-5 33.4 5.9z"/></svg>
+        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM155.7 250.2L192 302.1l36.3-51.9c7.6-10.9 22.6-13.5 33.4-5.9s13.5 22.6 5.9 33.4L221.3 344l46.4 66.2c7.6 10.9 5 25.8-5.9 33.4s-25.8 5-33.4-5.9L192 385.8l-36.3 51.9c-7.6 10.9-22.6 13.5-33.4 5.9s-13.5-22.6-5.9-33.4L162.7 344l-46.4-66.2c-7.6-10.9-5-25.8 5.9-33.4s25.8-5 33.4 5.9z"/></svg>
             {{ __('Preuzmi Excel') }}
         </x-jet-secondary-button>
         <div class="ml-2">
             <button data-tooltip-target="tooltip-default" type="button" class="mt-1">
-                <svg class="fill-green-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
+                <svg class="fill-green-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
             </button>
 
             <div id="tooltip-default" role="tooltip" class="absolute z-100 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700">
@@ -18,6 +33,7 @@
         
         </div>
     </div>
+    </div>
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -26,14 +42,14 @@
                     <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Z</th>
+                                <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">::</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Licenca</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Početak</th>
                                 <th class="bg-gray-50 text-gray-500" ></th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Kraj</th>
-                                <th colspan="3" class="bg-gray-50 px-6 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno licenci: {{ $br_licenci }}<br /> Ukupno terminala {{$br_terminala}}</th>
+                                <th colspan="4" class="bg-gray-50 px-6 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">  
@@ -57,18 +73,17 @@
                                 </td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
-                                <td colspan="4">
+                                <td colspan="5">
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                             </tr>
                             @php
                                 $olditem = new stdClass();
-                                $olditem->tmlokId = '';
+                                $olditem->id = '';
                             @endphp
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    @if($olditem->tmlokId == $item->tmlokId)
+                                    @if($olditem->id == $item->id)
                                         @php
                                             $item->isDuplicate = true;
                                         @endphp
@@ -106,7 +121,8 @@
                                             @if($item->isDuplicate)
                                                 <span class=""> <svg class="fill-sky-300 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg></span> 
                                             @else
-                                                {{ $item->l_naziv }}<br />{{ $item->adresa }}, {{ $item->mesto }}
+                                                @if($item->is_duplicate)<span class="text-red-500">*</span>@endif
+                                                {{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}<br />{{ $item->adresa }}, {{ $item->mesto }}
                                             @endif   
                                         </td>
                                         <td class="px-2 py-2">
@@ -128,11 +144,11 @@
                                         <td class="px-2 py-2">@if($item->datum_kraj_licence != '') {{ App\Http\Helpers::datumFormatDan($item->datum_kraj_licence) }} @endif</td>                                       
                                         <td class="px-1 py-1">
                                             @if($item->licenca_naziv != '')
-                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Pregled licence" wire:click="pregledLicenceShovModal('{{$item->tmlokId}}', '{{$item->lnid}}', {{$item->month_diff}})">
+                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Pregled licence" wire:click="pregledLicenceShovModal('{{$item->id}}', '{{$item->lnid}}', {{$item->month_diff}})">
                                                     <svg class="fill-current w-6 h-8 pl-1 mx-1 my-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
                                                 </a>
                                             @else
-                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Dodaj licencu" wire:click="dodajLicencaShowModal('{{$item->tmlokId}}')">
+                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Dodaj licencu" wire:click="dodajLicencaShowModal('{{$item->id}}')">
                                                     <svg class="fill-current w-6 h-8 pl-1 mx-1 my-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" enable-background="new 0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><polygon points="207,208.3 177,208.3 177,284.8 100.5,284.8 100.5,314.8 177,314.8 177,391.3 207,391.3 207,314.8 283.5,314.8 283.5,284.8 207,284.8"/></g></svg>
                                                 </a>
                                             @endif
@@ -166,7 +182,7 @@
                                         </td>   
                                         <td>
                                             @if($komentariTerminalVisible)
-                                            <button class="p-2 text-sm relative text-gray-300 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tmlokId }})" title="Komentari">
+                                            <button class="p-2 text-sm relative text-gray-300 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->id }})" title="Komentari">
                                                 <div class="z-10 absolute ml-1 mb-1 text-gray-500 text-lg">{{ $item->br_komentara}}</div>
                                                 
                                                 <svg class="text-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
@@ -202,6 +218,9 @@
             {{ __('Dodaj licence terminalu') }}
         </x-slot>
         <x-slot name="content">
+             @if($dodajLicencuModalVisible)
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+            @endif
             <div class="my-4">
                 @if(count($licence_dodate_terminalu))
                     <div class="bg-gray-50 border-t-4 border-gray-500 px-4 py-3">
@@ -274,7 +293,7 @@
                         <p class="">Greška!<br />
                         <span class="font-bold block sm:inline">Datum isteka licence mora biti veći od datuma početka!</span>
                         <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
                         </span>
                         </p>
                     </div>
@@ -352,6 +371,9 @@
         </x-slot>
 
         <x-slot name="content">
+            @if($modalConfirmDeleteVisible)
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+            @endif
             <div my-4>
                 <p>Da li ste sigurni da želite da obišete licencu!<br />
                 @if($licencaDeleteInfo)
@@ -363,7 +385,7 @@
                         <p class="">Greška!<br />
                         <span class="font-bold block sm:inline">Zeta System DOO je napravio zaduženje za ovu licencu.</span>
                         <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
                         </span>
                         </p>
                     </div>
@@ -391,6 +413,7 @@
         </x-slot>
         <x-slot name="content">
             @if($parametriModalVisible)
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
                 <div class="mr-4 mb-4">Licenca: <span class="font-bold">{{$pm_licenca_naziv}}</span></div>
                 <div class="flex border-b border-blue-500 mt-2">
                     <div class="max-w-2xl grid grid-cols-5 gap-2 mb-4 ml-4">
@@ -424,6 +447,7 @@
         </x-slot>
         <x-slot name="content">
             @if($pregledLicencaShowModal)
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
                 @if($mnth_diff < 1 || $lic_nenaplativa)
                     <div class="my-4 border-y py-2 bg-red-50 flex mx-4">
                         @if($lic_nenaplativa)
@@ -601,6 +625,9 @@
             Produži licencu <span class="font-bold">@if($produziLicModalVisible){{$naziv_licence}}@endif</span>
         </x-slot>
         <x-slot name="content">
+            @if($produziLicModalVisible)
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+            @endif
             <div class="px-4 py-2 bg-green-50 border-t-4 border-green-400">
                 <p class="font-bold">Kurs evra:</p>
                 <table class="min-w-full divide-y divide-gray-200">
@@ -654,7 +681,7 @@
                         <p class="">Greška!<br />
                         <span class="font-bold block sm:inline">Datum isteka licence mora biti veći od datuma početka!</span>
                         <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
                         </span>
                         </p>
                     </div>
@@ -743,27 +770,14 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-        {{-- KOMENTARI MODAL --}}
+        {{-- KOMENTARI MODAL ################################################################### --}}
     <x-jet-dialog-modal wire:model="modalKomentariVisible">
         <x-slot name="title">
             KOMENTARI
         </x-slot>
         <x-slot name="content"> 
             @if($modalKomentariVisible)
-                <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
-                    <div class="flex">
-                        <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 0C305.7 0 320 14.33 320 32V96C320 113.7 305.7 128 288 128H208V160H424.1C456.6 160 483.5 183.1 488.2 214.4L510.9 364.1C511.6 368.8 512 373.6 512 378.4V448C512 483.3 483.3 512 448 512H64C28.65 512 0 483.3 0 448V378.4C0 373.6 .3622 368.8 1.083 364.1L23.76 214.4C28.5 183.1 55.39 160 87.03 160H143.1V128H63.1C46.33 128 31.1 113.7 31.1 96V32C31.1 14.33 46.33 0 63.1 0L288 0zM96 48C87.16 48 80 55.16 80 64C80 72.84 87.16 80 96 80H256C264.8 80 272 72.84 272 64C272 55.16 264.8 48 256 48H96zM80 448H432C440.8 448 448 440.8 448 432C448 423.2 440.8 416 432 416H80C71.16 416 64 423.2 64 432C64 440.8 71.16 448 80 448zM112 216C98.75 216 88 226.7 88 240C88 253.3 98.75 264 112 264C125.3 264 136 253.3 136 240C136 226.7 125.3 216 112 216zM208 264C221.3 264 232 253.3 232 240C232 226.7 221.3 216 208 216C194.7 216 184 226.7 184 240C184 253.3 194.7 264 208 264zM160 296C146.7 296 136 306.7 136 320C136 333.3 146.7 344 160 344C173.3 344 184 333.3 184 320C184 306.7 173.3 296 160 296zM304 264C317.3 264 328 253.3 328 240C328 226.7 317.3 216 304 216C290.7 216 280 226.7 280 240C280 253.3 290.7 264 304 264zM256 296C242.7 296 232 306.7 232 320C232 333.3 242.7 344 256 344C269.3 344 280 333.3 280 320C280 306.7 269.3 296 256 296zM400 264C413.3 264 424 253.3 424 240C424 226.7 413.3 216 400 216C386.7 216 376 226.7 376 240C376 253.3 386.7 264 400 264zM352 296C338.7 296 328 306.7 328 320C328 333.3 338.7 344 352 344C365.3 344 376 333.3 376 320C376 306.7 365.3 296 352 296z"/></svg></div>
-                        <div>
-                            <p>Terminal: <span class="font-bold">{{$selectedTerminal->sn}}</span> &nbsp;&nbsp;&nbsp; Staus: <span class="font-bold">{{ $selectedTerminal->ts_naziv }}</span></p>
-                            <p class="text-sm">Lokacija: <span class="font-bold">{{ $selectedTerminal->l_naziv }}, {{$selectedTerminal->mesto}}</span></p>
-                            <p class="text-sm">Model: <span class="font-bold">{{ $selectedTerminal->treminal_model }}</span> | Proizvođač: <span class="font-bold">{{$selectedTerminal->treminal_proizvodjac}}</span></p>
-                            <p class="text-sm">Distributer: <span class="font-bold">{{ $selectedTerminal->distributer_naziv }}</span></p>
-                            <p class="text-sm">PIB: <span class="font-bold">{{ $selectedTerminal->pib }}</span></p>
-                        </div>
-                    </div>
-                </div> 
-
-
+                <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
                 <div class="flex mb-4">
                         <livewire:komponente.prikazkomentara 
                             :terminalLokacijaId="$modelId"

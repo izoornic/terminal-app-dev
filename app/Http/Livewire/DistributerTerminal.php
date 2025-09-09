@@ -5,21 +5,23 @@ namespace App\Http\Livewire;
 use App\Models\LicencaNaplata;
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
-use App\Models\LicencaParametar;
+//use App\Models\LicencaParametar;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaParametarTerminal;
 
+use App\Actions\Terminali\TerminaliReadActions;
+
 use App\Http\Helpers;
-use App\Ivan\CryptoSign;
-use App\Ivan\SelectedTerminalInfo;
+//use App\Ivan\CryptoSign;
+//use App\Ivan\SelectedTerminalInfo;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
+//use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use Maatwebsite\Excel\Facades\Excel;
@@ -118,7 +120,7 @@ class DistributerTerminal extends Component
     {
         $this->modelId = $terminal_lokacija_id;
         $this->licenceNaziviInfo = LicencaDistributerCena::naziviDodatihLicenci($this->licenceDodateTerminalu());
-        $this->terminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($terminal_lokacija_id);
+        //$this->terminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($terminal_lokacija_id);
         $this->modalTerminalInfoVisible = true;
     }
    
@@ -178,58 +180,19 @@ class DistributerTerminal extends Component
      */
     public function read()
     {
-        
-        return TerminalLokacija::select(
-            'terminal_lokacijas.id', 
-            'terminal_lokacijas.br_komentara',
-            'terminals.sn', 
-            'lokacijas.l_naziv', 
-            'lokacijas.mesto', 
-            'lokacijas.adresa', 
-            'lokacijas.latitude', 
-            'lokacijas.longitude',
-            'lokacijas.pib',
-            'lokacijas.id as lokid',
-            'licenca_naplatas.id as lnid', 
-            'licenca_naplatas.datum_pocetka_licence', 
-            'licenca_naplatas.datum_kraj_licence',
-            'licenca_naplatas.nenaplativ',
-            'licenca_naplatas.zaduzeno', 
-            'licenca_naplatas.razduzeno',
-            'licenca_naplatas.nenaplativ',
-            'licenca_tips.licenca_naziv', 
-            'licenca_tips.id as ltid', 
-            'licenca_tips.broj_parametara_licence')
-    ->leftJoin('licenca_naplatas', function($join)
-        {
-            $join->on('licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id');
-            $join->on('licenca_naplatas.aktivna', '=', DB::raw("1"));
-        })
-    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-    ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
-    ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
-    ->where('terminal_lokacijas.distributerId', '=', $this->distId)
-    ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
-    ->when($this->searchMesto > 0, function ($rtval){
-        return $rtval->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-            ->orWhere('lokacijas.adresa', 'like', '%'.$this->searchMesto.'%')
-            ->orWhere('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%');
-    })
-    ->when($this->searchTipLicence > 0, function ($rtval){
-        return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
-    })
-    ->when($this->searchNenaplativ > 0, function ($rtval){
-        return $rtval->where('licenca_naplatas.nenaplativ', '=', 1);
-    })
-    ->when($this->searchPib, function ($query) {
-        return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
-    })
-    ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
-    ->orderBy('terminal_lokacijas.id')
-    ->orderBy('licenca_distributer_cenas.licenca_tipId')
-    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
-        
+
+        $search = [
+            'searchSB' => $this->searchTerminalSn,
+            'searchLokacija' => $this->searchMesto,
+            'searchTipLicence' => $this->searchTipLicence,
+            'searchNenaplativ' => $this->searchNenaplativ,
+            'searchPib' => $this->searchPib,
+        ];
+
+        $builder = TerminaliReadActions::DistributerTerminaliRead($this->distId, $search);
+
+        $perPage = Config::get('global.terminal_paginate');
+        return $builder->paginate($perPage, ['*'], 'terminali');   
     }
 
     public function showLatLogModal($id)
@@ -279,7 +242,7 @@ class DistributerTerminal extends Component
         
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        //$this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->modalKomentariVisible = true;
     }
 

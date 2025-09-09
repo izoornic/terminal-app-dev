@@ -61,8 +61,9 @@
                             <p>Terminal: <span class="font-bold">{{$terminal->sn}}</span> </p>
                             <p>Staus: <span class="font-bold">{{ $terminal->ts_naziv }}</span></p>
                             <p class="text-sm">Model: <span class="font-bold">{{ $terminal->treminal_model }}</span> | Proizvođač: <span class="font-bold">{{$terminal->treminal_proizvodjac}}</span></p>
-                            <p>Lokacija:  <span class="font-bold">{{ $terminal->l_naziv }}</span></p>
-                            <p>Adresa: <span class="font-bold">{{ $terminal->adresa }}</span>, {{$terminal->mesto}}</p>
+                            <p>Lokacija:@if ($terminal->is_duplicate)<span class="text-red-500">*</span> @endif  <span class="font-bold">{{ $terminal->l_naziv }}&nbsp;{{ $terminal->l_naziv_sufix }}</span></p>
+                            <p>Adresa: <span class="font-bold">{{ $terminal->adresa }}</span></p>
+                            <p>Mesto: <span class="font-bold"> {{$terminal->mesto}}</p>
                             <p>Region:  <span class="font-bold">{{ $terminal->r_naziv }}</span></p>
                             <p>PIB:  <span class="font-bold">{{ $terminal->pib }}</span></p>
                             <p>e-mail:  <span class="font-bold">{{ $terminal->email }}</span></p>

@@ -11,7 +11,26 @@ class SelectedTerminalInfo
 
     public static function selectedTerminalInfo($tlid)
     {
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.adresa', 'lokacijas.mesto', 'lokacijas.pib', 'lokacijas.lokacija_tipId', 'lokacijas.email', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid', 'terminal_tips.model as treminal_model', 'terminal_tips.proizvodjac as treminal_proizvodjac', 'licenca_distributer_tips.distributer_naziv')
+        return TerminalLokacija::select(
+                        'terminal_lokacijas.*', 
+                        'terminals.sn', 
+                        'terminals.terminal_tipId as tid', 
+                        'terminal_status_tips.ts_naziv', 
+                        'lokacijas.is_duplicate',
+                        'lokacijas.l_naziv',
+                        'lokacijas.l_naziv_sufix', 
+                        'lokacijas.adresa', 
+                        'lokacijas.mesto', 
+                        'lokacijas.pib', 
+                        'lokacijas.lokacija_tipId', 
+                        'lokacijas.email', 
+                        'lokacija_kontakt_osobas.name', 
+                        'lokacija_kontakt_osobas.tel', 
+                        'regions.r_naziv', 
+                        'regions.id as rid', 
+                        'terminal_tips.model as treminal_model', 
+                        'terminal_tips.proizvodjac as treminal_proizvodjac', 
+                        'licenca_distributer_tips.distributer_naziv')
                     ->where('terminal_lokacijas.id',  $tlid)
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
@@ -37,7 +56,20 @@ class SelectedTerminalInfo
 
     public static function selectedTerminalInfoTerminalId($tid)
     {
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacijas.pib', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
+        return TerminalLokacija::select(
+                        'terminal_lokacijas.*', 
+                        'terminal_lokacijas.id as terminal_lokacija_id',
+                        'terminals.sn', 
+                        'terminals.terminal_tipId as tid', 
+                        'terminal_status_tips.ts_naziv', 
+                        'lokacijas.l_naziv', 
+                        'lokacijas.l_naziv_sufix', 
+                        'lokacijas.mesto', 
+                        'lokacijas.pib', 
+                        'lokacija_kontakt_osobas.name', 
+                        'lokacija_kontakt_osobas.tel', 
+                        'regions.r_naziv', 
+                        'regions.id as rid')
                     ->where('terminalId', $tid)            
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
@@ -56,8 +88,11 @@ class SelectedTerminalInfo
                         'terminals.broj_kutije',
                         'terminals.terminal_tipId as tid', 
                         'terminal_status_tips.ts_naziv', 
-                        'lokacijas.l_naziv', 'lokacijas.mesto', 
-                        'lokacijas.pib','lokacijas.lokacija_tipId', 
+                        'lokacijas.l_naziv', 
+                        'lokacijas.l_naziv_sufix',
+                        'lokacijas.mesto', 
+                        'lokacijas.pib',
+                        'lokacijas.lokacija_tipId', 
                         'lokacija_kontakt_osobas.name', 
                         'lokacija_kontakt_osobas.tel', 
                         'regions.r_naziv', 
@@ -65,8 +100,7 @@ class SelectedTerminalInfo
                         'terminal_tips.model as treminal_model', 
                         'terminal_tips.proizvodjac as treminal_proizvodjac', 
                         'licenca_distributer_tips.distributer_naziv'
-                        )
-                    ->where('terminal_lokacijas.id', $tid)            
+                        )            
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
@@ -74,6 +108,7 @@ class SelectedTerminalInfo
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                     ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
                     ->leftJoin('licenca_distributer_tips', 'terminal_lokacijas.distributerId', '=', 'licenca_distributer_tips.id')
+                    ->where('terminal_lokacijas.id', $tid)
                     -> first(); 
     }
 
@@ -105,10 +140,10 @@ class SelectedTerminalInfo
      * @param  mixed $terminalId
      * @return void
      */
-    public static function terminalImaLicencu($terminalId)
+    public static function terminalImaLicencu($terminal_lokacija_Id)
     {
-        $tlid = TerminalLokacija::where('terminalId', $terminalId) -> first()->id;
-        $licId = LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> first();
+        //$tlid = TerminalLokacija::where('terminalId', $terminalId) -> first()->id;
+        $licId = LicenceZaTerminal::where('terminal_lokacijaId', $terminal_lokacija_Id) -> first();
         
         if($licId == null) return false;
 

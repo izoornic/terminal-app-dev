@@ -178,7 +178,7 @@ class Tiketview extends Component
     {
         $this->newKoment = '';
         $this->tiket = $this->TiketInfo();
-
+        
         $this->selectedTerminalCommentsCount = TerminalLokacija::find($this->tiket->tremina_lokacijalId)->br_komentara;
         
         $this->kvarAkcijaId = $this->tiket->tokid;
@@ -471,7 +471,12 @@ class Tiketview extends Component
     public function render()
     {
         if($this->validTiket){
-            return view('livewire.tiketview', ['tiket' => $this->read(), 'akcije'=>$this->kvarAkcije(), 'terminal' => SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId), 'historyData' => $this->historyData(), 'komentari' => $this->readComments()]);
+            return view('livewire.tiketview', [
+                'tiket' => $this->read(), 
+                'akcije'=>$this->kvarAkcije(), 
+                'terminal' => SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId), 
+                'historyData' => $this->historyData(), 
+                'komentari' => $this->readComments()]);
         }else{
             return view('livewire.errortiket', []);
         }

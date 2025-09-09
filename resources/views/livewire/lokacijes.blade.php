@@ -450,7 +450,7 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-    {{-- The Delete or INFO Modal --}}
+    {{-- The Delete or INFO Modal ############################################################# --}}
     <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
         <x-slot name="title">
             @if($deletePosible)
@@ -468,7 +468,7 @@
                     <div class="flex">
                         <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg></div>
                             <div>
-                                <p><span class="font-bold">{{ $odabranaLokacija->l_naziv}}</span>, Adresa: <span class="font-bold">{{ $odabranaLokacija->adresa}}</span></p>
+                                <p><span class="font-bold">{{ $odabranaLokacija->l_naziv}}&nbsp;{{ $odabranaLokacija->l_naziv_sufix }}</span>, Adresa: <span class="font-bold">{{ $odabranaLokacija->adresa}}</span></p>
                                 <p>Mesto: <span class="font-bold">{{ $odabranaLokacija->mesto }}</span>, Region: <span class="font-bold">{{ $odabranaLokacija->r_naziv }}</span></p>
                                 <p>PIB: <span class="font-bold">{{ $odabranaLokacija->pib }}</span></p>
                                 <p>e-mail: <span class="font-bold">{{ $odabranaLokacija->email }}</span></p>
@@ -689,7 +689,7 @@
                             <tbody>
                                 @foreach($this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK) as $item)
                                     <tr>
-                                        <td><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
+                                        <td><input type="checkbox" value="{{ $item->id }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
                                         <td> {{ $item->sn }}</td>
                                         <td> {{ $item->broj_kutije }}</td>
                                         <td>{{ $item->model }}</td>

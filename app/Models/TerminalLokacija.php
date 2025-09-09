@@ -57,13 +57,13 @@ class TerminalLokacija extends Model
      * @return [type]
      * 
      */
-    public static function premestiTerminale($termila_ids, $lokacija_id, $datumPremestanja, $status_terminala_id, $distributer_id)
+    public static function premestiTerminale($termil_lokacija_ids, $lokacija_id, $datumPremestanja, $status_terminala_id, $distributer_id)
     {
         $retval = false;
         $oduzeti_distributeru = [];
 
-        foreach($termila_ids as $item){
-            $cuurent = TerminalLokacija::where('terminalId', $item) -> first();
+        foreach($termil_lokacija_ids as $item){
+            $cuurent = TerminalLokacija::where('id', $item) -> first();
             //da li se terminal oduzima distributeru?
             if(isset($cuurent->distributerId)){
                 if(!in_array($cuurent->distributerId, $oduzeti_distributeru)) array_push($oduzeti_distributeru, $cuurent->distributerId);
@@ -73,7 +73,7 @@ class TerminalLokacija extends Model
                 //insert to history table
                 TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
                 //update current
-                TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $status_terminala_id, 'lokacijaId' => $lokacija_id, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$datumPremestanja, 'distributerId' => $distributer_id ]);
+                TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $status_terminala_id, 'lokacijaId' => $lokacija_id, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$datumPremestanja, 'distributerId' => $distributer_id ]);
             });
         }
 

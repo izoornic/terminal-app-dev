@@ -263,7 +263,12 @@ V 1.0.4.8 (30.8.2025.) @main
         Duplikati su obelezeni crvenom * u prikazu
         U bazi je skinut index unique na polju email u tabeli lokacijas
 
+V 1.0.5.0 (9.9.2025.) @main 
+    - Terminal info komponenta implementirana na modalim gde se prikayuju podaci o terminalu
+    - Konacno extrahovana read funkcija za stranicu 'licenca-terminal' 
 
+//TODO 
+    - read funkciju primeniti na stranici Terminali 
 
 SELECT * 
 FROM lokacijas
@@ -279,11 +284,10 @@ FROM lokacijas
 110871136
 111700788 - 3 lokacije
 112990130
-102776993 - Obuća Pavle doo 31 lokacija - edituj naziv
+102776993 - Obuća Pavle doo 31 lokacija
 103079070 - 3 lokacije
 112457749 - Razliciti nazivi!!!
 114664893
-
 
 Poljoprivredno gazdinstvo Takač Dejan - nema PIB
 Radenko Cvanić  - nema PIB

@@ -153,9 +153,10 @@ class Terminal extends Component
         $this->dodeljenUserId = null;
 
         $this->prioritetTiketa = 4;
-        $this->newTiketTerminalLokacijaId = TerminalLokacija::select('id')->where('terminalId', '=', $tid)->first()->id;
-        $this->modelId = $tid;
-        $this->newTerminalInfo = $this->selectedTerminalTiketInfo();
+        //$this->newTiketTerminalLokacijaId = TerminalLokacija::select('id')->where('terminalId', '=', $tid)->first()->id;
+        $this->modelId = $tid; //ovo je terminal_lokacija_id
+        //$this->newTerminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);//$this->selectedTerminalTiketInfo();
+        //$this->newTiketTerminalLokacijaId = $this->newTerminalInfo->terminal_lokacija_id;
         $this->prioritetInfo = $this->prioritetInfo();
         $this->newTiketVisible = true;
     }
@@ -232,7 +233,7 @@ class Terminal extends Component
             ->join('lokacijas', 'lokacijas.id', '=', 'users.lokacijaId')
             ->join('regions', 'regions.id', '=', 'lokacijas.regionId')
             ->where('users.pozicija_tipId', '=', 3)
-            ->where('regions.id', '=',SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId)->rid)
+            ->where('regions.id', '=', SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId)->rid)
             ->first();
     }
 
@@ -248,24 +249,6 @@ class Terminal extends Component
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
                     ->where('users.id', '=', $user_id)
                     ->first();
-    }
-
-    /**
-     * [Description for selectedTerminalTiketInfo]
-     *
-     * @return [type]
-     * 
-     */
-    private function selectedTerminalTiketInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid', 'licenca_distributer_tips.distributer_naziv')
-                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-                    ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-                    ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    ->leftJoin('licenca_distributer_tips', 'terminal_lokacijas.distributerId', '=', 'licenca_distributer_tips.id')
-                    ->where('terminal_lokacijas.id', $this->newTiketTerminalLokacijaId)
-                    -> first();
     }
 
      /**
@@ -340,59 +323,6 @@ class Terminal extends Component
     }
 
     /**
-     * The read function.
-     *
-     * @return void
-     */
-    public function read()
-    {
-        $this->allInPage = [];
-
-        $terms =  TerminalLokacija::select(
-                        'lokacijas.*', 
-                        'terminals.id as tid', 
-                        'terminals.sn', 
-                        'terminals.broj_kutije', 
-                        'terminal_tips.model', 
-                        'lokacija_tips.lt_naziv', 
-                        'regions.r_naziv', 
-                        'terminal_status_tips.ts_naziv', 
-                        'terminal_status_tips.id as statusid', 
-                        'terminal_lokacijas.id as tlid', 
-                        'terminal_lokacijas.blacklist', 
-                        'terminal_lokacijas.distributerId',
-                        'terminal_lokacijas.br_komentara')
-        ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-        ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-        ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
-        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-        ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-        ->where('terminals.sn', 'like', '%'.$this->searchSB.'%')
-        ->where('terminals.broj_kutije', 'like', '%'.$this->searchKutija.'%')
-        ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
-        ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
-        ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
-        ->where('terminal_status_tips.id', ($this->searchStatus > 0) ? '=' : '<>', $this->searchStatus)
-        ->when($this->searchPib, function ($query) {
-            return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
-        })
-        ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
-        
-        $terms->each(function ($item, $key){
-           // da li terminal ima licencu i da li je regularna ili servisna
-            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first();
-            $item->tzlid = ($licenca) ?  $licenca->licenca_poreklo : 0;
-            
-            //ovo sluzi za check ALL box
-            array_push($this->allInPage,  $item->tid);
-        });
-        
-        return $terms;
-    }
-
-
-    /**
      * Shows STATUS update modal
      *
      * @param  mixed $id
@@ -401,9 +331,10 @@ class Terminal extends Component
     public function statusShowModal($id, $status)
     {
         $this->multiSelected = false;
-        $this->modelId = $id;
+        $this->modelId = $id; //id u tabeli terminal_lokacija
         $this->modalStatus = $status;
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
+        
+        //$this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         //$this->resetValidation();
         //$this->reset();
         $this->modalFormVisible = true;
@@ -417,18 +348,8 @@ class Terminal extends Component
     public function statusSelectedShowModal()
     {
         $this->multiSelected = true;
-        $this->multiSelectedInfo = $this->multiSelectedTInfo();
+        
         $this->modalFormVisible = true;
-    }
-
-    private function multiSelectedTInfo()
-    {
-        return TerminalLokacija::whereIn('terminalId', $this->selectedTerminals )
-        ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-        ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-        ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-        ->orderBy('lokacijaId')
-        ->get();
     }
 
      /**
@@ -438,17 +359,16 @@ class Terminal extends Component
      */
     public function statusUpdate()
     {
-
         if(!$this->multiSelected) $this->selectedTerminals[0] = $this->modelId;
-        
+        //dd($this->modalStatus, TerminalLokacija::where('id', $this->modelId) -> first());
         foreach($this->selectedTerminals as $item){
             DB::transaction(function()use($item){
                 //terminal
-                $cuurent = TerminalLokacija::where('terminalId', $item) -> first();
+                $cuurent = TerminalLokacija::where('id', $item) -> first();
                 //insert to history table
                 TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
                 //update current
-                TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
             });
         }
 
@@ -464,8 +384,9 @@ class Terminal extends Component
      */
     public function premestiShowModal($id, $status)
     {
+        $this->selectedTerminal = null;
         $this->multiSelected = false;
-        $this->modelId = $id;
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->plokacijaTip = 0;
         $this->plokacija = 0;
         $this->canMoveTerminal = 0;
@@ -476,8 +397,7 @@ class Terminal extends Component
         $this->searchPlokacijaRegion = 0;
         $this->licencaError = '';
         //podaci o terminalu koji se premesta
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
-        //dd($this->selectedTerminal);
+        //kupi ih komponenta preko modeId-a
         $this->modalConfirmPremestiVisible = true;
 
         $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
@@ -486,10 +406,11 @@ class Terminal extends Component
     public function premestiSelectedShowModal(){
         
         $this->multiSelected = true;
-        $this->multiSelectedInfo = $this->multiSelectedTInfo();
+        //podatke kupi komponenta preko selektovanih terminala
+        //$this->multiSelectedInfo = $this->multiSelectedTInfo();
 
         //status na listi se setuje prema prvom izabranom terminalu
-        $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selectedTerminals[0])->first()->terminal_statusId;
+        $this->modalStatusPremesti = TerminalLokacija::where('id', $this->selectedTerminals[0])->first()->terminal_statusId;
         //dd($this->modalStatusPremesti);
 
         $this->plokacijaTip = 0;
@@ -581,48 +502,6 @@ class Terminal extends Component
         $this->modalConfirmPremestiVisible = false;
     }
 
-    /**
-     * updated
-     *
-     * @param  mixed $key
-     * @param  mixed $value
-     * @return void
-     */
-    public function updated($key, $value)
-    {
-        $exp = Str::of($key)->explode(delimiter: '.');
-        if($exp[0] === 'selectAll' && is_numeric($value)){
-           foreach($this->allInPage as $termid){
-               if(!in_array($termid, $this->selectedTerminals)){
-                array_push($this->selectedTerminals, $termid);
-               }  
-           }
-        }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
-        }
-
-        if($this->modalConfirmPremestiVisible || $this->modalFormVisible){
-            $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
-        }
-
-        if($this->editTerminalInfoVisible){
-            $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        }
-
-        if($this->multiSelected && ($this->modalFormVisible || $this->modalConfirmPremestiVisible)){
-            $this->multiSelectedInfo = $this->multiSelectedTInfo();
-        }
-
-        if($this->newTiketVisible){
-            $this->newTerminalInfo = $this->selectedTerminalTiketInfo();
-            $this->prioritetInfo = $this->prioritetInfo();
-
-            if($this->dodeljenUserId){
-                $this->dodeljenUserInfo = $this->selectedUserInfo($this->dodeljenUserId);
-            }
-        }
-    }
-
         
     /**
      * History MODAL
@@ -633,10 +512,9 @@ class Terminal extends Component
     {
         $this->historyData = null;
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        
         $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
-        //dd($this->historyData);
-
+        
         $this->terminalHistoryVisible = true;
     }
 
@@ -652,9 +530,9 @@ class Terminal extends Component
     {
         //dd($tpl);        
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        
         $this->licencaData = LicenceZaTerminal::sveAktivneLicenceTerminala($id);
-        //dd($this->licencaData);
+
         $this->licencaModalVisible = true;
     }
     
@@ -872,7 +750,7 @@ class Terminal extends Component
        
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        
         $this->modalKomentariVisible = true;
     }
 
@@ -904,6 +782,92 @@ class Terminal extends Component
         $this->editTerminalInfoVisible = false;
     }
 
+    /**
+     * The read function.
+     *
+     * @return void
+     */
+    public function read()
+    {
+        $this->allInPage = [];
+
+        $terms =  TerminalLokacija::select(
+                        'lokacijas.*', 
+                        'terminals.id as tid', 
+                        'terminals.sn', 
+                        'terminals.broj_kutije', 
+                        'terminal_tips.model', 
+                        'lokacija_tips.lt_naziv', 
+                        'regions.r_naziv', 
+                        'terminal_status_tips.ts_naziv', 
+                        'terminal_status_tips.id as statusid', 
+                        'terminal_lokacijas.id as tlid', 
+                        'terminal_lokacijas.blacklist', 
+                        'terminal_lokacijas.distributerId',
+                        'terminal_lokacijas.br_komentara')
+        ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
+        ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+        ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
+        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+        ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+        ->where('terminals.sn', 'like', '%'.$this->searchSB.'%')
+        ->where('terminals.broj_kutije', 'like', '%'.$this->searchKutija.'%')
+        ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
+        ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
+        ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
+        ->where('terminal_status_tips.id', ($this->searchStatus > 0) ? '=' : '<>', $this->searchStatus)
+        ->when($this->searchPib, function ($query) {
+            return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
+        })
+        ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
+        
+        $terms->each(function ($item, $key){
+           // da li terminal ima licencu i da li je regularna ili servisna
+            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first();
+            $item->tzlid = ($licenca) ?  $licenca->licenca_poreklo : 0;
+            
+            //ovo sluzi za check ALL box
+            array_push($this->allInPage,  $item->tlid);
+        });
+        
+        return $terms;
+    }
+
+
+    /**
+     * updated
+     *
+     * @param  mixed $key
+     * @param  mixed $value
+     * @return void
+     */
+    public function updated($key, $value)
+    {
+        $exp = Str::of($key)->explode(delimiter: '.');
+        if($exp[0] === 'selectAll' && is_numeric($value)){
+           foreach($this->allInPage as $termid){
+               if(!in_array($termid, $this->selectedTerminals)){
+                array_push($this->selectedTerminals, $termid);
+               }  
+           }
+        }elseif($exp[0] === 'selectAll' && empty($value)){
+            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
+        }
+
+        if($this->editTerminalInfoVisible){
+            $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        }
+
+        if($this->newTiketVisible){
+            //$this->newTerminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);//$this->selectedTerminalTiketInfo();
+            $this->prioritetInfo = $this->prioritetInfo();
+
+            if($this->dodeljenUserId){
+                $this->dodeljenUserInfo = $this->selectedUserInfo($this->dodeljenUserId);
+            }
+        }
+    }
    
     public function render()
     {
