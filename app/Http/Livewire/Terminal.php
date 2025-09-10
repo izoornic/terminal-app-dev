@@ -31,6 +31,8 @@ use App\Ivan\TerminalHistory;
 use App\Ivan\SelectedTerminalInfo;
 use App\Ivan\MailToUser;
 
+use App\Actions\Terminali\TerminaliReadActions;
+
 class Terminal extends Component
 {
     use WithPagination;
@@ -789,46 +791,31 @@ class Terminal extends Component
      */
     public function read()
     {
-        $this->allInPage = [];
 
-        $terms =  TerminalLokacija::select(
-                        'lokacijas.*', 
-                        'terminals.id as tid', 
-                        'terminals.sn', 
-                        'terminals.broj_kutije', 
-                        'terminal_tips.model', 
-                        'lokacija_tips.lt_naziv', 
-                        'regions.r_naziv', 
-                        'terminal_status_tips.ts_naziv', 
-                        'terminal_status_tips.id as statusid', 
-                        'terminal_lokacijas.id as tlid', 
-                        'terminal_lokacijas.blacklist', 
-                        'terminal_lokacijas.distributerId',
-                        'terminal_lokacijas.br_komentara')
-        ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-        ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-        ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
-        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-        ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-        ->where('terminals.sn', 'like', '%'.$this->searchSB.'%')
-        ->where('terminals.broj_kutije', 'like', '%'.$this->searchKutija.'%')
-        ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
-        ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
-        ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
-        ->where('terminal_status_tips.id', ($this->searchStatus > 0) ? '=' : '<>', $this->searchStatus)
-        ->when($this->searchPib, function ($query) {
-            return $query->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
-        })
-        ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
+        $this->allInPage = [];
+        //get the builder with filters applied
+        $search = [
+            'searchSB' => $this->searchSB,
+            'searchKutija' => $this->searchKutija,
+            'searchNazivLokacije' => $this->searchName,
+            'searchRegion' => $this->searchRegion,
+            'searchTipLokacije' => $this->searchTip,
+            'searchStatus' => $this->searchStatus,
+            'searchPib' => $this->searchPib,
+        ];
+
+        $builder = TerminaliReadActions::TerminaliRead($search);
         
-        $terms->each(function ($item, $key){
-           // da li terminal ima licencu i da li je regularna ili servisna
-            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first();
-            $item->tzlid = ($licenca) ?  $licenca->licenca_poreklo : 0;
-            
-            //ovo sluzi za check ALL box
-            array_push($this->allInPage,  $item->tlid);
+        // paginate the builder
+        $perPage = Config::get('global.terminal_paginate');
+        $terms = $builder->paginate($perPage, ['*'], 'terminali');
+
+        // enrich paginated items and collect ids present on the current page
+        $terms->getCollection()->transform(function ($item) {
+            $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
+            $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0;
+            $this->allInPage[] = $item->tlid;
+            return $item;
         });
         
         return $terms;
