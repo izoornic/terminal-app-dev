@@ -1,4 +1,5 @@
 <div class="p-6">
+    <x-icon-history class="fill-current w-4 h-4 mr-0"/>
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

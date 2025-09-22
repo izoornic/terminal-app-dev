@@ -4,7 +4,7 @@
             <!--! CREATE NEW USER -->
             <x-heroicon-o-user-plus class="w-5 h-5 mr-0 ml-1"/>
         <span class="ml-4">Novi korisnik</span>    
-    </x-jet-button>
+    </x-jet-button> 
     </div>
 
     {{-- The data table --}}
