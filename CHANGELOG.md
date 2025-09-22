@@ -263,12 +263,22 @@ V 1.0.4.8 (30.8.2025.) @main
         Duplikati su obelezeni crvenom * u prikazu
         U bazi je skinut index unique na polju email u tabeli lokacijas
 
-V 1.0.5.0 (9.9.2025.) @main 
+V 1.0.5.1 (9.9.2025.) @main 
     - Terminal info komponenta implementirana na modalim gde se prikayuju podaci o terminalu
     - Konacno extrahovana read funkcija za stranicu 'licenca-terminal' 
 
-//TODO 
-    - read funkciju primeniti na stranici Terminali 
+V 1.0.5.2 (15.9.2025.) @bankomati 
+    - 'pozicija_tips' - dodate 3 nove pozicije i polje u tabeli 'dashboard_path'
+
+V 1.0.6.0 (22.9.2025.) @bankomati 
+    - Novi deo aplikacije sa servisom Bankomata  4 od 5 stranica: Pocetna, Bankomati, Lokacije, Modeli bankomata
+
+
+
+
+
+
+
 
 SELECT * 
 FROM lokacijas

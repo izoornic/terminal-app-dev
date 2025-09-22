@@ -5,6 +5,7 @@ use App\Http\Controllers\ApiDataController;
 //use App\Http\Controllers\SendEmailController;
 use App\Http\Controllers\PredracunPdfControler;
 use App\Http\Controllers\Distributer\DistPredracunControler;
+use App\Models\PozicijaTip;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,10 +46,10 @@ Route::group(['middleware' => [
     'auth:sanctum',
     'verified',
     'accessrole'
-]], function(){
+    ]], function(){
 
     Route::get('/dashboard', function(){
-        return (auth()->user()->pozicija_tipId == 8) ?view('distributer.dashboard') : view('admin.dashboard');
+        return view(PozicijaTip::getDashboardByPozicija(auth()->user()->pozicija_tipId));
         })->name('dashboard');
 
     Route::get('/users', function(){
@@ -186,5 +187,17 @@ Route::group(['middleware' => [
     Route::get('/managment-distributeri-mapa', function(){
         return view('managment.man-distributeri-licence-mapa');
         })->name('managment-distributeri-mapa');
+
+    Route::get('/bankomati', function(){
+        return view('bankomati.bankomati');
+        })->name('bankomati');
+
+    Route::get('/bankomati-lokacije', function(){
+        return view('bankomati.lokacija');
+        })->name('bankomati-lokacije');
+
+     Route::get('/bankomat-tipovi', function(){
+        return view('bankomati.bankomat-tipovi');
+        })->name('bankomat-tipovi');
 
 });
