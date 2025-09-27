@@ -5,12 +5,12 @@
                 <span class="mr-2">
                     <x-heroicon-o-swatch class="w-6 h-6 mr-1"/>
                 </span>    
-                   Modeli bankomata
+                   Modeli porizvoda
             </div>
             <div class="max-h-6" >
                 <span class="mr-2 pr-2"> 
                     <livewire:komponente.add-new-item-button 
-                            btn_name="Novi model bankomata"
+                            btn_name="Novi model proizvoda"
                             btn_event="newBankomatModel" />
                 </span>
             </div>

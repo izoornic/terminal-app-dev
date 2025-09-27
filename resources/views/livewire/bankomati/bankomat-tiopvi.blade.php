@@ -8,6 +8,7 @@
                         <thead>
                             <tr>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500"></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Proizvod</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Model</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Proizvođač</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Opis</th>
@@ -19,6 +20,14 @@
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td> <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /> </td>
+                                <td>
+                                    <select wire:model="searchProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">---</option>
+                                        @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
                                 <td class="px-2"><x-jet-input wire:model="searchModel" id="" class="block bg-orange-50 w-full" type="text" placeholder="Model" /></td>
                                 <td class="px-2"><x-jet-input wire:model="searchProizvodjac" id="" class="block bg-orange-50 w-full" type="text" placeholder="Proizvođač" /></td>
                                 <td class="px-2"><x-jet-input wire:model="searchOpis" id="" class="block bg-orange-50 w-full" type="text" placeholder="Opis" /></td>
@@ -34,6 +43,7 @@
                                                 <x-heroicon-o-pencil-square class="w-5 h-5 mx-2 my-1" />
                                             </button>
                                         </td> 
+                                        <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
                                         <td class="px-1 py-2">{{ $item->model }}</td>
                                         <td class="px-1 py-2">{{ $item->proizvodjac }}</td>
                                         <td class="px-1 py-2">{{ $item->opis }}</td>
@@ -69,7 +79,7 @@
                     <x-heroicon-o-building-office class="w-6 h-6 mr-2"/>
                     @if ($is_edit) Izmeni podatke - {{ $bankomat_model }}
                     @else 
-                         Novi model bankomata 
+                         Novi uređaj
                     @endif
                 </div>
 
@@ -77,6 +87,22 @@
         </x-slot>
 
         <x-slot name="content">
+           
+            <div class="mt-4">
+                <x-jet-label for="bankomat_product_tip" value="Tip uređaja" />
+                 @if ($is_edit)
+                    <p class="mt-2 text-sm font-bold text-gray-600">{{$tip_uredjaja_naziv}}</p>
+                 @else
+                    <select wire:model="bankomat_product_tip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">---</option>
+                        @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                    @error('bankomat_product_tip') <span class="error">{{ $message }}</span> @enderror
+                 @endif
+            </div>
+
             <div class="mt-4">
                 <x-jet-label for="bankomat_model" value="Model" />
                 <x-jet-input wire:model="bankomat_model" id="" class="block mt-1 w-full" type="text" />
@@ -114,7 +140,7 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-    {{-- DELET ############################################### --}}
+    {{-- DELETE ############################################### --}}
     <x-jet-dialog-modal wire:model="deleteModalVisible">
         <x-slot name="title">
             <div class="flex justify-between">

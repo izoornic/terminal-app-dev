@@ -24,6 +24,8 @@ class BankomatTiopvi extends Component
     public $bankomat_model;
     public $bankomat_old_model;
     public $bankomat_proizvodjac;
+    public $bankomat_product_tip;
+    public $tip_uredjaja_naziv;
     public $opis;
 
     //DELETE
@@ -33,6 +35,7 @@ class BankomatTiopvi extends Component
     public $searchModel;
     public $searchProizvodjac;
     public $searchOpis;
+    public $searchProductTip;
 
     /**
      * Listeners for Livewire events
@@ -54,6 +57,7 @@ class BankomatTiopvi extends Component
         //dd($this->modelData());
         $this->validate(
             [
+                'bankomat_product_tip' => 'required|integer|exists:bankomat_product_tips,id',
                 'bankomat_model' => 'required|string|max:64|unique:bankomat_tips,model',
                 'bankomat_proizvodjac' => 'required|string|max:64',
                 'opis' => 'nullable|string|max:255',
@@ -79,6 +83,7 @@ class BankomatTiopvi extends Component
         //dd($this->bankomat_model);
         $this->validate(
             [
+                'bankomat_product_tip' => 'required|integer|exists:bankomat_product_tips,id',
                 'bankomat_model' =>($this->bankomat_model == $this->bankomat_old_model) ? '' : 'required|string|max:64|unique:bankomat_tips,model',
                 'bankomat_proizvodjac' => 'required|string|max:64',
                 'opis' => 'nullable|string|max:255',
@@ -93,6 +98,9 @@ class BankomatTiopvi extends Component
     public function loadModel()
     {
         $model = BankomatTip::find($this->modelId);
+        $this->bankomat_product_tip = $model->bankomat_produkt_tip_id;
+        $this->tip_uredjaja_naziv = $model->bankomat_product_tip()->first()->bp_tip_naziv;//->bp_tip_naziv;
+        //dd( $this->tip_uredjaja_naziv);
         $this->bankomat_model = $model->model;
         $this->bankomat_old_model = $model->model;
         $this->bankomat_proizvodjac = $model->proizvodjac;
@@ -102,6 +110,7 @@ class BankomatTiopvi extends Component
     private function modelData()
     {
         return [
+            'bankomat_produkt_tip_id' => $this->bankomat_product_tip,
             'model' => $this->bankomat_model,
             'proizvodjac' => $this->bankomat_proizvodjac,
             'opis' => $this->opis,
@@ -125,23 +134,29 @@ class BankomatTiopvi extends Component
 
     private function resetInputFields()
     {
+        $this->bankomat_product_tip = '';
         $this->bankomat_model = '';
         $this->bankomat_old_model = '';
         $this->bankomat_proizvodjac = '';
+         $this->tip_uredjaja_naziv = '';
         $this->opis = '';
     }
 
     public function read()
     {
-        return BankomatTip::
-            when($this->searchModel, function ($query, $searchModel) {
+        return BankomatTip::select('bankomat_tips.*', 'bankomat_product_tips.bp_tip_naziv', 'bankomat_product_tips.id as produkt_tip_id')
+            ->leftJoin('bankomat_product_tips', 'bankomat_product_tips.id', '=', 'bankomat_tips.bankomat_produkt_tip_id')
+            ->when($this->searchModel, function ($query, $searchModel) {
                 return $query->where('model', 'like', '%'.$searchModel.'%');
             })
             ->when($this->searchProizvodjac, function ($query, $searchProizvodjac) {
                 return $query->where('proizvodjac', 'like', '%'.$searchProizvodjac.'%');
             })
             ->when($this->searchOpis, function ($query, $searchOpis) {
-                return $query->where('opis', 'like', '%'.$searchOpis.'%');
+                return $query->where('opis', 'like', '%'.$this->searchOpis.'%');
+            })
+            ->when($this->searchProductTip, function ($query) {
+                return $query->where('bankomat_produkt_tip_id', '=', $this->searchProductTip);
             })
             ->paginate(Config::get('global.paginate'));
     }

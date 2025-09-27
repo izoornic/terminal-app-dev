@@ -17,6 +17,8 @@ class BankomatLokacija extends Model
         'blokacija_id',
         'bankomat_status_tip_id',
         'user_id',
+        'created_at',
+        'updated_at'
     ];
 
     public function bankomat():HasOne

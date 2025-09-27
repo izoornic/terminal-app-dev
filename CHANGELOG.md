@@ -273,6 +273,9 @@ V 1.0.5.2 (15.9.2025.) @bankomati
 V 1.0.6.0 (22.9.2025.) @bankomati 
     - Novi deo aplikacije sa servisom Bankomata  4 od 5 stranica: Pocetna, Bankomati, Lokacije, Modeli bankomata
 
+V 1.0.6.0 (28.9.2025.) @bankomati
+    - Promenjeno sa Bankomata na Proizvodi i pripremljeno za unso Proizvoda i Lokacija
+
 
 
 

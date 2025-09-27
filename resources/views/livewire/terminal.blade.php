@@ -1,5 +1,4 @@
 <div class="p-6">
-    <x-icon-history class="fill-current w-4 h-4 mr-0"/>
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -491,7 +490,7 @@
 
         <x-slot name="footer">
         <x-jet-secondary-button wire:click="$toggle('terminalHistoryVisible')" wire:loading.attr="disabled">
-                {{ __('Zatvori') }}
+                Zatvori
             </x-jet-secondary-button>
         </x-slot>
     </x-jet-dialog-modal>
@@ -500,7 +499,7 @@
     <x-jet-dialog-modal wire:model="newTiketVisible">
         <x-slot name="title">
             <svg class="fill-current w-6 h-6 mr-2 mt-1 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
-            {{ __('Novi Tiket') }}
+            Novi Tiket
         </x-slot>
        
         <x-slot name="content">
