@@ -8,12 +8,13 @@ class BankomatInformation
 {
     public static function bankomatInfo($bankomat_lokacija_id)
     {
-        $bankomat_lokacija = BankomatLokacija::select( 
+        return BankomatLokacija::select( 
             'bankomat_lokacijas.id', 
             'bankomat_lokacijas.updated_at as last_updated', 
             'bankomats.id as bid', 
             'bankomats.b_sn',  
             'bankomats.b_terminal_id',
+            'blokacijas.is_duplicate',
             'blokacijas.bl_naziv as blokacija_naziv',
             'blokacijas.bl_naziv_sufix as blokacija_naziv_sufix',
             'blokacijas.bl_adresa as blokacija_adresa',
@@ -39,11 +40,11 @@ class BankomatInformation
             ->where('bankomat_lokacijas.id', '=', $bankomat_lokacija_id)
             ->first();
         //dd($bankomat_lokacija_id, $bankomat_lokacija);
-        return $bankomat_lokacija;
+        //return $bankomat_lokacija;
     }
     public static function multiSelectedTInfo($bankomat_lokacija_ids)
     {
-        $bankomat_lokacija = BankomatLokacija::select( 
+        return BankomatLokacija::select( 
             'bankomat_lokacijas.id', 
             'bankomat_lokacijas.updated_at as last_updated', 
             'bankomats.id as bid', 
@@ -72,7 +73,25 @@ class BankomatInformation
             ->leftJoin('bankomat_status_tips', 'bankomat_lokacijas.bankomat_status_tip_id', '=', 'bankomat_status_tips.id')
             ->whereIn('bankomat_lokacijas.id', $bankomat_lokacija_ids)
             ->get();
-       // dd($bankomat_lokacija);
-        return $bankomat_lokacija;
+        // dd($bankomat_lokacija);
+        //return $bankomat_lokacija;
+    }
+
+    public static function BankomatProizvodTip($bankomat_lokacija_id)
+    {
+        return BankomatLokacija::select( 
+            'bankomat_tips.model',
+            'bankomat_tips.proizvodjac',
+            'bankomat_tips.bankomat_produkt_tip_id',
+            'bankomat_product_tips.bp_tip_naziv',
+            'bankomat_product_tips.id as produkt_tip_id',
+            'blokacijas.bankomat_region_id',
+            )
+            ->leftJoin('bankomats','bankomat_lokacijas.bankomat_id', '=', 'bankomats.id')
+            ->leftJoin('bankomat_tips', 'bankomats.bankomat_tip_id', '=', 'bankomat_tips.id')
+            ->leftJoin('bankomat_product_tips', 'bankomat_tips.bankomat_produkt_tip_id', '=', 'bankomat_product_tips.id')
+            ->leftJoin('blokacijas', 'bankomat_lokacijas.blokacija_id', '=', 'blokacijas.id')
+            ->where('bankomat_lokacijas.id', '=', $bankomat_lokacija_id)
+            ->first();
     }
 }

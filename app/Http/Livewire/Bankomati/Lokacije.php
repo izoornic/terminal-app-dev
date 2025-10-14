@@ -60,6 +60,9 @@ class Lokacije extends Component
     public $kontaktOsobaInfo;
     public $odabranaLokacija;
 
+    //kontakt osoba modal
+    public $modalNewKontaktOsobaVisible = false;
+
     //lat log modal
     public $latLogVisible = false;
 
@@ -211,7 +214,8 @@ class Lokacije extends Component
              $this->validate(
                 [
                     'kontakt_name' => 'required|string|min:3|max:255',
-                    'kontakt_tel' => 'nullable|digits_between:7,11',
+                    'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
+                    //'kontakt_tel' => 'nullable|digits_between:7,11',
                     'kontakt_email' => 'nullable|email|max:255'
                 ]
              );
@@ -248,7 +252,8 @@ class Lokacije extends Component
              $this->validate(
                 [
                     'kontakt_name' => 'required|string|min:3|max:255',
-                    'kontakt_tel' => 'nullable|digits_between:7,11',
+                    'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
+                    //'kontakt_tel' => 'nullable|digits_between:7,11',
                     'kontakt_email' => 'nullable|email|max:255'
                 ]
              );
@@ -344,10 +349,6 @@ class Lokacije extends Component
     {
         $this->resetValidation();
         $this->modelId = $id;
-        $this->odabranaLokacija = Blokacija::where('id', '=', $this->modelId)->first();
-        //dd($this->odabranaLokacija);
-        $this->kontaktOsobaInfo = Blokacija::find($this->modelId)->kontaktOsobe()->first();
-        //dd($this->kontaktOsobaInfo);
         $this->kontaktOsobaVisible = true;
     }
 

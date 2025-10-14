@@ -42,8 +42,8 @@ class BankomatiLokacijeReadActions
             return $query->where('blokacijas.pib', 'like', '%' . $searchPib . '%');
         })
         ->when($searchAdresa, function ($query, $searchAdresa) {
-            return $query->where('blokacijas.bl_adresa', 'like', '%' . $searchAdresa . '%');
-                         //->orWhere('blokacijas.bl_mesto', 'like', '%' . $searchAdresa . '%');
+            return $query->where('blokacijas.bl_mesto', 'like', '%' . $searchAdresa . '%');
+                         //->orWhere('blokacijas.bl_adresa', 'like', '%' . $searchAdresa . '%');
         })
         ->orderBy($sortField, $sortAsc);
     }

@@ -23,10 +23,10 @@
                                 </th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">
                                     <livewire:komponente.sort-button 
-                                        :btn_text="'Adresa'" 
+                                        :btn_text="'Mesto'" 
                                         :wire:key="'adresa'" 
                                         :orderBy="$orderBy" 
-                                        :field="'blokacijas.bl_adresa'" />
+                                        :field="'blokacijas.bl_mesto'" />
                                 </th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">
                                     <livewire:komponente.sort-button 
@@ -50,7 +50,7 @@
                                     <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži adresu, mesto" />
+                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
                                     <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -160,8 +160,12 @@
                                         <td class="px-4 py-2">{{ $item->lt_naziv }}</td> 
                                         <td class="px-2 pt-1">
                                             @if($item->ime)
-                                                <button class="mt-1 -mb-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white"  wire:click="showKontaktOsobaModal({{ $item->id }})" title="Kontakt osoba">
+                                                <button class="mt-1 -mb-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white"  wire:click="showKontaktOsobaModal({{ $item->id }})" title="Kontakt">
                                                     <x-heroicon-o-user-card class="w-8 h-8 -m-1 -mb-3" />
+                                                </button>
+                                            @else
+                                                <button class="mt-1 -mb-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white"  wire:click="showKontaktOsobaModal({{ $item->id }})" title="Dodaj kontakt">
+                                                    <x-heroicon-o-user-plus class="w-4 h-4 mx-2" />
                                                 </button>
                                             @endif
                                         </td>
@@ -322,7 +326,6 @@
                 @error('bankomat_region_id') <span class="error">{{ $message }}</span> @enderror
             </div> 
             {{-- Kontakt osoba --}}
-            @if($blokacija_tip_id == 3)
                 <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mt-6 mb-6">
                     <hr />
                     <p class="flex">
@@ -337,11 +340,11 @@
                     <div class="mt-4">
                         <x-jet-label for="kontakt_tel" value="Broj telefona" />
                         <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                    
-							<span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
+                            <x-jet-input wire:model="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
+							{{-- <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
 								+381
 							</span>
-							<input wire:model="kontakt_tel" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+							<input wire:model="kontakt_tel" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" /> --}}
 							@error('kontakt_tel') <span class="error">{{ $message }}</span>@enderror
 						</div> 
 					</div>
@@ -351,7 +354,6 @@
                         @error('kontakt_email') <span class="error">{{ $message }}</span> @enderror
                     </div>
 				</div>
-            @endif
         </x-slot>
 
         <x-slot name="footer">
@@ -382,32 +384,18 @@
 
         <x-slot name="content">
             @if($kontaktOsobaVisible)
-                <div>
+                
                     <livewire:komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
-                </div> 
-                
-                    <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
-                        <div>Kontakt osoba:</div>
-                        <div class="flex">
-                            <div class="py-1">
-                                <x-heroicon-o-user-card class="w-8 h-8 mr-2" />
-                            </div>
-                            <div>
-                                <p class="font-bold">{{ $kontaktOsobaInfo->ime }}</p>
-                                <p class="text-sm"> +381 {{ $kontaktOsobaInfo->telefon }}</p>
-                                <p class="text-sm"> {{ $kontaktOsobaInfo->email }}</p>
-                            </div>
-                    </div>
-                
-
+                    <livewire:bankomati.komponente.kontakt-osobe :b_lokacija_id="$modelId" />        
             @endif 
         </x-slot>
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('kontaktOsobaVisible')" wire:loading.attr="disabled">
-                    {{ __('Otkaži') }}
+                    Otkaži
             </x-jet-secondary-button>
         </x-slot>
      </x-jet-dialog-modal>
+
 
         {{-- The Delete or INFO Modal ############################################################# --}}
     <x-jet-dialog-modal wire:model="modalLokacijaInfoVisible">

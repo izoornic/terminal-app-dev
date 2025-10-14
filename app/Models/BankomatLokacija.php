@@ -23,7 +23,7 @@ class BankomatLokacija extends Model
 
     public function bankomat():HasOne
     {
-        return $this->hasOne(Bankomat::class);
+        return $this->hasOne(Bankomat::class, 'id', 'bankomat_id');
     }
 
     public function blokacija():HasOne

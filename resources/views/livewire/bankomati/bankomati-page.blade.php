@@ -1,4 +1,6 @@
 <div class="p-6">
+    {{ session('status') }}
+    <livewire:komponente.session-flash-message />
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -406,7 +408,7 @@
             {{-- Izabrao je lokaciju menjam prikaz --}}
                 <p>Nova lokacija:</p>
                 <livewire:komponente.bankomat-lokacija-info :b_lokacija_id="$nova_lokacija" />
-                <div class="mt-4">
+            <div class="mt-4">
                 <x-jet-label for="bankomat_status" value="Status bankomata" />   
                 <select wire:model="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
@@ -478,7 +480,14 @@
         </x-slot>
        
         <x-slot name="content">
-
+            @if($modalNewTicketVisible)
+                <div class="mt-4">
+                    <livewire:komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
+                </div>
+                <div class="mt-4">
+                    <livewire:komponente.bankomat-new-ticket :bankomat_lokacija_id="$modelId" />
+                </div>
+            @endif
         </x-slot>
 
         <x-slot name="footer">

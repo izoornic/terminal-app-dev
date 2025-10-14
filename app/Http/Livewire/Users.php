@@ -304,6 +304,7 @@ class Users extends Component
     {
         $this->modelId = '';
         $this->name = '';
+        $this->password = '';
         $this->email = '';
         $this->pozicijaId = '';
         $this->lokacijaId = '';

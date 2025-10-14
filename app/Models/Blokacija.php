@@ -42,4 +42,9 @@ class Blokacija extends Model
     {
         return $this->hasMany(BlokacijaKontaktOsoba::class);
     }
+
+    public function region()
+    {
+        return $this->belongsTo(BankomatRegion::class);
+    }
 }

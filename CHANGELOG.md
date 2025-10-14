@@ -276,6 +276,12 @@ V 1.0.6.0 (22.9.2025.) @bankomati
 V 1.0.6.0 (28.9.2025.) @bankomati
     - Promenjeno sa Bankomata na Proizvodi i pripremljeno za unso Proizvoda i Lokacija
 
+V 1.0.6.3 () @bankomati
+    - Vise kontakt osoba na jednoj lokaciji
+    - Sve vrste lokacija imaju kontakt osobe
+
+
+
 
 
 

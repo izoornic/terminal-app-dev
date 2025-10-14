@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Actions\Bankomati\BankomatiReadActions;
-
+use Illuminate\Http\Request;
 
 class BankomatiPage extends Component
 {
@@ -66,6 +66,9 @@ class BankomatiPage extends Component
 
     //NEW TICKET
     public $modalNewTicketVisible = false;
+    public $flashMessage;
+    public $flashError;
+    public $flashKey = 1;
 
     //testing info component
    /*  public $selectedTerminals = [1,2,3,8,9,10];
@@ -77,7 +80,7 @@ class BankomatiPage extends Component
      *
      * @var array
      */
-    protected $listeners = ['newBankomat'];
+    protected $listeners = ['newBankomat', 'newTicketCreated'];
 
     public function newBankomat()
     {
@@ -87,6 +90,12 @@ class BankomatiPage extends Component
         $this->datum_promene = date('Y-m-d');
         $this->is_edit = false;
         $this->modalNewEditVisible = true;
+    }
+
+    public function newTicketCreated($id)
+    {
+        $this->modalNewTicketVisible = false;
+        $this->emit('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
     }
 
     private function resetInputFields()
@@ -121,7 +130,7 @@ class BankomatiPage extends Component
                 'datum_promene' => 'required|date',
             ]);
         $this->datum_promene .= ' ' . Helpers::vremeKalendarNow();
-        //dd($this->modelData(), $this->bankomat_lokacija, $this->bankomat_status);
+        
         // Save logic here, e.g., create or update the location in the database
         DB::transaction(function(){
             //Bankomat
@@ -160,6 +169,7 @@ class BankomatiPage extends Component
         $this->is_edit = true;
         $this->loadModel();
         $this->modalNewEditVisible = true;
+
     }
 
     public function updateBankomat()
@@ -175,6 +185,7 @@ class BankomatiPage extends Component
         $bankomat->update($this->modelData());
         $this->resetInputFields();
         $this->modalNewEditVisible = false;
+        
     }
 
     private function modelData()
