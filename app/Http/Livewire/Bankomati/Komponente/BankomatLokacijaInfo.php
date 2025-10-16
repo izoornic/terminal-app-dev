@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Livewire\Komponente;
+namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
 use App\Models\Blokacija;
 
 class BankomatLokacijaInfo extends Component
 {
-    public $b_lokacija_id;
+     public $b_lokacija_id;
 
     public function mount($b_lokacija_id)
     {
@@ -27,9 +27,10 @@ class BankomatLokacijaInfo extends Component
                 ->where('blokacijas.id', '=', $this->b_lokacija_id)
                 ->first();
     }
+
     public function render()
     {
-        return view('livewire.komponente.bankomat-lokacija-info', [
+        return view('livewire.bankomati.komponente.bankomat-lokacija-info', [
             'data' => $this->read(),
         ]);
     }

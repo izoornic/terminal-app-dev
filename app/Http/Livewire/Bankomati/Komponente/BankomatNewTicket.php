@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Komponente;
+namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Config;
 use App\Models\User;
 use App\Models\BankomatTiket;
 use App\Models\BankomatTiketPrioritetTip;
-
-use Illuminate\Http\Request;
 
 class BankomatNewTicket extends Component
 {
@@ -89,7 +87,7 @@ class BankomatNewTicket extends Component
         //$this->render();
     }
 
-    public function newTicket(Request $request)
+    public function newTicket()
     {
         $this->validate([
             'vrsta_kvara' => 'required|numeric',
@@ -116,6 +114,6 @@ class BankomatNewTicket extends Component
 
     public function render()
     {
-        return view('livewire.komponente.bankomat-new-ticket');
+        return view('livewire.bankomati.komponente.bankomat-new-ticket');
     }
 }

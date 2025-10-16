@@ -385,7 +385,7 @@
         <x-slot name="content">
             @if($kontaktOsobaVisible)
                 
-                    <livewire:komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
+                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
                     <livewire:bankomati.komponente.kontakt-osobe :b_lokacija_id="$modelId" />        
             @endif 
         </x-slot>
@@ -408,7 +408,7 @@
 
         <x-slot name="content">
             @if($modalLokacijaInfoVisible)
-                <livewire:komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
+                <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
             @endif
             @if($deletePosible)
                 {{ __('Da li ste sigurni da želite da obrišete lokaciju?') }}
@@ -436,7 +436,7 @@
             @if($modalLokacijaInfoVisible)
                 @if($odabranaLokacija->blokacija_tip_id == 3)
                     @if(!$deletePosible)
-                        <livewire:komponente.bankomat-info :bankomat_lokacija_id="0" :multySelectedArray="$lokacijaTerminals" :multySelected="true" />
+                        <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="0" :multySelectedArray="$lokacijaTerminals" :multySelected="true" />
                     @endif
                 @endif
             @endif 
@@ -464,7 +464,7 @@
 
         <x-slot name="content">
             @if($latLogVisible)
-                <livewire:komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
+                <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$modelId" />
                 <div class="mt-4">
                     <div>Koordinate:</div>
                     <div class="flex">

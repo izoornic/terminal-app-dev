@@ -280,6 +280,8 @@ V 1.0.6.3 () @bankomati
     - Vise kontakt osoba na jednoj lokaciji
     - Sve vrste lokacija imaju kontakt osobe
 
+V 1.0.6.4 (16.10.2025) @bankomati
+    - Komponente pomerene u novi folder Bankomati/komponente
 
 
 

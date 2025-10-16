@@ -16,15 +16,13 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Actions\Bankomati\BankomatiReadActions;
-use Illuminate\Http\Request;
 
 class BankomatiPage extends Component
 {
     use WithPagination;
 
     public $modelId;
-    public $is_edit = false;
-    public $modalNewEditVisible = false;
+    public $modalNewVisible = false;
 
     //SEARCH
     public $searchSB;
@@ -48,6 +46,9 @@ class BankomatiPage extends Component
     public $datum_promene;
     public $datum_promene_error;
     public $old_datum_promene;
+    public $vlasnik_proizvoda;
+    public $flashKey = 1;
+    public $location_key = 100;
 
     //STATUS MODAL
     public $modalStatusFormVisible = false;
@@ -68,7 +69,7 @@ class BankomatiPage extends Component
     public $modalNewTicketVisible = false;
     public $flashMessage;
     public $flashError;
-    public $flashKey = 1;
+    
 
     //testing info component
    /*  public $selectedTerminals = [1,2,3,8,9,10];
@@ -80,7 +81,7 @@ class BankomatiPage extends Component
      *
      * @var array
      */
-    protected $listeners = ['newBankomat', 'newTicketCreated'];
+    protected $listeners = ['newBankomat', 'newTicketCreated', 'novaLokacija'];
 
     public function newBankomat()
     {
@@ -88,14 +89,24 @@ class BankomatiPage extends Component
         $this->resetInputFields();
         $this->resetValidation();
         $this->datum_promene = date('Y-m-d');
-        $this->is_edit = false;
-        $this->modalNewEditVisible = true;
+        $this->flashKey ++;
+        $this->location_key ++;
+        $this->modalNewVisible = true;
+        
     }
 
     public function newTicketCreated($id)
     {
         $this->modalNewTicketVisible = false;
         $this->emit('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
+    }
+
+    public function novaLokacija($id, $key)
+    {
+        //dd($id, $key);
+        if($key == 'lokacija') $this->bankomat_lokacija = $id;
+        if($key == 'vlasnik') $this->vlasnik_proizvoda = $id;
+        if($key == 'premesti') $this->nova_lokacija = $id;
     }
 
     private function resetInputFields()
@@ -111,6 +122,7 @@ class BankomatiPage extends Component
         $this->nova_lokacija = '';
         $this->proizvod_model_tip = '';
         $this->datum_promene_error = '';
+        $this->vlasnik_proizvoda = '';
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
@@ -126,7 +138,8 @@ class BankomatiPage extends Component
                 'bankomat_tid' => 'nullable|string|max:255',
                 'proizvod_model' => 'required|numeric',
                 'bankomat_status' => 'required|numeric',
-                'bankomat_lokacija' => 'required|numeric',
+                'bankomat_lokacija' => 'required|exists:blokacijas,id',
+                'vlasnik_proizvoda' => 'required|numeric|exists:blokacijas,id',
                 'datum_promene' => 'required|date',
             ]);
         $this->datum_promene .= ' ' . Helpers::vremeKalendarNow();
@@ -156,7 +169,7 @@ class BankomatiPage extends Component
                 ]);
         });
         $this->resetInputFields();
-        $this->modalNewEditVisible = false;
+        $this->modalNewVisible = false;
     }
 
     public function editBankomat($id)
@@ -166,9 +179,8 @@ class BankomatiPage extends Component
         $this->resetValidation();
         $this->resetInputFields();
         $this->modelId = $id;
-        $this->is_edit = true;
         $this->loadModel();
-        $this->modalNewEditVisible = true;
+        $this->modalEditVisible = true;
 
     }
 
@@ -184,7 +196,7 @@ class BankomatiPage extends Component
         $bankomat = Bankomat::where('id', '=', $this->modelId)->first();
         $bankomat->update($this->modelData());
         $this->resetInputFields();
-        $this->modalNewEditVisible = false;
+        $this->modalEditVisible = false;
         
     }
 
@@ -194,6 +206,7 @@ class BankomatiPage extends Component
             'b_sn' => $this->b_sn,
             'b_terminal_id' => ($this->bankomat_tid) ?: null,
             'bankomat_tip_id' => $this->proizvod_model,
+            'vlasnik_proizvoda' => $this->vlasnik_proizvoda
         ];
     }
 
@@ -205,6 +218,7 @@ class BankomatiPage extends Component
         $this->old_b_sn = $bankomat->b_sn;
         $this->bankomat_tid = $bankomat->b_terminal_id; 
         $this->proizvod_model = $bankomat->bankomat_tip_id;
+        $this->vlasnik_proizvoda = $bankomat->vlasnik_proizvoda;
     }
 
     public function statusShowModal($id, $status)
@@ -262,14 +276,20 @@ class BankomatiPage extends Component
     public function premestiShowModal($id, $status)
     {
         $this->resetInputFields();
+        $this->resetValidation();
         $this->modelId = $id; //ovo je id terminal_lokacijas tabele
         $this->bankomat_status = $status;
+        $this->flashKey ++;
+        $this->datum_promene = date('Y-m-d');
         $this->modalPremestiVisible = true;
     }
 
     public function moveBankomat()
     {
-        $this->validate(['datum_promene' => 'required|date']);
+        $this->validate([
+            'datum_promene' => 'required|date', 
+            'nova_lokacija' => 'required|exists:blokacijas,id'
+    ]);
         $cuurent = BankomatLokacija::where('id', '=', $this->modelId)->first();
         //ako je isti status akcija je [3] PREMESTEN ako je razlicit status onda je akcija [4] Premesten i promenjen status
         $history_akcija = ($cuurent->bankomat_status_tip_id == $this->bankomat_status) ? 3 : 4;

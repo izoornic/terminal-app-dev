@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Livewire\Komponente;
+namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
 use App\Actions\Bankomati\BankomatInformation;
 
 class BankomatInfo extends Component
 {
-    public $bankomat_lokacija_id = 0;
+     public $bankomat_lokacija_id = 0;
     public $selectedBankomat;
 
     public $multySelected = false;
@@ -23,9 +23,8 @@ class BankomatInfo extends Component
             $this->selectedBankomat = BankomatInformation::bankomatInfo($this->bankomat_lokacija_id);
         }
     }
-
     public function render()
     {
-        return view('livewire.komponente.bankomat-info');
+        return view('livewire.bankomati.komponente.bankomat-info');
     }
 }

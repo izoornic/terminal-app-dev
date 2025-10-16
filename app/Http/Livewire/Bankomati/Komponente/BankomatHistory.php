@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Komponente;
+namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
 use App\Models\BankomatLocijaHirtory;
@@ -37,9 +37,7 @@ class BankomatHistory extends Component
     }
     public function render()
     {
-        //dd($this->read());
-        return view('livewire.komponente.bankomat-history', [
-            'historyData' => $this->read(),
-        ]);
+        return view('livewire.bankomati.komponente.bankomat-history', 
+        [ 'historyData' => $this->read(), ]);
     }
 }
