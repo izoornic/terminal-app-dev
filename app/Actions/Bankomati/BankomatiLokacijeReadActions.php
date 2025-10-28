@@ -26,8 +26,8 @@ class BankomatiLokacijeReadActions
             'blokacija_kontakt_osobas.ime',
             'blokacija_kontakt_osobas.telefon',
             'blokacija_kontakt_osobas.email as kontakt_email')
-        ->leftJoin('blokacija_tips', 'blokacijas.blokacija_tip_id', '=', 'blokacija_tips.id')
-        ->leftJoin('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
+        ->join('blokacija_tips', 'blokacijas.blokacija_tip_id', '=', 'blokacija_tips.id')
+        ->join('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
         ->leftJoin('blokacija_kontakt_osobas', 'blokacijas.id', '=', 'blokacija_kontakt_osobas.blokacija_id')
         ->when($searchNaziv, function ($query, $searchNaziv) {
             return $query->where('blokacijas.bl_naziv', 'like', '%' . $searchNaziv . '%');
@@ -45,6 +45,7 @@ class BankomatiLokacijeReadActions
             return $query->where('blokacijas.bl_mesto', 'like', '%' . $searchAdresa . '%');
                          //->orWhere('blokacijas.bl_adresa', 'like', '%' . $searchAdresa . '%');
         })
+        ->groupBy('blokacijas.id')
         ->orderBy($sortField, $sortAsc);
     }
 }
