@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 
 use App\Models\Bankomat;
 use App\Models\Blokacija;
+use App\Models\BankomatsHistory;
 use App\Models\BankomatLokacija;
 use App\Models\BankomatLocijaHirtory;
 
@@ -23,7 +24,7 @@ class BankomatiPage extends Component
 
     public $modelId;
     public $modalNewVisible = false;
-
+    public $modalEditVisible = false;
     //SEARCH
     public $searchSB;
     public $searchTerminalId;
@@ -47,6 +48,7 @@ class BankomatiPage extends Component
     public $datum_promene_error;
     public $old_datum_promene;
     public $vlasnik_proizvoda;
+    public $old_vlasnik_proizvoda;
     public $flashKey = 1;
     public $location_key = 100;
 
@@ -70,6 +72,10 @@ class BankomatiPage extends Component
     public $flashMessage;
     public $flashError;
     
+    //NAPLATA MODAL
+    public $modalNaplatVisible = false;
+    public $naplata;
+    public $old_naplata;
 
     //testing info component
    /*  public $selectedTerminals = [1,2,3,8,9,10];
@@ -123,10 +129,14 @@ class BankomatiPage extends Component
         $this->proizvod_model_tip = '';
         $this->datum_promene_error = '';
         $this->vlasnik_proizvoda = '';
+        $this->old_vlasnik_proizvoda = '';
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
         $this->searchPlokacijaRegion = 0;
+
+        $this->naplata = '';
+        $this->old_naplata = '';
     }
 
     public function saveBankomat()
@@ -191,10 +201,34 @@ class BankomatiPage extends Component
                 'b_sn' => ($this->b_sn == $this->old_b_sn) ? '' : 'required|string|max:255|unique:bankomats',
                 'bankomat_tid' => 'nullable|string|max:255',
                 'proizvod_model' => 'required|numeric',
+                'vlasnik_proizvoda' => 'required|numeric|exists:blokacijas,id',
             ]
         );
         $bankomat = Bankomat::where('id', '=', $this->modelId)->first();
         $bankomat->update($this->modelData());
+        //ako je promenjen vlasnik proizvoda upisati u history
+        if($this->old_vlasnik_proizvoda != $this->vlasnik_proizvoda){
+            $cuurent = BankomatLokacija::where('bankomat_id', '=', $bankomat->id)->first();
+            BankomatLocijaHirtory::create([
+                'bankomat_lokacija_id' => $cuurent['id'],
+                'bankomat_id' => $bankomat['id'], 
+                'blokacija_id' => $cuurent['blokacija_id'],
+                'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
+                'user_id' => auth()->user()->id,
+                'naplata' => $cuurent['naplata'],
+                'history_action_id' => 7
+                ]);
+            BankomatsHistory::create([
+                'bankomat_id' => $bankomat['id'],
+                'bankomat_tip_id' => $bankomat['bankomat_tip_id'],
+                'b_sn' => $bankomat['b_sn'],
+                'b_terminal_id' => $bankomat['b_terminal_id'],
+                'komentar' => 'Promenjen vlasnik proizvoda',
+                'vlasnik_uredjaja' => $this->old_vlasnik_proizvoda,
+                'user_id' => auth()->user()->id
+                ]);
+        }
+
         $this->resetInputFields();
         $this->modalEditVisible = false;
         
@@ -206,7 +240,7 @@ class BankomatiPage extends Component
             'b_sn' => $this->b_sn,
             'b_terminal_id' => ($this->bankomat_tid) ?: null,
             'bankomat_tip_id' => $this->proizvod_model,
-            'vlasnik_proizvoda' => $this->vlasnik_proizvoda
+            'vlasnik_uredjaja' => $this->vlasnik_proizvoda
         ];
     }
 
@@ -218,7 +252,24 @@ class BankomatiPage extends Component
         $this->old_b_sn = $bankomat->b_sn;
         $this->bankomat_tid = $bankomat->b_terminal_id; 
         $this->proizvod_model = $bankomat->bankomat_tip_id;
-        $this->vlasnik_proizvoda = $bankomat->vlasnik_proizvoda;
+        $this->vlasnik_proizvoda = $bankomat->vlasnik_uredjaja;
+        $this->old_vlasnik_proizvoda = $bankomat->vlasnik_uredjaja;
+        //dd($this->proizvod_model_tip, $this->b_sn, $this->bankomat_tid, $this->proizvod_model, $this->vlasnik_proizvoda);
+    }
+
+    private function validDatumPromene($history_actions) 
+    {
+        //Poslednja akcije koja se menja
+        $last_change_model = BankomatLocijaHirtory::where('bankomat_lokacija_id', '=', $this->modelId)->whereIn('history_action_id', $history_actions)->orderBy('updated_at', 'desc')->first();
+
+        //dd($history_actions,$last_change_model, $this->datum_promene);
+        if(Helpers::equalGraterOrLessThan($last_change_model->updated_at->format('Y-m-d'), $this->datum_promene) == 'gt') {
+            $this->datum_promene_error = 'Datum promene ne može biti manji od datuma poslednje promene.';
+            return false;
+        }
+
+        $this->datum_promene .= ' ' . date('H:i:s');
+        return true;
     }
 
     public function statusShowModal($id, $status)
@@ -244,15 +295,10 @@ class BankomatiPage extends Component
             return;
         }
 
-        if(Helpers::equalGraterOrLessThan($cuurent->updated_at, $this->datum_promene.' ' . Helpers::vremeDbDate($cuurent->updated_at)) == 'gt') {
-            $this->datum_promene_error = 'Datum promene ne može biti manji od datum poslednje promene.';
-            return;
-        }elseif(Helpers::equalGraterOrLessThan(date('Y-m-d'), $this->datum_promene) == 'eq') {
-            $this->datum_promene = date('Y-m-d H:i:s');
-        }else{
-            $this->datum_promene .= ' ' . Helpers::vremeDbDate($cuurent->updated_at);
-        }
-
+        //Provera datuma koji je korisnik uneo za promenu statusa
+        if(!$this->validDatumPromene([1, 2, 4])) return;
+        
+        //dd($this->datum_promene);
         DB::transaction(function()use($cuurent){
             $cuurent->update(['bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
 
@@ -262,7 +308,7 @@ class BankomatiPage extends Component
                 'blokacija_id' => $cuurent['blokacija_id'],
                 'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
                 'user_id' => $cuurent['user_id'],
-                'created_at' => $cuurent['created_at'],
+                'naplata' => $cuurent['naplata'],
                 'updated_at' => $cuurent['updated_at'],
                 'history_action_id' => 2
             ]);  
@@ -299,15 +345,8 @@ class BankomatiPage extends Component
             return;
         }
 
-        if(Helpers::equalGraterOrLessThan($cuurent->updated_at, $this->datum_promene.' ' . Helpers::vremeDbDate($cuurent->updated_at)) == 'gt') {
-            $this->datum_promene_error = 'Datum promene ne može biti manji od datum poslednje promene.';
-            return;
-        }elseif(Helpers::equalGraterOrLessThan(date('Y-m-d'), $this->datum_promene) == 'eq') {
-            $this->datum_promene = date('Y-m-d H:i:s');
-        }else{
-            $this->datum_promene .= ' ' . Helpers::vremeDbDate($cuurent->updated_at);
-        }
-
+        //Provera datuma koji je korisnik uneo za promenu statusa
+        if(!$this->validDatumPromene([1, 3, 4])) return;
 
         DB::transaction(function()use($cuurent, $history_akcija){
             $cuurent->update(['blokacija_id' => $this->nova_lokacija, 'bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
@@ -318,7 +357,7 @@ class BankomatiPage extends Component
                 'blokacija_id' => $cuurent['blokacija_id'],
                 'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
                 'user_id' => $cuurent['user_id'],
-                'created_at' => $cuurent['created_at'],
+                'naplata' => $cuurent['naplata'],
                 'updated_at' => $cuurent['updated_at'],
                 'history_action_id' => $history_akcija
             ]);              
@@ -336,7 +375,7 @@ class BankomatiPage extends Component
      * @return [type]
      * 
      */
-    public function lokacijeTipa($tipId)
+    /* public function lokacijeTipa($tipId)
     {
         return Blokacija::select('blokacijas.*', 'bankomat_regions.r_naziv')
             ->leftJoin('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
@@ -345,7 +384,7 @@ class BankomatiPage extends Component
             ->where('bl_mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
             ->where('blokacijas.bankomat_region_id', ($this->searchPlokacijaRegion > 0) ? '=' : '<>', $this->searchPlokacijaRegion)
             ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
-    }
+    } */
 
     public function proizvodlHistoryShowModal($id)
     {
@@ -357,6 +396,46 @@ class BankomatiPage extends Component
     {
         $this->modelId = $id;
         $this->modalNewTicketVisible = true;
+    }
+
+    public function naplatShowModal($id, $naplata)
+    {
+        $this->resetInputFields();
+        $this->modelId = $id;
+        $this->naplata = $naplata;
+        $this->old_naplata = $naplata; //BankomatLokacija::where('id', '=', $this->modelId)->first()->naplata;
+        $this->datum_promene = date('Y-m-d');
+        //dd($this->old_naplata);
+        $this->modalNaplatVisible = true;
+    }
+
+    public function promeniNaplatu()
+    {
+       if($this->old_naplata != $this->naplata) {
+            if(!$this->validDatumPromene([1, 5, 6])) return;
+            $history_akcija = ($this->naplata) ? 5 : 6;
+
+            DB::transaction(function()use($history_akcija){
+                $cuurent = BankomatLokacija::where('id', '=', $this->modelId)->first();
+                $cuurent->update(['naplata' => ($this->naplata ? 1 : 0), 'updated_at' => $this->datum_promene]);
+
+                BankomatLocijaHirtory::create([
+                'bankomat_lokacija_id' => $this->modelId,
+                'bankomat_id' => $cuurent['bankomat_id'],
+                'blokacija_id' => $cuurent['blokacija_id'],
+                'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
+                'user_id' => $cuurent['user_id'],
+                'naplata' => $cuurent['naplata'],
+                'updated_at' => $cuurent['updated_at'],
+                'history_action_id' => $history_akcija
+            ]);          
+            });
+       }else {
+           $this->datum_promene_error = 'Niste promenili naplatu.';
+            return;
+       }
+        
+        $this->modalNaplatVisible = false;
     }
 
     

@@ -114,12 +114,15 @@
                                                 <span class="text-sm text-red-400">{{ $item->tok_naziv }}</span> 
                                         </td>
                                         <td class="px-2 pr-2">{{ $item->mesto }}<br />{{ $item->r_naziv }}</td>
-                                        <td class="px-2 pr-2">{{ $item->br_komentara }}</td>
+                                        <td class="px-1 py-2">
+                                            <div class="z-10 absolute ml-1 text-lg">{{ $item->br_komentara}}</div>
+                                            <x-heroicon-o-chat-bubble-bottom-center-text class="text-gray-400 -mt-1 ml-2 w-3 h-3"/>
+                                        </td> 
                                         <td class="px-2 pr-2"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$item->tr_bg_collor}} text-{{$item->btn_collor}}" >{{ $item->tp_naziv }}</span></td>                                       
                                         <td class="px-2 pr-2">
-                                        <x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->tikid] ) }}" :active="request()->routeIs('tiketview', ['id' => $item->tikid])" >
-                                            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M128 160H448V352H128V160zM512 64C547.3 64 576 92.65 576 128V208C549.5 208 528 229.5 528 256C528 282.5 549.5 304 576 304V384C576 419.3 547.3 448 512 448H64C28.65 448 0 419.3 0 384V304C26.51 304 48 282.5 48 256C48 229.5 26.51 208 0 208V128C0 92.65 28.65 64 64 64H512zM96 352C96 369.7 110.3 384 128 384H448C465.7 384 480 369.7 480 352V160C480 142.3 465.7 128 448 128H128C110.3 128 96 142.3 96 160V352z"/></svg>
-                                                Tiket
+                                            <x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->tikid] ) }}" :active="request()->routeIs('tiketview', ['id' => $item->tikid])" >
+                                                <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M128 160H448V352H128V160zM512 64C547.3 64 576 92.65 576 128V208C549.5 208 528 229.5 528 256C528 282.5 549.5 304 576 304V384C576 419.3 547.3 448 512 448H64C28.65 448 0 419.3 0 384V304C26.51 304 48 282.5 48 256C48 229.5 26.51 208 0 208V128C0 92.65 28.65 64 64 64H512zM96 352C96 369.7 110.3 384 128 384H448C465.7 384 480 369.7 480 352V160C480 142.3 465.7 128 448 128H128C110.3 128 96 142.3 96 160V352z"/></svg>
+                                                    Tiket
                                             </x-jet-nav-link>
                                         </td>
                                     </tr>

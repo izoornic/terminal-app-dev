@@ -15,9 +15,11 @@ class BankomatLocijaHirtory extends Model
         'blokacija_id',
         'bankomat_status_tip_id',
         'user_id',
+        'naplata',
         'updated_at',
         'created_at',
         'history_action_id',
+        'bankomat_tiket_id',
     ];
 
 }

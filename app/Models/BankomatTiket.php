@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
+use App\Models\BankomatTiketKomantar;
+use App\Models\BankomatLokacija;
+use App\Models\Blokacija;
+use App\Models\BankomatTiketKvarTip;
+use App\Models\BankomatTiketPrioritetTip;
+
 class BankomatTiket extends Model
 {
     use HasFactory;
@@ -42,11 +48,11 @@ class BankomatTiket extends Model
 
     public function kvarTip()
     {
-        return $this->belongsTo(TiketOpisKvaraTip::class);
+        return $this->belongsTo(BankomatTiketKvarTip::class, 'bankomat_tiket_kvar_tip_id', 'id');
     }
 
     public function prioritet()
     {
-        return $this->belongsTo(TiketPrioritetTip::class);
+        return $this->belongsTo(BankomatTiketPrioritetTip::class, 'bankomat_tiket_prioritet_id', 'id');
     }
 }

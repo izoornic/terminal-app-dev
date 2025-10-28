@@ -283,6 +283,8 @@ V 1.0.6.3 () @bankomati
 V 1.0.6.4 (16.10.2025) @bankomati
     - Komponente pomerene u novi folder Bankomati/komponente
 
+V 1.0.7.2 (28.10.2025) @bankomati
+    - 80% servisa bankomata gotovo ( verzija da bi Role unosio proizvode )
 
 
 

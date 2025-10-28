@@ -32,10 +32,10 @@
                         &nbsp;&nbsp;&nbsp;Status: <span class="font-bold">{{ $selectedBankomat->status_naziv }}</span>
                     </p>
                     <p class="text-sm">Model: <span class="font-bold">{{ $selectedBankomat->model }}</span> | Proizvođač: <span class="font-bold">{{$selectedBankomat->proizvodjac}}</span></p>
-                    <p class="text-sm">Lokacija: <span class="font-bold">{{ $selectedBankomat->blokacija_naziv }}&nbsp;{{ $selectedBankomat->blokacija_naziv_sufix }}</span></p> 
+                    <p class="text-sm">Lokacija: <span class="font-bold">{{ $selectedBankomat->blokacija_naziv }}&nbsp;{{ $selectedBankomat->blokacija_naziv_sufix }},</span> {{$selectedBankomat->blokacija_adresa}}, {{$selectedBankomat->blokacija_mesto}}, {{$selectedBankomat->r_naziv}}
+                    </p> 
                     <p class="text-sm">PIB: <span class="font-bold">{{ $selectedBankomat->pib }}</span></p>
-                    <p class="text-sm">Adresa: <span class="font-bold">{{$selectedBankomat->blokacija_adresa}}, {{$selectedBankomat->blokacija_mesto}}</span></p>
-                    <p class="text-sm">Region: <span class="font-bold">{{$selectedBankomat->r_naziv}}</span></p>
+                    <p class="text-sm">Vlasnik: <span class="font-bold">{{$selectedBankomat->vlasnik_naziv}}  {{ $selectedBankomat->vlasnik_naziv_sufix }},</span> {{$selectedBankomat->vlasnik_adresa}}, {{$selectedBankomat->vlasnik_mesto}}</p>
                     <p class="text-sm">Poslednja promena: <span class="font-bold">{{ App\Http\Helpers::datumFormat($selectedBankomat->last_updated) }}</span></p>    
                 </div>
             @endif

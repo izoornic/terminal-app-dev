@@ -14,6 +14,7 @@ class Bankomat extends Model
         'b_sn',
         'b_terminal_id',
         'komentar',
+        'vlasnik_uredjaja',
     ];
 
     public function bankomat_tip()

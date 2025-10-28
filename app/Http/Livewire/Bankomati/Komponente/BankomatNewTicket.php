@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use App\Models\User;
 use App\Models\BankomatTiket;
 use App\Models\BankomatTiketPrioritetTip;
+use App\Models\BankomatLocijaHirtory;
 
 class BankomatNewTicket extends Component
 {
@@ -96,8 +97,9 @@ class BankomatNewTicket extends Component
             'prioritetTiketa' => 'required',
         ]);
 
-        /* $ticket = new BankomatTiket();
+        $ticket = new BankomatTiket();
         $ticket->bankoamt_lokacija_id = $this->bankomat_lokacija_id;
+        $ticket->status = 'Dodeljen';
         $ticket->bankomat_tiket_kvar_tip_id = ($this->vrsta_kvara == 1000) ? null : $this->vrsta_kvara;
         $ticket->opis = $this->opis_kvara;
         $ticket->user_prijava_id = auth()->user()->id;
@@ -105,10 +107,23 @@ class BankomatNewTicket extends Component
         $ticket->bankomat_tiket_prioritet_id = $this->prioritetTiketa;
         $ticket->save();
 
-        $mail_action = new BankomatTiketMailingActions($ticket->id);
+        $cuurent = BankomatLocijaHirtory::where('bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)->orderBy('created_at', 'desc')->first();
+        BankomatLocijaHirtory::create([
+                'bankomat_lokacija_id' => $this->bankomat_lokacija_id,
+                'bankomat_id' => $cuurent['bankomat_id'],
+                'blokacija_id' => $cuurent['blokacija_id'],
+                'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
+                'user_id' => auth()->user()->id,
+                'naplata' => $cuurent['naplata'],
+                'updated_at' => date('Y-m-d H:i:s'),
+                'history_action_id' => 8,
+                'bankomat_tiket_id' => $ticket->id
+            ]);  
+
+        /*$mail_action = new BankomatTiketMailingActions($ticket->id);
         $mail_action->sendEmails("novi"); */
 
-        $this->emit('newTicketCreated', 168); // $ticket->id);
+        $this->emit('newTicketCreated', $ticket->id); //168); // $ticket->id);
         
     }
 

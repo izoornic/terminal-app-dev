@@ -185,10 +185,10 @@ class BankomatTiketMailingActions
         $bankomat_lokacija .=', '.$bankomat_info->blokacija_adresa.', '.$bankomat_info->blokacija_mesto;
         
         //TODO KONTAKT ODSBE VISE NJIH
-        //TODO adresa tiketview stranice
+        
        $mail_data = [
         'subject'   =>  $subject.$this->tiket->id,
-        'tiketlink' =>  'https://servis.epos.rs/btiketview?id='.$this->tiket->id,
+        'tiketlink' =>  'https://servis.epos.rs/bankomat-tiketview?id='.$this->tiket->id,
         'hedaing'   =>  $heding.$this->tiket->id,
         'row1'      =>  'Prioritet: '.BankomatTiketPrioritetTip::where('id', '=', $this->tiket->bankomat_tiket_prioritet_id)->first()->btpt_naziv.' | Kreiran: '.Helpers::datumFormat($this->tiket->created_at),
         'row2'      =>  'Otvorio: '.$kreirao,

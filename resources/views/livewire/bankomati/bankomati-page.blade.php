@@ -1,5 +1,4 @@
 <div class="p-6">
-    {{ session('status') }}
     <livewire:komponente.session-flash-message />
     {{-- The data table --}}
     <div class="flex flex-col">
@@ -19,7 +18,7 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Region</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Status</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500"></th>
-                                <th colspan="2" class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Ukupno: {{ $data->total() }}</th>
+                                <th colspan="3" class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Ukupno: {{ $data->total() }}</th>
                                   
                             </tr>
                         </thead>
@@ -65,7 +64,7 @@
                                     </select>
                                 </td>
                                 
-                                <td colspan="2">
+                                <td colspan="3">
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                             </tr>  
@@ -119,6 +118,12 @@
                                         <td class="px-1 py-1">
                                              <button class="text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="proizvodlHistoryShowModal({{ $item->blid }})" title="Istorija terminala">
                                                 <x-icon-history class="fill-current w-4 h-4 mr-0"/>
+                                            </button>
+                                        </td>
+                                        <td class="px-1 py-1">
+                                             <button class="text-sm @if($item->naplata) text-green-600 @else text-red-600 @endif text-gray-700 uppercase border rounded-md p-1 hover:bg-gray-700 hover:text-white" wire:click="naplatShowModal({{ $item->blid }}, {{ $item->naplata }})" title="Naplata">
+                                                <x-heroicon-o-currency-euro class="w-6 h-6 mr-0" />
+
                                             </button>
                                         </td>
                                         <td class="px-1 py-1">
@@ -239,7 +244,7 @@
                         <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
                     </div>
                     @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
-                    {{-- <p class="p-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</p> --}}
+                    
                     @if($datum_promene_error != '')
                         <p class="text-red-500"> {{$datum_promene_error}} </p>
                     @endif
@@ -252,17 +257,67 @@
                Otkaži
             </x-jet-secondary-button>
 
-           {{--  @if ($is_edit)
-                <x-jet-button class="ml-2" wire:click="updateBankomat" wire:loading.attr="disabled">
-                   Update
-                </x-jet-danger-button>
-            @else --}}
-                <x-jet-button class="ml-2" wire:click="saveBankomat" wire:loading.attr="disabled">
-                   Sačuvaj
-                </x-jet-danger-button>
-           {{--  @endif  --}}           
+            <x-jet-button class="ml-2" wire:click="saveBankomat" wire:loading.attr="disabled">
+                Sačuvaj
+            </x-jet-danger-button>           
         </x-slot>
     </x-jet-dialog-modal>
+
+    {{-- EDIT MODAL ############################################################### --}}
+    <x-jet-dialog-modal wire:model="modalEditVisible">
+        <x-slot name="title">
+            <div class="flex justify-between">
+                <div class="flex">
+                    <x-heroicon-c-arrow-path-rounded-square class="w-6 h-6 mr-2"/>
+                   Status proizvoda 
+                </div>
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="mt-4">
+                <x-jet-label for="b_sn" value="Serijski broj" />
+                <x-jet-input wire:model.defer="b_sn" id="" class="block mt-1 w-full" type="text" />
+                @error('b_sn') <span class="error">{{ $message }}</span> @enderror
+            </div>
+             @if($proizvod_model_tip == 1)
+                <div class="mt-4">
+                    <x-jet-label for="bankomat_tid" value="Terminal ID" />
+                    <x-jet-input wire:model.defer="bankomat_tid" id="" class="block mt-1 w-full" type="text" />
+                    @error('bankomat_tid') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            @endif
+
+            <div class="mt-4">
+                <div class="flex justify-between">
+                    <p class="font-bold ml-2">Vlasnik proizvoda:</p>
+                    @if($vlasnik_proizvoda)
+                    <button class="mr-2" wire:click="$set('vlasnik_proizvoda', null)" wire:loading.attr="disabled" title="Ukloni vlasnika" >
+                        <x-heroicon-o-x-circle class="w-6 h-6 text-red-500"/>
+                    </button>
+                    @endif
+                </div>
+                @if($vlasnik_proizvoda)
+                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" />
+                @else
+                    <livewire:bankomati.komponente.izbor-lokacije :key="$location_key" comp_index="vlasnik" />
+                @endif
+                @error('vlasnik_proizvoda') <span class="error">{{ $message }}</span> @enderror
+            </div>
+                
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalEditVisible')" wire:loading.attr="disabled">
+                Otkaži
+            </x-jet-secondary-button>
+
+            <x-jet-button class="ml-2" wire:click="updateBankomat" wire:loading.attr="disabled">
+                Sačuvaj
+            </x-jet-button>     
+        </x-slot>
+    </x-jet-dialog-modal>
+
 
     {{-- STATUS MODAL ############################################################### --}}
     <x-jet-dialog-modal wire:model="modalStatusFormVisible">
@@ -421,6 +476,60 @@
             <x-jet-secondary-button wire:click="$toggle('modalNewTicketVisible')" wire:loading.attr="disabled">
                 Zatvori
             </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- NAPLATA Modal ################################################################################## --}}
+    <x-jet-dialog-modal wire:model="modalNaplatVisible">
+        <x-slot name="title">
+            <div class="flex">
+            <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
+            Naplata Usluge
+            </div>
+        </x-slot>
+       
+        <x-slot name="content">
+            @if($modalNaplatVisible)
+                <div class="mt-4">
+                    <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
+                </div>
+                <div class="mt-4">
+                    <p class="font-bold mb-2">Naplata:</p>
+                    <div class="flex">
+                    <label class="inline-flex items-center ml-4 cursor-pointer">
+                        <input type="checkbox" wire:model="naplata" {{-- value="{{ $naplata }}" --}} class="sr-only peer" {{-- onChange="changeBarVisability('nove')"  checked --}}>
+                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
+                    </label>
+                        @if($naplata)
+                            <p class="font-bold text-teal-600 ml-4">Da</p>
+                        @else
+                            <span class="font-bold text-red-600 ml-4">Ne</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <x-jet-label for="datum_promene" value="Datum promene" />
+                    <div class="flex">
+                        <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                    </div>
+                    @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
+                    @if($datum_promene_error != '')
+                        <p class="text-red-500"> {{$datum_promene_error}} </p>
+                    @endif
+                </div>
+                
+            @endif
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalNaplatVisible')" wire:loading.attr="disabled">
+                Zatvori
+            </x-jet-secondary-button>
+
+            <x-jet-button class="ml-2" wire:click="promeniNaplatu" wire:loading.attr="disabled">
+                Sačuvaj
+            </x-jet-button>
         </x-slot>
     </x-jet-dialog-modal>
 </div>

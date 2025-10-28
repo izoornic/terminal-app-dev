@@ -29,9 +29,14 @@ class BankomatInformation
             'bankomat_regions.r_naziv',
             'bankomat_status_tips.status_naziv',
             'bankomat_product_tips.bp_tip_naziv',
+            'B2.bl_naziv as vlasnik_naziv',
+            'B2.bl_naziv_sufix as vlasnik_naziv_sufix',
+            'B2.bl_adresa as vlasnik_adresa',
+            'B2.bl_mesto as vlasnik_mesto',
             )
             ->leftJoin('bankomats','bankomat_lokacijas.bankomat_id', '=', 'bankomats.id')
             ->leftJoin('blokacijas', 'bankomat_lokacijas.blokacija_id', '=', 'blokacijas.id')
+            ->leftJoin('blokacijas AS B2', 'B2.id', '=', 'bankomats.vlasnik_uredjaja')
             ->leftJoin('bankomat_tips', 'bankomats.bankomat_tip_id', '=', 'bankomat_tips.id')
             ->leftJoin('bankomat_product_tips', 'bankomat_tips.bankomat_produkt_tip_id', '=', 'bankomat_product_tips.id')
             ->leftJoin('blokacija_tips', 'blokacijas.blokacija_tip_id', '=', 'blokacija_tips.id')

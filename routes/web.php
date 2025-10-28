@@ -200,4 +200,12 @@ Route::group(['middleware' => [
         return view('bankomati.bankomat-tipovi');
         })->name('bankomat-tipovi');
 
+    Route::get('/bankomat-tiketi', function(){
+        return view('bankomati.tiketi');
+        })->name('bankomat-tiketi');
+
+    Route::get('/bankomat-tiketview', function(){
+        return view('bankomati.ticket-view');
+        })->name('bankomat-tiketview');
+
 });

@@ -27,6 +27,7 @@ class BankomatiReadActions
         $searchTipLokacije = $search['tip'] ?? null;
         $searchPib = $search['pib'] ?? null;
         $searchProduct = $search['product_tip'] ?? null;
+        $searchMesto = $search['mesto'] ?? null;
 
         if(!$sortField) $sortField='bankomats.id';
         
@@ -42,6 +43,7 @@ class BankomatiReadActions
             'bankomat_status_tips.status_naziv', 
             'bankomat_status_tips.id as statusid', 
             'bankomat_lokacijas.id as blid',
+            'bankomat_lokacijas.naplata',
             'bankomat_product_tips.bp_tip_naziv',
             'bankomat_product_tips.id as bptipid'
             )
@@ -65,6 +67,9 @@ class BankomatiReadActions
             return $query->where('blokacijas.bl_naziv', 'like', '%' .$searchNazivLokacije . '%');
                          /* ->orWhere('lokacijas.adresa', 'like', '%' . $searchNazivLokacije . '%')    
                          ->orWhere('lokacijas.mesto', 'like', '%' . $searchNazivLokacije . '%'); */
+        })
+        ->when($searchMesto, function ($query, $searchMesto) {
+            return $query->where('blokacijas.bl_mesto', 'like', '%' . $searchMesto . '%');
         })
          ->when($searchRegion, function ($query, $searchRegion) {
             return $query->where('blokacijas.bankomat_region_id', '=', $searchRegion);
