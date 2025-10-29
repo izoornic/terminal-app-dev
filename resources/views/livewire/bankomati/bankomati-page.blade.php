@@ -217,25 +217,27 @@
                 </div>
             @if($modalNewVisible)
                 <div class="mt-4">
-                    <p class="font-bold">Lokacija proizvoda:</p>
+                    <p class="flex "><x-heroicon-o-map-pin class="w-6 h-6 mr-2"/> <span class="font-bold">Lokacija proizvoda:</span> </p>
                     @if(!$bankomat_lokacija)
-                        <livewire:bankomati.komponente.izbor-lokacije :key="$flashKey" comp_index="lokacija" />
+                        <livewire:bankomati.komponente.izbor-lokacije :key="'lokacija-one-'.$flashKey" comp_index="lokacija" />
                     @else
                         {{-- Izabrao je lokaciju menjam prikaz --}}
                         <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$bankomat_lokacija" />  
                     @endif
                     @error('bankomat_lokacija') <span class="error">{{ $message }}</span> @enderror
                 </div>
+                
                 <div class="mt-4">
-                    <p class="font-bold">Vlasnik proizvoda:</p>
+                     <p class="flex "><x-heroicon-o-user-circle class="w-6 h-6 mr-2"/><span class="font-bold">Vlasnik proizvoda: </span></p>
                     @if(!$vlasnik_proizvoda)
-                        <livewire:bankomati.komponente.izbor-lokacije :key="$location_key" comp_index="vlasnik" />
+                        <livewire:bankomati.komponente.izbor-lokacije :key="'lokacija-two-'.$location_key" comp_index="vlasnik" />
                     @else
                         {{-- Izabrao je lokaciju menjam prikaz --}}
                         <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" />
                     @endif
                     @error('vlasnik_proizvoda') <span class="error">{{ $message }}</span> @enderror
                 </div>
+
                 
             @endif
                 <div class="mt-4">

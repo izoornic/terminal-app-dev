@@ -1,5 +1,6 @@
 <div class="mt-2 bg-green-100 border-t-4 border-green-500 rounded-b text-green-900 px-4 py-3 shadow-md mb-6" role="alert">
-   @if(!$vrsta_lokacije)
+   
+    @if(!$vrsta_lokacije)
         <div class="my-2 flex justify-between">
             @foreach (App\Models\BlokacijaTip::getAll() as $key => $value)
                 <button wire:click="vrstaLokacije({{$key}})" class="flex mt-1 -mb-1 bg-yellow-50 text-sm text-gray-700 uppercase border border-green-500 rounded-md p-1.5 hover:bg-gray-700 hover:text-white" >
