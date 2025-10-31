@@ -19,6 +19,8 @@ class BankomatNewTicket extends Component
 {
     use WithPagination;
 
+    public $tiket_exists = false;
+
     public $bankomat_lokacija_id;
     public $productTipId;
     public $bakomatRegionId;
@@ -40,6 +42,11 @@ class BankomatNewTicket extends Component
     public function mount($bankomat_lokacija_id)
     {
         $this->bankomat_lokacija_id = $bankomat_lokacija_id;
+        $this->tiket_exists = BankomatTiket::where('bankoamt_lokacija_id', '=', $this->bankomat_lokacija_id)->where('status', '!=', 'Zatvoren')->first();
+        //dd($this->tiket_exists);
+        /* if($this->tiket_exists){
+            
+        } */
         $this->selectedBankomatTip = BankomatInformation::BankomatProizvodTip($this->bankomat_lokacija_id);
         $this->productTipId = $this->selectedBankomatTip->bankomat_produkt_tip_id;
         $this->bakomatRegionId = $this->selectedBankomatTip->bankomat_region_id;

@@ -45,7 +45,7 @@ class BankomatiReadActions
             'bankomat_lokacijas.id as blid',
             'bankomat_lokacijas.naplata',
             'bankomat_product_tips.bp_tip_naziv',
-            'bankomat_product_tips.id as bptipid'
+            'bankomat_product_tips.id as bptipid',
             )
         ->join('bankomats', 'bankomat_lokacijas.bankomat_id', '=', 'bankomats.id')
         ->join('blokacijas', 'bankomat_lokacijas.blokacija_id', '=', 'blokacijas.id')

@@ -10,6 +10,7 @@ use App\Models\BankomatLokacija;
 
 use App\Models\BankomatTiket;
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
 
 class TiketView extends Component
 {
@@ -37,6 +38,14 @@ class TiketView extends Component
 
     //Obrisi tiket
     public $obrisiTiketModalVisible;
+
+    //Dodeli tiket
+    public $modalDodeliTiketVisible;
+    public $searchUserName;
+    public $searchUserLokacija;
+    public $searchUserPozicija;
+    public $noviDodeljenUserId;
+     public $dodeljenUserInfo;
 
     public $user_pozicija_id;
      public function mount()
@@ -81,6 +90,55 @@ class TiketView extends Component
         $this->komentari = $this->tiket->komentari()->get();
 
         //dd($this->prioritet);
+    }
+
+    public function dodeliTiketShowModal()
+    {
+        $this->noviDodeljenUserId = null;
+        $this->searchUserName = '';
+        $this->searchUserLokacija = '';
+        $this->searchUserPozicija = '';
+        $this->modalDodeliTiketVisible = true;
+    }
+
+    public function changeUser()
+    {
+        $this->validate([
+            'noviDodeljenUserId' => 'required',
+        ]);
+        $update_tiket = [
+            'user_dodeljen_id' => $this->noviDodeljenUserId
+        ];
+        if($this->tiket->status == 'Otvoren') {
+            $update_tiket['status'] = 'Dodeljen';
+        }
+        $this->tiket->update($update_tiket); 
+        $this->modalDodeliTiketVisible = false;
+        $this->redirect(request()->header('Referer'));
+    }
+    public function setDodeljenUserInfo($dodeljenUserId)
+    {
+        $this->noviDodeljenUserId = $dodeljenUserId;
+        $this->dodeljenUserInfo = User::select('users.id', 'users.name', 'blokacijas.bl_naziv', 'blokacijas.bl_mesto', 'pozicija_tips.naziv')
+                    ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
+                    ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
+                    ->where('users.id', $dodeljenUserId)->first();
+    }
+
+    public function searchUser()
+    {
+        return User::select('users.id', 'users.name', 'blokacijas.bl_naziv', 'pozicija_tips.naziv')
+                    ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
+                    ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
+                    ->leftJoin('bankomat_regions', 'bankomat_regions.id', '=', 'blokacijas.bankomat_region_id')
+                    ->where('name', 'like', '%'.$this->searchUserName.'%')
+                    ->where('bl_naziv', 'like', '%'.$this->searchUserLokacija.'%')
+                    ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')
+                    ->whereIn('users.pozicija_tipId', [9,10, 11])
+                    ->when($this->tiket->user_dodeljen_id, function ($query) {
+                        $query->where('users.id', '!=', $this->tiket->user_dodeljen_id);
+                    })
+                    ->paginate(Config::get('global.modal_search'), ['*'], 'usersp');
     }
 
     public function zatvoriTiketShowModal()

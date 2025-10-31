@@ -287,10 +287,10 @@ V 1.0.7.2 (28.10.2025) @bankomati
     - 80% servisa bankomata gotovo ( verzija da bi Role unosio proizvode )
 
 V 1.0.7.4 (29.10.2025.) @bankomati
-    - Konacno ispravljen bug sa dve iste komponente u jednom modalu - modal NOVI PROIZVOD
+    - Konacno ispravljen bug sa dve iste komponente u jednom modalu - stranica PROIZVODI modal NOVI PROIZVOD
 
-
-
+V 1.0.7.5 (31.10.2025.) @bankomati
+    - Zavrsen servis bankomata za ulogu Admin
 
 
 
