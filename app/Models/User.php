@@ -10,6 +10,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Blokacija;
+
 use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
@@ -95,5 +97,17 @@ class User extends Authenticatable
          $retval[$pozicija->route_name] = $pozicija->naziv;
         }
         return  $retval;
+    }
+
+    public function userBankmatPositionAndRegion(){
+        $roles = [
+            9 => 'admin',
+            10 => 'sef',
+            11 => 'serviser'
+        ];
+        $retval = [];
+        $retval['role'] = $roles[$this->pozicija_tipId];
+        $retval['region'] = Blokacija::select('bankomat_region_id')->where('id', auth()->user()->lokacijaId)->first()->bankomat_region_id;
+        return $retval;
     }
 }

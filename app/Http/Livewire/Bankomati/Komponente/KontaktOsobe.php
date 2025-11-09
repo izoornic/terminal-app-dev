@@ -34,7 +34,7 @@ class KontaktOsobe extends Component
         $this->validate(
             [
                 'kontakt_name' => 'required|string|min:3|max:255',
-                'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
+                //'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
                 'kontakt_email' => 'nullable|email|max:255'
             ]
         );

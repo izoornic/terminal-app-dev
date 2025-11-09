@@ -25,12 +25,14 @@
                         <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
                         <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                         <td>
+                            @if($role_region['role'] == 'admin')
                             <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                     @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                                         <option value="{{ $key }}">{{ $value }}</option>
                                     @endforeach
                             </select>
+                            @endif
                         </td>
                         <td></td>
                     </tr>

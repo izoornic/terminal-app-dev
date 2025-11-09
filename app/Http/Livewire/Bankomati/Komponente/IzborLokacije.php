@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 
 class IzborLokacije extends Component
 {
+    public $role_region;
     public $vrsta_lokacije;
     public $comp_index;
 
@@ -19,6 +20,12 @@ class IzborLokacije extends Component
 
     public function mount($comp_index = null, $vrsta_lokacije=null )
     {
+        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+
+        $this->searchPLokacijaNaziv = '';
+        $this->searchPlokacijaMesto = '';
+        $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin') ? 0 : $this->role_region['region'];
+
         if($vrsta_lokacije) {
             $this->vrsta_lokacije = $vrsta_lokacije;
         }
@@ -48,7 +55,9 @@ class IzborLokacije extends Component
             ->where('blokacijas.blokacija_tip_id', '=', $tipId)
             ->where('bl_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
             ->where('bl_mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
-            ->where('blokacijas.bankomat_region_id', ($this->searchPlokacijaRegion > 0) ? '=' : '<>', $this->searchPlokacijaRegion)
+            ->when($this->searchPlokacijaRegion, function ($query) {
+                return $query->where('blokacijas.bankomat_region_id', $this->searchPlokacijaRegion);
+            })
             ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
     }
 

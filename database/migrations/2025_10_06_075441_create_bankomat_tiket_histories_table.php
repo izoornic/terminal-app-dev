@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('bankomat_tiket_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bankomat_tiket_id')->nullable()->constrained('bankomat_tikets')->onDelete('set null');
-            $table->foreignId('bankoamt_lokacija_id')->constrained('bankomat_lokacijas')->onDelete('cascade');
+            $table->foreignId('bankomat_tiket_id')->constrained('bankomat_tikets')->onDelete('cascade');
+            $table->foreignId('bankoamt_lokacija_id')->nullable()->constrained('bankomat_lokacijas')->onUpdate('cascade')->onDelete('set null');
             $table->enum('status', ['Otvoren', 'Dodaljen', 'Zatvoren'])->default('Otvoren');
             $table->foreignId('bankomat_tiket_kvar_tip_id')->nullable()->constrained('bankomat_tiket_kvar_tips')->onDelete('set null');
-            $table->foreignId('bankomat_tiket_prioritet_id')->constrained('bankomat_tiket_prioritet_tips')->onDelete('cascade');
+            $table->foreignId('bankomat_tiket_prioritet_id')->nullable()->constrained('bankomat_tiket_prioritet_tips')->onDelete('set null');
             $table->text('opis');
             $table->foreignId('user_prijava_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('user_dodeljen_id')->nullable()->constrained('users')->onDelete('set null');

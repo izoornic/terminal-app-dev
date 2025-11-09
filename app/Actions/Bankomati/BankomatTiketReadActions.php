@@ -14,7 +14,7 @@ class BankomatTiketReadActions
      * @param  mixed $sortAsc - sort direction
      * @return void
      */
-    public static function read($search, $sortField=null, $sortAsc=true)
+    public static function read($search, $sortField=null, $sortAsc=false)
     {
         
        // Extract search parameters
@@ -22,6 +22,10 @@ class BankomatTiketReadActions
         $searchStatus = $search['searchStatus'] ?? null;
         $searchLokacijaNaziv = $search['searchLokacijaNaziv'] ?? null;
         $searchMesto = $search['searchMesto'] ?? null;
+        $searchRegion = $search['searchRegion'] ?? null;
+        $dodeljeniUsersIds = $search['serviseri'] ?? null;
+        $searchUsersRegion = $search['searchUsersRegion'] ?? null;
+        
         if($searchStatus == 'Svi')  $searchStatus = null;
 
         if(!$sortField) $sortField='bankomat_tikets.id';
@@ -55,8 +59,21 @@ class BankomatTiketReadActions
         ->join('bankomat_tips', 'bankomats.bankomat_tip_id', '=', 'bankomat_tips.id')
         ->join('bankomat_product_tips', 'bankomat_tips.bankomat_produkt_tip_id', '=', 'bankomat_product_tips.id')
         ->join('bankomat_tiket_prioritet_tips', 'bankomat_tikets.bankomat_tiket_prioritet_id', '=', 'bankomat_tiket_prioritet_tips.id')
+        ->when($dodeljeniUsersIds, function ($query) use ($dodeljeniUsersIds, $searchUsersRegion) {
+            return $query->whereIn('bankomat_tikets.user_dodeljen_id', $dodeljeniUsersIds)
+                        ->where('bankomat_regions.id', '<>' ,$searchUsersRegion);
+        })
         ->when($searchProductTip, function ($query, $searchProductTip) {
             return $query->where('bankomat_product_tips.id', '=', $searchProductTip);
+        })
+        ->when($searchLokacijaNaziv, function ($query, $searchLokacijaNaziv) {
+            return $query->where('blokacijas.bl_naziv', 'like', '%'.$searchLokacijaNaziv.'%');
+        })
+        ->when($searchMesto, function ($query, $searchMesto) {
+            return $query->where('blokacijas.bl_mesto', 'like', '%'.$searchMesto.'%');
+        })
+        ->when($searchRegion, function ($query, $searchRegion) {
+            return $query->where('bankomat_regions.id', $searchRegion);
         })
         ->when($searchStatus, function ($query, $searchStatus) {
             if($searchStatus == 'Aktivan'){
@@ -64,12 +81,6 @@ class BankomatTiketReadActions
             }else{
                 return $query->where('bankomat_tikets.status', '=', $searchStatus);
             }     
-        })
-        ->when($searchLokacijaNaziv, function ($query, $searchLokacijaNaziv) {
-            return $query->where('blokacijas.bl_naziv', 'like', '%'.$searchLokacijaNaziv.'%');
-        })
-        ->when($searchMesto, function ($query, $searchMesto) {
-            return $query->where('blokacijas.bl_mesto', 'like', '%'.$searchMesto.'%');
         })
         ->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

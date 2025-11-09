@@ -26,8 +26,6 @@ class TiketView extends Component
     public $kvatTipNaziv;
     public $bankomat_lokacija_id;
 
-    public $historyData;
-
     //komentari
     public $modalKomentariVisible;
     public $komentari;
@@ -45,9 +43,9 @@ class TiketView extends Component
     public $searchUserLokacija;
     public $searchUserPozicija;
     public $noviDodeljenUserId;
-     public $dodeljenUserInfo;
+    public $dodeljenUserInfo;
 
-    public $user_pozicija_id;
+    public $role_region;
      public function mount()
     {
         $this->tikid = request()->query('id');
@@ -58,23 +56,31 @@ class TiketView extends Component
         }
         $this->bankomat_lokacija_id = $this->tiket->bankoamt_lokacija_id;
         
-        $this->tiketLokacija = $this->tiket->lokacija()->first(); //LokacijaInfo::getInfo($this->tiket->tremina_lokacijalId)->first(); $this->tiket->lokacija()->first());
+        $this->tiketLokacija = $this->tiket->lokacija()->first();
         $this->ticketRegion = $this->tiketLokacija->bankomat_region_id;
-        //TODO check if user is allowed to see this ticket
-        //is user allowed to see this ticket
-        $this->user_pozicija_id = auth()->user()->pozicija_tipId;
         
-        if($this->user_pozicija_id == 9 || $this->user_pozicija_id == 10 || $this->user_pozicija_id == 11){
-            if($this->user_pozicija_id == 10){
-                //sef servisa
-
+        //is user allowed to see this ticket
+        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+        if($this->role_region['role'] != 'admin') {
+            if($this->role_region['region'] != $this->ticketRegion) {
+                //proverimo da li je serviser ili sef
+                if($this->role_region['role'] == 'sef'){
+                    //pokupi idjeve svih u servisu
+                    $this->serviseri = User::select('users.id')
+                                            ->join('blokacijas', 'blokacijas.id', '=', 'users.lokacijaId')
+                                            ->join('bankomat_regions', 'bankomat_regions.id', '=', 'blokacijas.bankomat_region_id')
+                                            ->whereIn('pozicija_tipId', [10, 11])
+                                            ->where('bankomat_region_id', $this->role_region['region'])  
+                                            ->pluck('id')
+                                            ->toArray();
+                }else{
+                    $this->serviseri = [auth()->user()->id];
+                }
+                //dd($this->tiket->user_dodeljen_id, $this->serviseri);
+                if(!in_array($this->tiket->user_dodeljen_id, $this->serviseri)){
+                    abort(404);
+                }
             }
-        }else{
-            $this->validTiket = false;
-        }
-
-        if(!$this->validTiket) {
-            abort(404);
         }
 
         $this->prioritet = $this->tiket->prioritet()->first();
@@ -86,7 +92,6 @@ class TiketView extends Component
         
         $this->kvarTipNaziv = $kvarTip->btkt_naziv ?? 'Ostalo';
         
-        $this->historyData = $this->tiket->komentari()->get();
         $this->komentari = $this->tiket->komentari()->get();
 
         //dd($this->prioritet);
@@ -95,6 +100,7 @@ class TiketView extends Component
     public function dodeliTiketShowModal()
     {
         $this->noviDodeljenUserId = null;
+        if($this->role_region['role'] == 'serviser') $this->setDodeljenUserInfo(auth()->user()->id);
         $this->searchUserName = '';
         $this->searchUserLokacija = '';
         $this->searchUserPozicija = '';
@@ -127,6 +133,7 @@ class TiketView extends Component
 
     public function searchUser()
     {
+        $positions = ($this->role_region['role'] == 'admin') ? [9, 10, 11] : [10, 11];
         return User::select('users.id', 'users.name', 'blokacijas.bl_naziv', 'pozicija_tips.naziv')
                     ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
@@ -134,9 +141,12 @@ class TiketView extends Component
                     ->where('name', 'like', '%'.$this->searchUserName.'%')
                     ->where('bl_naziv', 'like', '%'.$this->searchUserLokacija.'%')
                     ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')
-                    ->whereIn('users.pozicija_tipId', [9,10, 11])
+                    ->whereIn('users.pozicija_tipId', $positions)
                     ->when($this->tiket->user_dodeljen_id, function ($query) {
                         $query->where('users.id', '!=', $this->tiket->user_dodeljen_id);
+                    })
+                    ->when($this->role_region['role'] != 'admin', function ($query) {
+                        $query->where('bankomat_regions.id', '=', $this->role_region['region']);
                     })
                     ->paginate(Config::get('global.modal_search'), ['*'], 'usersp');
     }
@@ -167,7 +177,7 @@ class TiketView extends Component
             $tiket_update['br_komentara'] = $komentari->count();
         };
         $this->tiket->update($tiket_update);
-        //TODO update bankomat history table
+        //$action: 
         // 9 - zatvoren
         // 10 - obrisan tiket
         $this->addBankomatHistory(9);

@@ -22,6 +22,10 @@ class BankomatiPage extends Component
 {
     use WithPagination;
 
+    //USER ROLE
+    public $role_region;
+
+    //NEW PRODUCT
     public $modelId;
     public $modalNewVisible = false;
     public $modalEditVisible = false;
@@ -80,7 +84,6 @@ class BankomatiPage extends Component
     //testing info component
    /*  public $selectedTerminals = [1,2,3,8,9,10];
     public $multiSelected = true; */
-    
 
     /**
      * Listeners for Livewire events
@@ -98,7 +101,6 @@ class BankomatiPage extends Component
         $this->flashKey ++;
         $this->location_key ++;
         $this->modalNewVisible = true;
-        
     }
 
     public function newTicketCreated($id)
@@ -113,6 +115,12 @@ class BankomatiPage extends Component
         if($key == 'lokacija') $this->bankomat_lokacija = $id;
         if($key == 'vlasnik') $this->vlasnik_proizvoda = $id;
         if($key == 'premesti') $this->nova_lokacija = $id;
+    }
+    //TODO pretraga po terminal-id, mesto, nayiv sufix... skloniti pretragu po PIB-u
+    
+    public function mount()
+    {
+        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
     }
 
     private function resetInputFields()
@@ -190,6 +198,7 @@ class BankomatiPage extends Component
         $this->resetInputFields();
         $this->modelId = $id;
         $this->loadModel();
+        $this->location_key ++;
         $this->modalEditVisible = true;
 
     }
@@ -367,25 +376,6 @@ class BankomatiPage extends Component
         $this->modalPremestiVisible = false;
     }
 
-    /**
-     * Puni tabelu u modalu iz koje se bira lokacija
-     *
-     * @param mixed $tipId
-     * 
-     * @return [type]
-     * 
-     */
-    /* public function lokacijeTipa($tipId)
-    {
-        return Blokacija::select('blokacijas.*', 'bankomat_regions.r_naziv')
-            ->leftJoin('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
-            ->where('blokacijas.blokacija_tip_id', '=', $tipId)
-            ->where('bl_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
-            ->where('bl_mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
-            ->where('blokacijas.bankomat_region_id', ($this->searchPlokacijaRegion > 0) ? '=' : '<>', $this->searchPlokacijaRegion)
-            ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
-    } */
-
     public function proizvodlHistoryShowModal($id)
     {
         $this->modelId = $id;
@@ -446,7 +436,7 @@ class BankomatiPage extends Component
             'b_terminal_id' => $this->searchTerminalId,
             'proizvod_model' => $this->searchModel,
             'lokacija_naziv' => $this->searchLokacijaNaziv,
-            'region' => $this->searchRegion,
+            'region' => ($this->role_region['role'] == 'admin') ? $this->searchRegion : $this->role_region['region'],
             'tip' => $this->searchLocationTip,
             'status' => $this->searchStatus,
             'pib' => $this->searchPib,

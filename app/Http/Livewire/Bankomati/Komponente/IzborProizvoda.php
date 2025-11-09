@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Config;
 
 class IzborProizvoda extends Component
 {
+    //USER ROLE
+    public $role_region;
     public $proizvod_model_tip;
 
     public $searchSN;
@@ -18,6 +20,10 @@ class IzborProizvoda extends Component
     public function mount()
     {
         $this->proizvod_model_tip = null;
+        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+        if($this->role_region['role'] != 'admin') {
+            $this->searchPlokacijaRegion = $this->role_region['region'];
+        }
     }
 
     public function izabraniProizvod($id)

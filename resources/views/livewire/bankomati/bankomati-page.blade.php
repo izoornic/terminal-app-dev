@@ -40,12 +40,14 @@
                                 <td></td>
                                 <td><x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" /></td>
                                 <td>
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                                <option value="">---</option>
+                                    @if($role_region['role'] == 'admin')
+                                        <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                            <option value="">---</option>
                                             @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
                                             @endforeach
-                                    </select>
+                                        </select>
+                                    @endif
                                 </td>
                                 <td>
                                     <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -271,7 +273,7 @@
             <div class="flex justify-between">
                 <div class="flex">
                     <x-heroicon-c-arrow-path-rounded-square class="w-6 h-6 mr-2"/>
-                   Status proizvoda 
+                   Izmeni 
                 </div>
             </div>
         </x-slot>
@@ -292,7 +294,7 @@
 
             <div class="mt-4">
                 <div class="flex justify-between">
-                    <p class="font-bold ml-2">Vlasnik proizvoda:</p>
+                    <p class="font-bold ml-2">Vlasnik proizvoda: </p>
                     @if($vlasnik_proizvoda)
                     <button class="mr-2" wire:click="$set('vlasnik_proizvoda', null)" wire:loading.attr="disabled" title="Ukloni vlasnika" >
                         <x-heroicon-o-x-circle class="w-6 h-6 text-red-500"/>
@@ -300,7 +302,7 @@
                     @endif
                 </div>
                 @if($vlasnik_proizvoda)
-                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" />
+                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" :key="time()" />
                 @else
                     <livewire:bankomati.komponente.izbor-lokacije :key="$location_key" comp_index="vlasnik" />
                 @endif

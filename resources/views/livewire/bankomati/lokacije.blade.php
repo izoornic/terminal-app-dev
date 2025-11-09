@@ -53,12 +53,14 @@
                                     <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    @if($role_region['role'] == 'admin')
+                                        <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
-                                            @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
-                                                <option value="{{ $key }}">{{ $value }}</option>
-                                            @endforeach
-                                    </select>
+                                                @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
+                                                    <option value="{{ $key }}">{{ $value }}</option>
+                                                @endforeach
+                                        </select>
+                                    @endif
                                 </td>
 
                                 <td>
@@ -317,13 +319,17 @@
             </div>      
             <div class="mt-4">
                 <x-jet-label for="bankomat_region_id" value="Region" />
-                <select wire:model="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                  <option value="">Odaberi region</option>
-                    @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('bankomat_region_id') <span class="error">{{ $message }}</span> @enderror
+                @if($role_region['role'] == 'admin')
+                    <select wire:model="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <option value="">Odaberi region</option>
+                        @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                    @error('bankomat_region_id') <span class="error">{{ $message }}</span> @enderror
+                @else
+                    <p class="ml-4"><strong>{{ App\Models\BankomatRegion::getAll()[$role_region['region']] }}</strong></p>
+                @endif
             </div> 
             {{-- Kontakt osoba --}}
                 <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mt-6 mb-6">

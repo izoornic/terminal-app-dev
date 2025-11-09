@@ -292,6 +292,8 @@ V 1.0.7.4 (29.10.2025.) @bankomati
 V 1.0.7.5 (31.10.2025.) @bankomati
     - Zavrsen servis bankomata za ulogu Admin
 
+V 1.0.7.6 (9.11.2025.) @bankomati
+    - Zavrsen servis bankomata za uloge Sef servisa i Serviser
 
 
 

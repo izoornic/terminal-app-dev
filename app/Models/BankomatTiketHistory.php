@@ -20,5 +20,6 @@ class BankomatTiketHistory extends Model
         'user_dodeljen_id',
         'user_zatvorio_id',
         'br_komentara',
+        'action_id',
     ];
 }

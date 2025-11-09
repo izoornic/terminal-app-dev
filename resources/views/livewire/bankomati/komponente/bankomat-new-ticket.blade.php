@@ -28,9 +28,8 @@
             @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
         </div> 
 
-        @if($userPozicija == 9 || $userPozicija == 10)
-            <!-- Admin i Šef servisa dodeljuju tiket sebi ili serviseru -->
-            @if(!$dodeljenUserId)
+        <!-- Admin i Šef servisa dodeljuju tiket sebi ili serviseru -->
+        @if(!$dodeljenUserId)
             <div class="mt-4">
                 <hr />
                 <p>Dodeli tiket korisniku:</p>
@@ -66,28 +65,18 @@
                 @error('dodeljenUserId') <span class="error">{{ $message }}</span> @enderror
             </div>
 
-            @else
-            
+        @else
+        
             <div class="mt-4">Tiket dodeljen korisniku:</div>
             <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
                 <div class="flex">
                     <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg></div>
                     <div>
-                        <p>Korisnik: <span class="font-bold">{{ $dodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserInfo->naziv }}</span></p>
-                        <p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserInfo->bl_naziv }}, {{$dodeljenUserInfo->bl_mesto}}</span></p>
+                        <p>Korisnik: <span class="font-bold">{{ $dodeljenUserName }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserPozicija }}</span></p>
+                        <p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserLokacija }}, {{$dodeljenUserMesto}}</span></p>
                     </div>
                 </div>
             </div> 
-            @endif
-        @else
-            <!-- SERVISER SAM SEBI DODELJUJE  -->
-            <div class="flex mt-4">
-                <div>
-                    <p>Korisnik: <span class="font-bold">{{ $dodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserInfo->naziv }}</span></p>
-                    <p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserInfo->bl_naziv }}, {{$dodeljenUserInfo->bl_mesto}}</span></p>
-                </div>
-            </div>
-            
         @endif
 
         <p>Odredi prioritet tiketa:</p>

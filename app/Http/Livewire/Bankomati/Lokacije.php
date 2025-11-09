@@ -83,15 +83,12 @@ class Lokacije extends Component
     public $searchPib;
 
     //ROLES
-    public $userRegion;
-    public $userRole;
+    public $role_region;
 
     public function mount()
     {
-        $this->resetInputFields();
-        $this->userRegion = Blokacija::select('bankomat_region_id')->where('id', auth()->user()->lokacijaId)->first()->bankomat_region_id;
-        $this->userRole = auth()->user()->pozicija_tipId;
-        //dd($this->userRegion, $this->userRole);
+        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+         $this->resetInputFields();
         /* 
         9 	Admin bankomata
         10 	Šef servisa bankomata
@@ -145,7 +142,7 @@ class Lokacije extends Component
         $this->bl_mesto = '';
         $this->blokacija_tip_id = '';
         $this->blokacija_tip = '';
-        $this->bankomat_region_id = '';
+        $this->bankomat_region_id = ($this->role_region['role'] == 'admin') ? '' : $this->role_region['region'];
         $this->pib = '';
         $this->mb = '';
         $this->email = '';
@@ -214,7 +211,7 @@ class Lokacije extends Component
              $this->validate(
                 [
                     'kontakt_name' => 'required|string|min:3|max:255',
-                    'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
+                    //'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
                     //'kontakt_tel' => 'nullable|digits_between:7,11',
                     'kontakt_email' => 'nullable|email|max:255'
                 ]
@@ -252,7 +249,7 @@ class Lokacije extends Component
              $this->validate(
                 [
                     'kontakt_name' => 'required|string|min:3|max:255',
-                    'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
+                    //'kontakt_tel' => 'nullable|phone:INTERNATIONAL',
                     //'kontakt_tel' => 'nullable|digits_between:7,11',
                     'kontakt_email' => 'nullable|email|max:255'
                 ]
@@ -443,7 +440,7 @@ class Lokacije extends Component
         $searchParams=[
             'naziv' => $this->searchName,
             'adresa' => $this->searchMesto,
-            'region' => $this->searchRegion,
+            'region' => ($this->role_region['role'] == 'admin') ? $this->searchRegion : $this->role_region['region'],
             'tip_lokacije' => $this->searchTip,
             'pib' => $this->searchPib
         ];
