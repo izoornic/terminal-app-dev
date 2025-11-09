@@ -22,8 +22,7 @@ class BankomatNewTicket extends Component
 
     public $tiket_exists = false;
 
-    public $bankomat_lokacija_id;
-    public $productTipId;
+    public $bankomat_lokacija_id; 
     public $bakomatRegionId;
 
     public $vrsta_kvara;
@@ -51,7 +50,7 @@ class BankomatNewTicket extends Component
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
         $this->bankomat_lokacija_id = $bankomat_lokacija_id;
-        $this->tiket_exists = BankomatTiket::where('bankoamt_lokacija_id', '=', $this->bankomat_lokacija_id)->where('status', '!=', 'Zatvoren')->first();
+        $this->tiket_exists = BankomatTiket::where('bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)->where('status', '!=', 'Zatvoren')->first();
         //dd($this->tiket_exists);
         /* if($this->tiket_exists){
             
@@ -122,14 +121,17 @@ class BankomatNewTicket extends Component
         ]);
 
         $ticket = new BankomatTiket();
-        $ticket->bankoamt_lokacija_id = $this->bankomat_lokacija_id;
+        $ticket->bankomat_lokacija_id = $this->bankomat_lokacija_id;
         $ticket->status = 'Dodeljen';
         $ticket->bankomat_tiket_kvar_tip_id = ($this->vrsta_kvara == 1000) ? null : $this->vrsta_kvara;
         $ticket->opis = $this->opis_kvara;
         $ticket->user_prijava_id = auth()->user()->id;
         $ticket->user_dodeljen_id = $this->dodeljenUserId;
         $ticket->bankomat_tiket_prioritet_id = $this->prioritetTiketa;
+        $ticket->br_komentara = 0;
         $ticket->save();
+
+        $ticket->newHistroy(2);
 
         $cuurent = BankomatLocijaHirtory::where('bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)->orderBy('created_at', 'desc')->first();
         BankomatLocijaHirtory::create([

@@ -50,7 +50,7 @@ class BankomatTiketReadActions
             'users.name',
             'bankomat_tiket_kvar_tips.btkt_naziv',
         )
-        ->join('bankomat_lokacijas', 'bankomat_tikets.bankoamt_lokacija_id', '=', 'bankomat_lokacijas.id')
+        ->join('bankomat_lokacijas', 'bankomat_tikets.bankomat_lokacija_id', '=', 'bankomat_lokacijas.id')
         ->join('bankomats', 'bankomats.id', '=', 'bankomat_lokacijas.bankomat_id')
         ->leftJoin('users', 'users.id', '=', 'bankomat_tikets.user_dodeljen_id')
         ->leftJoin('bankomat_tiket_kvar_tips', 'bankomat_tikets.bankomat_tiket_kvar_tip_id', '=', 'bankomat_tiket_kvar_tips.id')

@@ -11,7 +11,7 @@ class BankomatTiketHistory extends Model
 
      protected $fillable = [
         'bankomat_tiket_id',
-        'bankoamt_lokacija_id',
+        'bankomat_lokacija_id',
         'status',
         'bankomat_tiket_kvar_tip_id',
         'bankomat_tiket_prioritet_id',

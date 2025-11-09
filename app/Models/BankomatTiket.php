@@ -12,13 +12,14 @@ use App\Models\BankomatLokacija;
 use App\Models\Blokacija;
 use App\Models\BankomatTiketKvarTip;
 use App\Models\BankomatTiketPrioritetTip;
+use App\Models\BankomatTiketHistory;
 
 class BankomatTiket extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'bankoamt_lokacija_id',
+        'bankomat_lokacija_id',
         'status',
         'bankomat_tiket_kvar_tip_id',
         'bankomat_tiket_prioritet_id',
@@ -41,7 +42,7 @@ class BankomatTiket extends Model
             BankomatLokacija::class, 
             'id',                       // Foreign key on the BankomatLokacija table
             'id',                       // Foreign key on the Blokacija table
-            'bankoamt_lokacija_id',     // Local key on the BankomatTiket table..
+            'bankomat_lokacija_id',     // Local key on the BankomatTiket table..
             'blokacija_id'              // Local key on the BankomatLokacija table
         );
     }
@@ -54,5 +55,22 @@ class BankomatTiket extends Model
     public function prioritet()
     {
         return $this->belongsTo(BankomatTiketPrioritetTip::class, 'bankomat_tiket_prioritet_id', 'id');
+    }
+
+    public function newHistroy($action) {
+        $new_histroy = [
+            'bankomat_tiket_id' => $this->id,
+            'bankomat_lokacija_id' => $this->bankomat_lokacija_id,
+            'status' => $this->status,
+            'bankomat_tiket_kvar_tip_id' => $this->bankomat_tiket_kvar_tip_id,
+            'bankomat_tiket_prioritet_id' => $this->bankomat_tiket_prioritet_id,
+            'opis' => $this->opis,
+            'user_prijava_id' => $this->user_prijava_id,
+            'user_dodeljen_id' => $this->user_dodeljen_id,
+            'user_zatvorio_id' => $this->user_zatvorio_id,
+            'br_komentara' => $this->br_komentara,
+            'action_id' => $action,
+        ];
+        BankomatTiketHistory::create($new_histroy);
     }
 }

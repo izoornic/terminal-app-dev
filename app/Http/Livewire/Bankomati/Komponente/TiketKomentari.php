@@ -39,19 +39,22 @@ class TiketKomentari extends Component
 
         $this->novi_komentar = '';
 
-        $this->updateNoOfComments();
+        $this->updateNoOfComments(5);
     }
 
     public function deleteKomentar($id)
     {
         BankomatTiketKomantar::where('id', '=', $id)->delete();
-        $this->updateNoOfComments();
+        $this->updateNoOfComments(6);
     }
 
-    private function updateNoOfComments()
+    private function updateNoOfComments($history_action_id)
     {
         $komentari = BankomatTiketKomantar::where('bankomat_tiket_id', '=', $this->tiketid)->get();
-        BankomatTiket::where('id', '=', $this->tiketid)->update(['br_komentara' => $komentari->count()]);
+        $tiket = BankomatTiket::where('id', '=', $this->tiketid)->first();
+        $tiket->br_komentara = $komentari->count();
+        $tiket->save();
+        $tiket->newHistroy($history_action_id);
     }
 
     public function read()

@@ -54,7 +54,7 @@ class TiketView extends Component
         if(!$this->tiket) {
             abort(404);
         }
-        $this->bankomat_lokacija_id = $this->tiket->bankoamt_lokacija_id;
+        $this->bankomat_lokacija_id = $this->tiket->bankomat_lokacija_id;
         
         $this->tiketLokacija = $this->tiket->lokacija()->first();
         $this->ticketRegion = $this->tiketLokacija->bankomat_region_id;
@@ -119,6 +119,7 @@ class TiketView extends Component
             $update_tiket['status'] = 'Dodeljen';
         }
         $this->tiket->update($update_tiket); 
+        $this->tiket->newHistroy(4);
         $this->modalDodeliTiketVisible = false;
         $this->redirect(request()->header('Referer'));
     }
@@ -177,6 +178,7 @@ class TiketView extends Component
             $tiket_update['br_komentara'] = $komentari->count();
         };
         $this->tiket->update($tiket_update);
+        $this->tiket->newHistroy(3);
         //$action: 
         // 9 - zatvoren
         // 10 - obrisan tiket

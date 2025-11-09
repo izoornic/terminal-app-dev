@@ -147,7 +147,7 @@ class BankomatTiketMailingActions
      */
     private function tiketData($sub)
     {
-        $bankomat_info = BankomatInformation::bankomatInfo($this->tiket->bankoamt_lokacija_id);
+        $bankomat_info = BankomatInformation::bankomatInfo($this->tiket->bankomat_lokacija_id);
         //$this->tikedd(t);
         $dodeljen_ime = ($this->tiket->user_dodeljen_id != null) ? $this->userInfo($this->tiket->user_dodeljen_id)->name : 'Tiket nije dodeljen';
         $kreirao = ($this->tiket->user_prijava_id != null) ? $this->userInfo($this->tiket->user_prijava_id)->name : 'on line';

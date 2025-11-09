@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('bankomat_tikets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bankoamt_lokacija_id')->constrained('bankomat_lokacijas')->onDelete('cascade');
+            $table->foreignId('bankomat_lokacija_id')->constrained('bankomat_lokacijas')->onDelete('cascade');
             $table->enum('status', ['Otvoren', 'Dodeljen', 'Zatvoren'])->default('Otvoren');
             $table->foreignId('bankomat_tiket_kvar_tip_id')->nullable()->constrained('bankomat_tiket_kvar_tips')->onDelete('set null');
             $table->foreignId('bankomat_tiket_prioritet_id')->constrained('bankomat_tiket_prioritet_tips')->onDelete('cascade');

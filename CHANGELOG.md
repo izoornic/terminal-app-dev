@@ -295,7 +295,8 @@ V 1.0.7.5 (31.10.2025.) @bankomati
 V 1.0.7.6 (9.11.2025.) @bankomati
     - Zavrsen servis bankomata za uloge Sef servisa i Serviser
 
-
+V 1.0.7.7 (9.11.2025.) @bankomati
+    - Izmenjeno pohresno ime polja u tabelama bankomat_tiket i bankomat_tiket_histroy
 
 SELECT * 
 FROM lokacijas
