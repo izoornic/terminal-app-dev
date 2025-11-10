@@ -14,6 +14,7 @@ class BankomatInformation
             'bankomats.id as bid', 
             'bankomats.b_sn',  
             'bankomats.b_terminal_id',
+            'blokacijas.id as blokacijaid',
             'blokacijas.is_duplicate',
             'blokacijas.bl_naziv as blokacija_naziv',
             'blokacijas.bl_naziv_sufix as blokacija_naziv_sufix',

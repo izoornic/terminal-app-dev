@@ -39,6 +39,8 @@ class BankomatiPage extends Component
     public $searchStatus;
     public $searchPib;
     public $searchProductTip;
+    public $searchMesto;
+    public $searchNazivSufix;
 
     //NEW EDIT
     public $b_sn;
@@ -116,7 +118,7 @@ class BankomatiPage extends Component
         if($key == 'vlasnik') $this->vlasnik_proizvoda = $id;
         if($key == 'premesti') $this->nova_lokacija = $id;
     }
-    //TODO pretraga po terminal-id, mesto, nayiv sufix... skloniti pretragu po PIB-u
+    
     
     public function mount()
     {
@@ -440,7 +442,10 @@ class BankomatiPage extends Component
             'tip' => $this->searchLocationTip,
             'status' => $this->searchStatus,
             'pib' => $this->searchPib,
-            'product_tip' => $this->searchProductTip
+            'product_tip' => $this->searchProductTip,
+            'naziv_sufix' => $this->searchNazivSufix,
+            'mesto' => $this->searchMesto,
+
         ];
         
        $builder = BankomatiReadActions::BankomatiRead($searchParams);

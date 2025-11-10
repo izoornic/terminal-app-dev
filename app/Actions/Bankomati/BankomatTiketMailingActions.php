@@ -3,11 +3,15 @@
 namespace App\Actions\Bankomati;
 
 use App\Models\BankomatTiketPrioritetTip;
+use App\Models\BlokacijaKontaktOsoba;
 use App\Models\BankomatTiketKvarTip;
 use App\Models\BankomatTiket;
 use App\Models\User;
 
 use App\Http\Helpers;
+
+use Mail;
+use App\Mail\NotyfyMail;
 
 class BankomatTiketMailingActions
 {
@@ -42,7 +46,7 @@ class BankomatTiketMailingActions
      */
     public function sendEmails($subject, $comentari = null)
     {
-        //dd($this->tiketData($subject), $this->email_primaoci);
+        //dd($this->tiketData($subject), $comentari);
         foreach ($this->email_primaoci as $mail_address) {
             try {
                 Mail::to($mail_address)->send(new NotyfyMail($this->tiketData($subject), $comentari));
@@ -140,7 +144,7 @@ class BankomatTiketMailingActions
     }
 
     /**
-     * Podaci koji se prikazuju u email poruci
+     * Podaci koji se prikazuju u email poruci 
      *
      * @param  mixed $tik
      * @return void
@@ -148,7 +152,7 @@ class BankomatTiketMailingActions
     private function tiketData($sub)
     {
         $bankomat_info = BankomatInformation::bankomatInfo($this->tiket->bankomat_lokacija_id);
-        //$this->tikedd(t);
+        //dd($bankomat_info->blokacijaid);
         $dodeljen_ime = ($this->tiket->user_dodeljen_id != null) ? $this->userInfo($this->tiket->user_dodeljen_id)->name : 'Tiket nije dodeljen';
         $kreirao = ($this->tiket->user_prijava_id != null) ? $this->userInfo($this->tiket->user_prijava_id)->name : 'on line';
         
@@ -167,7 +171,7 @@ class BankomatTiketMailingActions
             break;
             case 'dodeljen':
                 $subject = 'Dodeljen tiket #';
-                $heding = 'Na servisnom portalu dodeljen vam je tiket #';
+                $heding = 'Na servisnom portalu dodeljen je tiket #';
             break;
             case 'zatvoren':
                 $subject = 'Zatvoren tiket #';
@@ -177,14 +181,24 @@ class BankomatTiketMailingActions
         }
         
         $opisKvaraObj = ($this->tiket->bankomat_tiket_kvar_tip_id) ? BankomatTiketKvarTip::where('id', '=', $this->tiket->bankomat_tiket_kvar_tip_id)->first() : null;
-        $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->btkt_naziv;
+        $opisKvara = ($opisKvaraObj == null) ? 'Ostalo' : $opisKvaraObj->btkt_naziv;
 
         $bankomat_lokacija = ($bankomat_info->is_duplicate) ? "*" : "";
         $bankomat_lokacija .= $bankomat_info->blokacija_naziv;
         $bankomat_lokacija .= ($bankomat_info->is_duplicate) ? ' - '.$bankomat_info->blokacija_naziv_sufix : "";
         $bankomat_lokacija .=', '.$bankomat_info->blokacija_adresa.', '.$bankomat_info->blokacija_mesto;
-        
-        //TODO KONTAKT ODSBE VISE NJIH
+
+        $bankomat_kontakt_sobe = BlokacijaKontaktOsoba::where('blokacija_id', '=', $bankomat_info->blokacijaid)->get();
+       //dd($bankomat_kontakt_sobe, $bankomat_kontakt_sobe->count());
+        $kontakt_osobe = '';
+        if($bankomat_kontakt_sobe->count() > 0){
+            $bankomat_kontakt_sobe->each(function($item) use (&$kontakt_osobe){
+               $kontakt_osobe .=  ($item->ime) ? $item->ime : '';
+               $kontakt_osobe .=  ($item->telefon) ? ' Tel: '.$item->telefon : '';
+               $kontakt_osobe .=  ($item->email) ? ' email: '.$item->email : '';
+               $kontakt_osobe .=  ' ||  ';
+            });
+        }
         
        $mail_data = [
         'subject'   =>  $subject.$this->tiket->id,
@@ -200,7 +214,7 @@ class BankomatTiketMailingActions
         'row8'      =>  'Status: '.$bankomat_info->status_naziv,
         'row9'      =>  'Lokacija: '.$bankomat_lokacija,
         'row10'     =>  'Region: '. $bankomat_info->r_naziv,
-        'row11'     =>  'Kontakt: ', //. $bankomat_info->name.'  tel: '.$bankomat_info->tel
+        'row11'     =>  'Kontakt: '. $kontakt_osobe, //. $bankomat_info->name.'  tel: '.$bankomat_info->tel
         ];
 
         return $mail_data;

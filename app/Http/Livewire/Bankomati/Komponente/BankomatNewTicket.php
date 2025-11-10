@@ -146,8 +146,8 @@ class BankomatNewTicket extends Component
                 'bankomat_tiket_id' => $ticket->id
             ]);  
 
-        /*$mail_action = new BankomatTiketMailingActions($ticket->id);
-        $mail_action->sendEmails("novi"); */
+        $mail_action = new BankomatTiketMailingActions($ticket->id);
+        $mail_action->sendEmails("novi");
 
         $this->emit('newTicketCreated', $ticket->id); //168); // $ticket->id);
         

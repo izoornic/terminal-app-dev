@@ -35,10 +35,10 @@
                                     </select>
                                 </td>
                                 <td><x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
-                                {{-- <td><x-jet-input wire:model="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="Terminal ID" /></td> --}}
                                 <td><x-jet-input wire:model="searchModel" id="" class="block bg-orange-50 w-full" type="text" placeholder="Model" /></td>
-                                <td></td>
-                                <td><x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" /></td>
+                                <td colspan="2">
+                                    <x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
+                                </td>
                                 <td>
                                     @if($role_region['role'] == 'admin')
                                         <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -69,7 +69,24 @@
                                 <td colspan="3">
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
-                            </tr>  
+                            </tr> 
+                            <tr class="bg-orange-50">
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <x-jet-input wire:model="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="Terminal ID" />
+                                </td>
+                                <td></td>
+                                <td colspan="2">
+                                    <x-jet-input wire:model="searchNazivSufix" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv sufix" />
+                                </td>
+                                <td colspan="2">
+                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td colspan="2"></td>
+                            </tr> 
                             
                             <!-- DATA  -->                   
                             @if ($data->count())
@@ -82,7 +99,10 @@
                                             </button>
                                         </td> 
                                         <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
-                                        <td class="px-1 py-2">{{ $item->b_sn }}</td>
+                                        <td class="px-1 py-2">
+                                            {{ $item->b_sn }}
+                                            @if($item->b_terminal_id) <br /><span class="text-xs text-red-500"> {{ $item->b_terminal_id }} </span> @endif
+                                        </td>
                                         
                                         <td class="px-1 py-2">{{ $item->model }}</td>
                                         <td class="pl-1">
@@ -103,7 +123,10 @@
                                             {{ $item->bl_naziv }}&nbsp;{{ $item->bl_naziv_sufix }}
                                         </td>
                                         {{-- <td class="px-1 py-2">{{ $item->bl_adresa }}, {{ $item->bl_mesto  }}</td> --}} 
-                                        <td class="px-1 py-2">{{ $item->r_naziv}}</td>
+                                        <td class="px-1 py-2">{{ $item->r_naziv}}
+                                            <br />
+                                            <span class="text-sm text-red-400">  {{ $item->bl_mesto }}</span>
+                                        </td>
                                         {{-- <td class="px-1 py-2">{{ $item->bl_tip_naziv}}</td> --}}
                                         <td class="px-1 py-2">
                                             <button class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="statusShowModal({{ $item->blid}}, {{ $item->statusid }})">

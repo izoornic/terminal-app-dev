@@ -298,6 +298,9 @@ V 1.0.7.6 (9.11.2025.) @bankomati
 V 1.0.7.7 (9.11.2025.) @bankomati
     - Izmenjeno pohresno ime polja u tabelama bankomat_tiket i bankomat_tiket_histroy
 
+V 1.0.8.0 (10.11.2025.) @bankomati
+    - Prva verzija bankomat servisa sa mailerom i fixevim koje je trazio Role
+
 SELECT * 
 FROM lokacijas
    INNER JOIN (SELECT pib

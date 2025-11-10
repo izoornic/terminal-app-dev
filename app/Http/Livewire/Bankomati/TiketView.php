@@ -12,6 +12,8 @@ use App\Models\BankomatTiket;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
 
+use App\Actions\Bankomati\BankomatTiketMailingActions;
+
 class TiketView extends Component
 {
     public $tikid;
@@ -120,6 +122,10 @@ class TiketView extends Component
         }
         $this->tiket->update($update_tiket); 
         $this->tiket->newHistroy(4);
+
+        $mail_action = new BankomatTiketMailingActions( $this->tiket->id);
+        $mail_action->sendEmails("dodeljen");
+
         $this->modalDodeliTiketVisible = false;
         $this->redirect(request()->header('Referer'));
     }
@@ -183,6 +189,10 @@ class TiketView extends Component
         // 9 - zatvoren
         // 10 - obrisan tiket
         $this->addBankomatHistory(9);
+
+        $mail_action = new BankomatTiketMailingActions( $this->tiket->id);
+        $mail_action->sendEmails("zatvoren");
+
         $this->modalZatvoriTiketVisible = false;
         $this->redirect(request()->header('Referer'));
     }

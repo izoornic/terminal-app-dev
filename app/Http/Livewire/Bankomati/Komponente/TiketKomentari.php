@@ -7,6 +7,8 @@ use Livewire\Component;
 use App\Models\BankomatTiketKomantar;
 use App\Models\BankomatTiket;
 
+use App\Actions\Bankomati\BankomatTiketMailingActions;
+
 class TiketKomentari extends Component
 {
     public $tiketid;
@@ -55,6 +57,11 @@ class TiketKomentari extends Component
         $tiket->br_komentara = $komentari->count();
         $tiket->save();
         $tiket->newHistroy($history_action_id);
+        
+        if($history_action_id == 5) {
+            $mail_action = new BankomatTiketMailingActions($this->tiketid);
+            $mail_action->sendEmails("komentar", $komentari);
+        }
     }
 
     public function read()
