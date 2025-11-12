@@ -301,6 +301,9 @@ V 1.0.7.7 (9.11.2025.) @bankomati
 V 1.0.8.0 (10.11.2025.) @bankomati
     - Prva verzija bankomat servisa sa mailerom i fixevim koje je trazio Role
 
+V 1.0.8.1 (12.11.2025.) @bankomati
+    - Dodate kontakt osobe na komponentu BankomaiInfo
+
 SELECT * 
 FROM lokacijas
    INNER JOIN (SELECT pib

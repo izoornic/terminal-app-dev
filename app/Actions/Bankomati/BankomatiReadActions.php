@@ -13,7 +13,7 @@ class BankomatiReadActions
      * @param  mixed $search - array of search parameters
      * @param  mixed $sortField - field to sort by
      * @param  mixed $sortAsc - sort direction
-     * @return void
+     * @return object
      */
     public static function BankomatiRead($search, $sortField=null, $sortAsc=true)
     {

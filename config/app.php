@@ -43,7 +43,7 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
-    /*
+    /* 
     |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
@@ -183,6 +183,8 @@ return [
 
     ],
 
+    'editor'=> env('APP_EDITOR','vscode'),
+
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -196,7 +198,6 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // ...
-        //'PDF' => Barryvdh\DomPDF\Facade::class,
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
     ])->toArray(),
 

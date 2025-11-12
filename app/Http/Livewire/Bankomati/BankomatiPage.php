@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\Bankomat;
-use App\Models\Blokacija;
+//use App\Models\Blokacija;
 use App\Models\BankomatsHistory;
 use App\Models\BankomatLokacija;
 use App\Models\BankomatLocijaHirtory;
@@ -198,7 +198,7 @@ class BankomatiPage extends Component
         //Ovde je $id iz tabele bankomats jer se edituju samo polja iz te tabele
         $this->resetValidation();
         $this->resetInputFields();
-        $this->modelId = $id;
+        $this->modelId = $id ?? null;
         $this->loadModel();
         $this->location_key ++;
         $this->modalEditVisible = true;
@@ -268,8 +268,9 @@ class BankomatiPage extends Component
         //dd($this->proizvod_model_tip, $this->b_sn, $this->bankomat_tid, $this->proizvod_model, $this->vlasnik_proizvoda);
     }
 
-    private function validDatumPromene($history_actions) 
+    private function validDatumPromene($history_a) 
     {
+        $history_actions = $history_a ?? null;
         //Poslednja akcije koja se menja
         $last_change_model = BankomatLocijaHirtory::where('bankomat_lokacija_id', '=', $this->modelId)->whereIn('history_action_id', $history_actions)->orderBy('updated_at', 'desc')->first();
 
@@ -446,7 +447,7 @@ class BankomatiPage extends Component
             'naziv_sufix' => $this->searchNazivSufix,
             'mesto' => $this->searchMesto,
 
-        ];
+        ]; 
         
        $builder = BankomatiReadActions::BankomatiRead($searchParams);
        // paginate the builder
