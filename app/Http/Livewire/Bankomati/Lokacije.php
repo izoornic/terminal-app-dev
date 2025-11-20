@@ -65,12 +65,16 @@ class Lokacije extends Component
 
     //lat log modal
     public $latLogVisible = false;
+    public $latLogValue;
+    public $lat_value;
+    public $long_value;
 
     //lokacija info modal
     public $modalLokacijaInfoVisible = false;
     public $deletePosible = false;
     public $usersOfLocation;
     public $lokacijaSadrzi;
+    public $lokacijaTerminals;
 
     //nova edit podlokacija
     public $is_sublocation;
@@ -137,7 +141,7 @@ class Lokacije extends Component
         $this->modelId = null;
         $this->is_duplicate = false;
         $this->bl_naziv = '';
-        $this->dl_naziv_sufix = '';
+        $this->bl_naziv_sufix = '';
         $this->bl_adresa = '';
         $this->bl_mesto = '';
         $this->blokacija_tip_id = '';
