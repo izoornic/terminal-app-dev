@@ -116,7 +116,7 @@ class BankomatiPage extends Component
         //dd($id, $key);
         if($key == 'lokacija') $this->bankomat_lokacija = $id;
         if($key == 'vlasnik') $this->vlasnik_proizvoda = $id;
-        if($key == 'premesti') $this->nova_lokacija = $id;
+        if($key == 'premesti') $this->nova_lokacija = $id; 
     }
     
     
