@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\Bankomat;
+//use App\Models\Blokacija;
 use App\Models\BankomatsHistory;
 use App\Models\BankomatLokacija;
 use App\Models\BankomatLocijaHirtory;
@@ -115,7 +116,7 @@ class BankomatiPage extends Component
         //dd($id, $key);
         if($key == 'lokacija') $this->bankomat_lokacija = $id;
         if($key == 'vlasnik') $this->vlasnik_proizvoda = $id;
-        if($key == 'premesti') $this->nova_lokacija = $id;
+        if($key == 'premesti') $this->nova_lokacija = $id; 
     }
     
     
@@ -151,7 +152,7 @@ class BankomatiPage extends Component
     public function saveBankomat()
     {
         $this->validate(
-            [ 
+            [
                 'proizvod_model_tip' => 'required|numeric|exists:bankomat_product_tips,id',
                 'b_sn' => 'required|string|max:255|unique:bankomats',
                 'bankomat_tid' => 'nullable|string|max:255',
@@ -164,7 +165,7 @@ class BankomatiPage extends Component
         $this->datum_promene .= ' ' . Helpers::vremeKalendarNow();
         
         // Save logic here, e.g., create or update the location in the database
-        DB::transaction(function() {
+        DB::transaction(function(){
             //Bankomat
             $cuurent = Bankomat::create($this->modelData());
             //BankomatLokacija

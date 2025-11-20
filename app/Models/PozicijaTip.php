@@ -43,4 +43,9 @@ class PozicijaTip extends Model
         return  $pozicija_list;
     }
 
+    public static function getDashboardByPozicija($pozicijaId){
+        $pozicija = PozicijaTip::find($pozicijaId);
+        return $pozicija ? $pozicija->dashboard_path : '';
+    }
+
 }

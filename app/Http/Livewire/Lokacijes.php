@@ -701,7 +701,7 @@ class Lokacijes extends Component
         }
         // Check if the latitude and longitude values are numeric
         if(!is_numeric($exp[0]) || !is_numeric($exp[1])){
-            $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
+           $this->addError('latLogValue', 'Unesite ispravne koordinate u formatu: "latitude, longitude"');
             return;
         }
         $this->lat_value = $exp[0];

@@ -124,13 +124,10 @@
                                             </x-jet-button>
                                         </td>
                                         <td>
-                                            <button class="p-2 text-sm relative text-gray-300 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
-                                                <div class="z-10 absolute ml-1 mb-1 text-gray-500 text-lg">{{ $item->br_komentara}}</div>
-                                                
-                                                <svg class="text-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
-
+                                            <button class="px-2 text-sm relative text-gray-500 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
+                                                <div class="mx-1 text-lg">{{ $item->br_komentara}}</div>
+                                                <x-heroicon-o-chat-bubble-bottom-center-text class="z-10 absolute top-0 text-gray-400 -mt-1.5 ml-2 w-3 h-3"/>
                                             </button>
-
                                         </td>
                                     </tr>
                                 @endforeach
@@ -490,7 +487,7 @@
 
         <x-slot name="footer">
         <x-jet-secondary-button wire:click="$toggle('terminalHistoryVisible')" wire:loading.attr="disabled">
-                {{ __('Zatvori') }}
+                Zatvori
             </x-jet-secondary-button>
         </x-slot>
     </x-jet-dialog-modal>
@@ -499,7 +496,7 @@
     <x-jet-dialog-modal wire:model="newTiketVisible">
         <x-slot name="title">
             <svg class="fill-current w-6 h-6 mr-2 mt-1 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
-            {{ __('Novi Tiket') }}
+            Novi Tiket
         </x-slot>
        
         <x-slot name="content">
@@ -629,7 +626,7 @@
                     </x-jet-danger-button>     
                 @endif 
             @else
-                @if($prioritetTiketa && !App\Models\Tiket::daliTerminalImaOtvorenTiket($newTiketTerminalLokacijaId))
+                @if($prioritetTiketa && !App\Models\Tiket::daliTerminalImaOtvorenTiket($modelId))
                     <x-jet-danger-button class="ml-2" wire:click="createCallCentar(false)" wire:loading.attr="disabled">
                     <svg class="float-left fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
                         {{ __('Otvori tiket') }}

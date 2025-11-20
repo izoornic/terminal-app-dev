@@ -263,12 +263,46 @@ V 1.0.4.8 (30.8.2025.) @main
         Duplikati su obelezeni crvenom * u prikazu
         U bazi je skinut index unique na polju email u tabeli lokacijas
 
-V 1.0.5.0 (9.9.2025.) @main 
+V 1.0.5.1 (9.9.2025.) @main 
     - Terminal info komponenta implementirana na modalim gde se prikayuju podaci o terminalu
     - Konacno extrahovana read funkcija za stranicu 'licenca-terminal' 
 
-//TODO 
-    - read funkciju primeniti na stranici Terminali 
+V 1.0.5.2 (15.9.2025.) @bankomati 
+    - 'pozicija_tips' - dodate 3 nove pozicije i polje u tabeli 'dashboard_path'
+
+V 1.0.6.0 (22.9.2025.) @bankomati 
+    - Novi deo aplikacije sa servisom Bankomata  4 od 5 stranica: Pocetna, Bankomati, Lokacije, Modeli bankomata
+
+V 1.0.6.0 (28.9.2025.) @bankomati
+    - Promenjeno sa Bankomata na Proizvodi i pripremljeno za unso Proizvoda i Lokacija
+
+V 1.0.6.3 () @bankomati
+    - Vise kontakt osoba na jednoj lokaciji
+    - Sve vrste lokacija imaju kontakt osobe
+
+V 1.0.6.4 (16.10.2025) @bankomati
+    - Komponente pomerene u novi folder Bankomati/komponente
+
+V 1.0.7.2 (28.10.2025) @bankomati
+    - 80% servisa bankomata gotovo ( verzija da bi Role unosio proizvode )
+
+V 1.0.7.4 (29.10.2025.) @bankomati
+    - Konacno ispravljen bug sa dve iste komponente u jednom modalu - stranica PROIZVODI modal NOVI PROIZVOD
+
+V 1.0.7.5 (31.10.2025.) @bankomati
+    - Zavrsen servis bankomata za ulogu Admin
+
+V 1.0.7.6 (9.11.2025.) @bankomati
+    - Zavrsen servis bankomata za uloge Sef servisa i Serviser
+
+V 1.0.7.7 (9.11.2025.) @bankomati
+    - Izmenjeno pohresno ime polja u tabelama bankomat_tiket i bankomat_tiket_histroy
+
+V 1.0.8.0 (10.11.2025.) @bankomati
+    - Prva verzija bankomat servisa sa mailerom i fixevim koje je trazio Role
+
+V 1.0.8.1 (12.11.2025.) @bankomati
+    - Dodate kontakt osobe na komponentu BankomaiInfo
 
 SELECT * 
 FROM lokacijas
