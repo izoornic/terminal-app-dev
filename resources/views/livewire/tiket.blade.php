@@ -109,17 +109,20 @@
                                         <td class="px-2 pr-2">{{ $item->tks_naziv }} <br /> {{ $item->name }}</td>  
                                         <td class="px-2 pr-2">
                                                  @if($item->is_duplicate)<span class="text-red-500">*</span>@endif
-                                                {{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}
+                                                <span>{{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}</span>
                                                 <br />
                                                 <span class="text-sm text-red-400">{{ $item->tok_naziv }}</span> 
                                         </td>
                                         <td class="px-2 pr-2">{{ $item->mesto }}<br />{{ $item->r_naziv }}</td>
-                                        <td class="px-2 pr-2">{{ $item->br_komentara }}</td>
+                                        <td class="px-1 py-2">
+                                            <div class="z-10 absolute ml-1 text-lg">{{ $item->br_komentara}}</div>
+                                            <x-heroicon-o-chat-bubble-bottom-center-text class="text-gray-400 -mt-1 ml-2 w-3 h-3"/>
+                                        </td> 
                                         <td class="px-2 pr-2"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$item->tr_bg_collor}} text-{{$item->btn_collor}}" >{{ $item->tp_naziv }}</span></td>                                       
                                         <td class="px-2 pr-2">
-                                        <x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->tikid] ) }}" :active="request()->routeIs('tiketview', ['id' => $item->tikid])" >
-                                            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M128 160H448V352H128V160zM512 64C547.3 64 576 92.65 576 128V208C549.5 208 528 229.5 528 256C528 282.5 549.5 304 576 304V384C576 419.3 547.3 448 512 448H64C28.65 448 0 419.3 0 384V304C26.51 304 48 282.5 48 256C48 229.5 26.51 208 0 208V128C0 92.65 28.65 64 64 64H512zM96 352C96 369.7 110.3 384 128 384H448C465.7 384 480 369.7 480 352V160C480 142.3 465.7 128 448 128H128C110.3 128 96 142.3 96 160V352z"/></svg>
-                                                {{ __('Tiket') }}
+                                            <x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->tikid] ) }}" :active="request()->routeIs('tiketview', ['id' => $item->tikid])" >
+                                                <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M128 160H448V352H128V160zM512 64C547.3 64 576 92.65 576 128V208C549.5 208 528 229.5 528 256C528 282.5 549.5 304 576 304V384C576 419.3 547.3 448 512 448H64C28.65 448 0 419.3 0 384V304C26.51 304 48 282.5 48 256C48 229.5 26.51 208 0 208V128C0 92.65 28.65 64 64 64H512zM96 352C96 369.7 110.3 384 128 384H448C465.7 384 480 369.7 480 352V160C480 142.3 465.7 128 448 128H128C110.3 128 96 142.3 96 160V352z"/></svg>
+                                                    Tiket
                                             </x-jet-nav-link>
                                         </td>
                                     </tr>
@@ -140,7 +143,7 @@
     {{ $data->links() }}
     </div>
  
-    {{-- Novi Tiket Form --}}
+    {{-- Novi Tiket Form ################################################################################# --}}
     <x-jet-dialog-modal wire:model="modalNewTiketVisible">
         <x-slot name="title">
         <svg class="fill-current w-6 h-6 mr-2 mt-1 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>

@@ -210,8 +210,9 @@ class Terminal extends Component
      */
     public function modelTiketData()
     {
+        //dd($this->newTiketTerminalLokacijaId);
         return [ 
-            'tremina_lokacijalId'   =>  $this->newTiketTerminalLokacijaId,
+            'tremina_lokacijalId'   =>  $this->modelId,
             'tiket_statusId'        =>  $this->tiketStatusId,
             'opis_kvaraId'          =>  $this->opisKvaraList,
             'korisnik_prijavaId'    =>  auth()->user()->id,

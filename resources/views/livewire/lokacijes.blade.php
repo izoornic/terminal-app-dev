@@ -861,6 +861,7 @@
                         <div class="flex-1">
                             <x-jet-label for="latLogValue" value="{{ __('Lat, Long') }}" />
                             <x-jet-input wire:model="latLogValue" id="" class="block mt-1 w-full" type="text" />
+                                @error('latLogValue') <span class="error">{{ $message }}</span> @enderror
                                 @error('lat_value') <span class="error">{{ $message }}</span> @enderror
                                 @error('long_value') <span class="error">{{ $message }}</span> @enderror
                         </div>
