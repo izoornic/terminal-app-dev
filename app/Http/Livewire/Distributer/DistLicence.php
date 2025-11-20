@@ -75,6 +75,7 @@ class DistLicence extends Component
     public $canDelete;
 
     //PARAMETRI LICENCE MODAL
+    public $parametri;
     public $parametriModalVisible;
     public $pm_licenca_tip_id;
     //niz sa globalno dodeljenim parametrima za licencu
@@ -124,7 +125,7 @@ class DistLicence extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -445,9 +446,9 @@ class DistLicence extends Component
     /**
      * The reset form for new teminal
      *
-     * @return void
+     * @return bool
      */
-    public function resetTerm()
+    public function resetTerm():bool
     {
         if(!$this->unete_cene_error || !$this->unete_cene_licenci) return false;
         $this->datum_pocetka_licence = Helpers::datumKalendarNow();
@@ -497,7 +498,7 @@ class DistLicence extends Component
         LicenceZaTerminal::updateOrCreate( $key_arr, $vals_ins );
     }
 
-    private function licencaImaParametre($licenca_tip_id)
+    private function licencaImaParametre($licenca_tip_id): bool
     {
         return (LicencaParametar::where('licenca_tipId', '=', $licenca_tip_id)->first()) ? true : false;
     }
@@ -566,7 +567,7 @@ class DistLicence extends Component
     /**
      * The read function. searchTipLicence
      *
-     * @return void
+     * @return object
      */
     private function licencaInfo()
     {
@@ -655,7 +656,7 @@ class DistLicence extends Component
      */
      public function commentsShowModal($id)
     {
-        $this->newKoment = '';
+        //$this->newKoment = '';
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         

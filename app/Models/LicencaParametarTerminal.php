@@ -21,17 +21,19 @@ class LicencaParametarTerminal extends Model
 
     /**
      * Dodavanje parametara novoj licenci
-     * @param key_arr = [   'terminal_lokacijaId' => $this->modelId,
+     * @param array $key_arr   //= [   'terminal_lokacijaId' => $this->modelId,
      *                      'distributerId' => $this->distId,
      *                      'licenca_distributer_cenaId' => $lc ];
      *
-     * @param licenca_tip_id  = id licence iz tabele licenca_tips
+     * @param array $licenca_tip_id  // = id licence iz tabele licenca_tips
      * 
-     * @param selectedParametars = niz sa selektovanim parametrima iz checkbox-a
+     * @param array $selectedParametars // = niz sa selektovanim parametrima iz checkbox-a
      * 
      * @return void
      * 
      */
+
+    
     public static function addParametarsToLicence($key_arr, $licenca_tip_id, $selectedParametars)
     {
         // izdvoj iz niza izabranih parametara samo parametre koji su za licencu
@@ -45,13 +47,13 @@ class LicencaParametarTerminal extends Model
     
     /**
      * Update parametara iz dve funkcije
-     * @param key_arr = [   'terminal_lokacijaId' => $this->modelId,
+     * @param array $key_arr //= [   'terminal_lokacijaId' => $this->modelId,
      *                      'distributerId' => $this->distId,
      *                      'licenca_distributer_cenaId' => $lc ];
      *
-     * @param licenca_tip_id  = id licence iz tabele licenca_tips
+     * @param array $licenca_tip_id  //= id licence iz tabele licenca_tips
      * 
-     * @param selectedParametars = niz sa selektovanim parametrima iz checkbox-a
+     * @param array $selectedParametars //= niz sa selektovanim parametrima iz checkbox-a
      * 
      * @return void
      * 

@@ -13,11 +13,10 @@ class TerminaliReadActions
      * @param  mixed $search - array of search parameters
      * @param  mixed $sortField - field to sort by
      * @param  mixed $sortAsc - sort direction
-     * @return void
+     * @return object
      */
-    public static function TerminaliRead($search, $sortField=null, $sortAsc=true)
-    {
-        // Extract search parameters
+    public static function TerminaliRead($search, $sortField=null, $sortAsc=true): object
+    {        // Extract search parameters
         $searchSB = $search['searchSB'] ?? null;
         $searchKutija = $search['searchKutija'] ?? null;
         $searchNazivLokacije = $search['searchNazivLokacije'] ?? null;
@@ -102,6 +101,7 @@ class TerminaliReadActions
         return TerminalLokacija::select(
             'terminal_lokacijas.id', 
             'terminal_lokacijas.br_komentara',
+            'terminal_lokacijas.blacklist',
             'terminals.sn', 
             'lokacijas.l_naziv', 
             'lokacijas.l_naziv_sufix', 
@@ -154,7 +154,7 @@ class TerminaliReadActions
                 return $query->where('lokacijas.pib', 'like', '%'.$searchPib.'%');
             })
             ->where('terminal_lokacijas.distributerId', '=', $distId)
-            ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
+            ->orderBy(DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')"), 'ASC')
             ->orderBy('terminal_lokacijas.id')
             ->orderBy('licenca_distributer_cenas.licenca_tipId');
     }

@@ -1,6 +1,9 @@
+
+# Version History
+
 V 0.4.3.0 (22.7.2023.)
-    - 'Osnovna licenca' ukinuta kao i sva funkcijonalnost vezana za nju. Dodavanje, brisanje licence terminalu. 
-    - Brisanje licence na stranici 'Distributer terminal' brise licencu i u apiju
+        - 'Osnovna licenca' ukinuta kao i sva funkcijonalnost vezana za nju. Dodavanje, brisanje licence terminalu.  
+        - Brisanje licence na stranici 'Distributer terminal' brise licencu i u apiju
 
 V 0.4.3.1 (28.7.2023.)
     - Zamenjena ikona 'Add to Blacklist' na stranici Terminali (Menager Licenci)
@@ -10,7 +13,7 @@ V 0.4.3.2 (11.8.2023.)
     - Dodat podatak o modelu i proizvodjaču na modalu HISTORY na stranicama: "licenca-terminali", "terminal", "tiketview"
 
 V 0.4.3.3 (12.10.2023.)
-    - Ispravljen bug kod dodavanja tiketa. Lista "Opis kvara" vis ne zavisi od tipa terminala. 
+    - Ispravljen bug kod dodavanja tiketa. Lista "Opis kvara" vis ne zavisi od tipa terminala.  
 
 V 0.5.0 (23.12.2013.)
     - Nova tabela u bazi: distributer_user_indices
@@ -80,11 +83,9 @@ V 0.5.1.2 (6.3.2024.)
 V 0.5.1.3 (6.4.2024.)
     - Ispravljen bug sa editom lokacije koja ima dodatu email adresu. Stranice "Lokacije" i "Dist-Lokacije"
 
-
 V 0.5.1.4 (23.4.2024.)
     - Dodata funkcionalnost da Admin i Menager licenci ne mogu da premestaju terminale koji imaju dodatu licencu.
     - Dodata dva nova plja u tabelu "licenca_naplatas": 'aktivna', 'nenaplativ'
-    
     - Izbacena tabela 'licenca_distributer_terminals' iz baze
 
         UPDATE licenca_naplatas ls, ( SELECT id, nenaplativ FROM licenca_distributer_terminals ) ldt
@@ -109,7 +110,7 @@ V 1.0.0.2 (18.11.2024.)
     -Dodata funkcija BLACKLIST distributerima - branch Black-lista-distributer
 
 V 1.0.0.1 (18.11.2024.)
-    - Komit na branch "Servisna licenca" 
+    - Komit na branch "Servisna licenca"  
         - dodata tabela "licenca_servisnas" gde se loguju servisne licence
         - Dodato polje u tabelu "licence_za_terminals" - "licenca_poreklo"
 
@@ -123,9 +124,9 @@ V 1.0.0.5 (19.11.2024.)
 V 1.0.0.7 (26.12.2024.)
     - Dodata nova tabela u bazu "licenca_servisnas" loguje servisne licence
     - Dodato polje u tabelu "licence_za_terminals" >> "licenca_poreklo"->default(1) zastavica za poreklo licence
-    - Zavresena Servisna licenca. 
+    - Zavresena Servisna licenca.  
     - Refaktorovane funkcije na stranici DistLicence a manipulacija parametima apstrahovana u model LicencaParametarTerminal
-    - Deploj na barnch Servisna-licenca-sa-novim-composerom. 
+    - Deploj na barnch Servisna-licenca-sa-novim-composerom.  
     - Odradio greskom composer update pa ima 1K fajlova za depliy
 
 V 1.0.0.8 (26.12.2024.)
@@ -158,14 +159,14 @@ V 1.0.1.8 (10.2.2025.)
     - Izdvojena logika brisanja servisnih licenci i parametara u clasu Ivan/SelectedTerminalInfo
 
 V 1.0.1.9 (23.2.2025.)
-    - Menadzeru licenci dodata opcija dodavanja novog terminala na stranci "Terminali". Terminale dodaje na fixnu lokaciju "Centralni servis" 
-    
+    - Menadzeru licenci dodata opcija dodavanja novog terminala na stranci "Terminali". Terminale dodaje na fixnu lokaciju "Centralni servis"  
+  
 V 1.0.2.0 (27.2.2025.) @stanje-terminala branch
     - LARAVEL UPDATE 10.48.28 0 prelazak na noviu verziju 3k fajlova update - branch "Stanje-terminala-po-modelu"
 
 V 1.0.2.5 (17.3.2025.) @stanje-terminala branch
     - Dodata funkcija za brisanje distributera
-    - Dodata stranica "Terminali stanje" za Admina 
+    - Dodata stranica "Terminali stanje" za Admina  
 
 V 1.0.2.6 (26.3.2025.) @stanje-terminala branch
     - Dodata stranica "Licence grafika" za Menadzera licenci
@@ -184,9 +185,9 @@ V 1.0.3.1 (2.4.2025.)
 
 V 1.0.3.2 (10.4.2025.) @stanje-terminala branch
     - Pomeren kraj isteka servisne licence sa wikenda na ponedeljak
-    - Servisna licenca moze da se doda preko istekle trajne licence 
-    - Dodata funkcionalnos za produzetak privremene licence 
- 
+    - Servisna licenca moze da se doda preko istekle trajne licence  
+    - Dodata funkcionalnos za produzetak privremene licence  
+  
 V 1.0.3.2 (16.4.2025.) @stanje-terminala branch
     - Dodata opcija Export Excel za izvoz licenci koje su istekle ili uskoro isticu ya uloge Menadzer licenci i Distributer
 
@@ -198,8 +199,8 @@ V 1.0.3.8 (21.5.2025.) @Statistika-licenci-prodaja
         managment-distributeri (lista distributera)
             -- komponenta "komponente.sort-button" - sortiranje sa eventom
         managment-distributer-licence (grafik licenci prema datumu pocetka sa prikazom pojedinacnih na klik)
-            -- komponenta "managment.pocetak-licence-grafik"  - grafik 
-            -- komponenta "managment.prikaz-izabranih-licenci"  - Tabela licenci posle klika na grafik        
+            -- komponenta "managment.pocetak-licence-grafik"  - grafik  
+            -- komponenta "managment.prikaz-izabranih-licenci"  - Tabela licenci posle klika na grafik  
 
  V 1.0.3.9 (24.5.2025.) @Statistika-licenci-prodaja  
     - Dodati check boxovi (toogle) za prikay kategorija na grafiku
@@ -226,51 +227,51 @@ V 1.0.4.1 (20.7.2025.) @mapa-terminala-distibutera
 V 1.0.4.3.1 (21.7.2025.) @mapa-terminala-distibutera
     - Promenjen izgled pinova (nijanse crvene boje) sa brojevima od 1 do 15+ sivi pinovi ya 0 i zuti za nove distributere sa 0 licenci
 
-V 1.0.4.4  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+V 1.0.4.4  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat  
     - Promenjen Cron job za brisanje servisnih licenci... sada brise dan posle isteka prekoracenja...
     - Dodati komentari na terminal za Menagra licenci
 
-V 1.0.4.5  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
-    - komentari na terminalu zavrseni za sve uloge. 
+V 1.0.4.5  (21.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat  
+    - komentari na terminalu zavrseni za sve uloge.  
         Menager licenci (add i edit) stranice: Terminali i distributer-terminali
         Admin, serviser, kol centar ( view ) stranice: Terminali i ticket-view
 
 V 1.0.4.6  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat
     - Dodata funkcija Adminu da može da uključi ili isključi komentare na terminalu za Distributera
 
-V 1.0.4.6.1  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat 
+V 1.0.4.6.1  (25.7.2025.) @ Termina-kutija-komentar-lokacija-duplikat  
     - Mapa svih distributera na pinu dodat link "Statistika licenci"
 
-V 1.0.4.6.2 (23.6.2025.) @main 
+V 1.0.4.6.2 (23.6.2025.) @main  
     - Menadzer licenci - Distributeri -> Terminali pretraga po nazivu: mesta, adresi, imenu lokacije
 
-V 1.0.4.6.4 (11.8.2025.) @main 
+V 1.0.4.6.4 (11.8.2025.) @main  
     - Admin stranica "Terminali" dodata pretraga po Pib-u
     - Menadzer licenci "Terminali" dodata pretraga po Pib-u
     - Menadzer licenci "Distributeri" -> "Terminali" dodata pretraga po Pib-u
     - Distributer  "Licence" dodata pretraga po Pib-u
 
-V 1.0.4.6.4 (11.8.2025.) @main 
+V 1.0.4.6.4 (11.8.2025.) @main  
     - Napravljena komponenta "Prikazzkomentara" i dodat prikay u vise redova
 
-V 1.0.4.7 (11.8.2025.) @main 
+V 1.0.4.7 (11.8.2025.) @main  
     - Dodat modal edit terminal info za ulogu Admin na stranici "Terminali" -> History modal -> Edit
 
-V 1.0.4.8 (30.8.2025.) @main 
-    - Vise lokacija sa istim PIB-om za uloge Admin i Distributer. 
+V 1.0.4.8 (30.8.2025.) @main  
+    - Vise lokacija sa istim PIB-om za uloge Admin i Distributer.  
         Kada se radi Edit lokacije koja je duplirana naziv je fixan plus sufix, opciono
         Kada se edituje lokacija koja je duplirana naziv i pib se menjaju na svim duplikatima
         Duplikati su obelezeni crvenom * u prikazu
         U bazi je skinut index unique na polju email u tabeli lokacijas
 
-V 1.0.5.1 (9.9.2025.) @main 
+V 1.0.5.1 (9.9.2025.) @main  
     - Terminal info komponenta implementirana na modalim gde se prikayuju podaci o terminalu
-    - Konacno extrahovana read funkcija za stranicu 'licenca-terminal' 
+    - Konacno extrahovana read funkcija za stranicu 'licenca-terminal'  
 
-V 1.0.5.2 (15.9.2025.) @bankomati 
+V 1.0.5.2 (15.9.2025.) @bankomati  
     - 'pozicija_tips' - dodate 3 nove pozicije i polje u tabeli 'dashboard_path'
 
-V 1.0.6.0 (22.9.2025.) @bankomati 
+V 1.0.6.0 (22.9.2025.) @bankomati  
     - Novi deo aplikacije sa servisom Bankomata  4 od 5 stranica: Pocetna, Bankomati, Lokacije, Modeli bankomata
 
 V 1.0.6.0 (28.9.2025.) @bankomati
@@ -304,32 +305,6 @@ V 1.0.8.0 (10.11.2025.) @bankomati
 V 1.0.8.1 (12.11.2025.) @bankomati
     - Dodate kontakt osobe na komponentu BankomaiInfo
 
-SELECT * 
-FROM lokacijas
-   INNER JOIN (SELECT pib
-               FROM   lokacijas
-               GROUP  BY pib
-               HAVING COUNT(id) > 1) dup
-           ON lokacijas.pib = dup.pib;
-
-51 lokacija
-108812629
-101517345
-110871136
-111700788 - 3 lokacije
-112990130
-102776993 - Obuća Pavle doo 31 lokacija
-103079070 - 3 lokacije
-112457749 - Razliciti nazivi!!!
-114664893
-
-Poljoprivredno gazdinstvo Takač Dejan - nema PIB
-Radenko Cvanić  - nema PIB
-
-
-    // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
-    SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 
-
-
-    // INFO o TerminalLokacija IDju
-    SELECT * FROM terminal_lokacijas tl WHERE tl.terminalId = (SELECT id FROM terminals WHERE sn LIKE '0500422040186607'); 
+V 1.0.8.2 (20.11.2025.) @main
+    - Merged Bankomati i Main i prvi deply na produkciju.
+    - Dodata ikonica blacklista na stranicu dist-licence za ulogu "Distributer"

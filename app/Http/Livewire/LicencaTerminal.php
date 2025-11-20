@@ -136,7 +136,7 @@ class LicencaTerminal extends Component
             'searchTipLokacije' => $this->searchTipLokacije,
             'searchStatus' => $this->searchStatus,
             'searchBlackist' => $this->searchBlackist,
-            'searchPib' => $this->searchPib,
+            'searchPib' => $this->searchPib, 
         ];
 
         $builder = TerminaliReadActions::TerminaliRead($search);
@@ -425,7 +425,7 @@ class LicencaTerminal extends Component
 
     public function commentsShowModal($id)
     {
-        $this->newKoment = '';
+        //$this->newKoment = '';
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         //$this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
