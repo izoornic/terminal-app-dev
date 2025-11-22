@@ -11,7 +11,8 @@ use App\Models\User;
 use App\Http\Helpers;
 
 use Mail;
-use App\Mail\NotyfyMail;
+use Exception;
+use App\Mail\BakomatiNotifyMail;
 
 class BankomatTiketMailingActions
 {
@@ -49,7 +50,8 @@ class BankomatTiketMailingActions
         //dd($this->tiketData($subject), $comentari);
         foreach ($this->email_primaoci as $mail_address) {
             try {
-                Mail::to($mail_address)->send(new NotyfyMail($this->tiketData($subject), $comentari));
+                Mail::to($mail_address)
+                    ->send(new BakomatiNotifyMail($this->tiketData($subject), $comentari));
             } catch (Exception $e) {
                 if (count(Mail::failures()) > 0) {
                     $failures[] = $mail_address;
@@ -62,7 +64,7 @@ class BankomatTiketMailingActions
     /**
      * setEmailPrimaoce
      *
-     * @return object
+     * @return array
      */
     private function setEmailPrimaoce()
     {
@@ -77,8 +79,8 @@ class BankomatTiketMailingActions
 
         foreach($email_primaci as $primac){
             if($primac != null){
-                if($primac->id != auth()->user()->id){
-                        if(!in_array($primac->email, $retval)){
+                if(isset($primac->id) && $primac->id != auth()->user()->id){
+                        if(!\in_array($primac->email, $retval)){
                             array_push($retval, $primac->email);
                         }
                     }   
@@ -115,21 +117,6 @@ class BankomatTiketMailingActions
                     ->first();
     }
     
-    /**
-     * tiketRegion
-     *
-     * @param  mixed $tikid
-     * @return void
-     */
-    private function tiketRegion($tikid)
-    {
-        return Region::select('regions.id as rid')
-                    ->join('lokacijas', 'lokacijas.regionId', '=', 'regions.id')
-                    ->join('terminal_lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->join('tikets', 'tikets.tremina_lokacijalId', '=', 'terminal_lokacijas.id')
-                    ->where('tikets.id', '=', $tikid)
-                    ->first()->rid;
-    }
   
     /**
      * userInfo
@@ -147,7 +134,7 @@ class BankomatTiketMailingActions
      * Podaci koji se prikazuju u email poruci 
      *
      * @param  mixed $tik
-     * @return void
+     * @return array
      */
     private function tiketData($sub)
     {

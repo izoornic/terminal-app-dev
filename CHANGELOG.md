@@ -308,3 +308,6 @@ V 1.0.8.1 (12.11.2025.) @bankomati
 V 1.0.8.2 (20.11.2025.) @main
     - Merged Bankomati i Main i prvi deply na produkciju.
     - Dodata ikonica blacklista na stranicu dist-licence za ulogu "Distributer"
+
+V 1.0.8.2 (22.11.2025.) @main
+    - Promenjne FROM na mejlovima koji se salje servis bankomata.
