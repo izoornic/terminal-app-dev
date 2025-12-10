@@ -91,7 +91,7 @@ class Tikets extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -305,7 +305,7 @@ class Tikets extends Component
     /**
      * selectedUserInfo
      *
-     * @return void
+     * @return object
      */
     private function selectedUserInfo($user_id)
     {
@@ -319,7 +319,7 @@ class Tikets extends Component
     /**
      * prioritetInfo
      *
-     * @return void
+     * @return object
      */
     private function prioritetInfo()
     {
@@ -388,7 +388,7 @@ class Tikets extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {

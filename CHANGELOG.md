@@ -311,3 +311,6 @@ V 1.0.8.2 (20.11.2025.) @main
 
 V 1.0.8.2 (22.11.2025.) @main
     - Promenjne FROM na mejlovima koji se salje servis bankomata.
+
+V 1.0.8.4 (22.11.2025.) @Rezervni-delovi
+    - Prvi komit 'Rezervni delovi' sa napravljenim modelima, migracijama, observerima...

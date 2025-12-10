@@ -39,5 +39,6 @@ return array(
     'ec07570ca5a812141189b1fa81503674' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     '017b24472353920ed42bb364f7653c43' => $vendorDir . '/propaganistas/laravel-phone/src/helpers.php',
     '320163ac6b93aebe3dc25b60a0533d56' => $vendorDir . '/spatie/laravel-ignition/src/helpers.php',
+    '377b22b161c09ed6e5152de788ca020a' => $vendorDir . '/spatie/laravel-permission/src/helpers.php',
     '3a1e86226e85e34baf8500c4863eeb40' => $baseDir . '/app/Helpers/PaginationHelper.php',
 );
