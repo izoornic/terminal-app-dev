@@ -7,9 +7,11 @@ use Livewire\Component;
 use App\Models\Blokacija;
 
 use Illuminate\Support\Facades\Config;
+use Livewire\WithPagination;
 
 class IzborLokacije extends Component
 {
+    use WithPagination;
     public $role_region;
     public $vrsta_lokacije;
     public $comp_index;
