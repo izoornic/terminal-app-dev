@@ -33,9 +33,9 @@ class IzborProizvoda extends Component
         $this->emit('izabraniProizvod', $id);
     }
 
-    public function read()
+    public function readProizvode()
     {
-        if($this->proizvod_model_tip == null) return [];
+        //if($this->proizvod_model_tip == null) return [];
         $search = [
             'product_tip' => $this->proizvod_model_tip,
             'b_sn' => $this->searchSN,
@@ -51,8 +51,6 @@ class IzborProizvoda extends Component
     }
     public function render()
     {
-        return view('livewire.bankomati.komponente.izbor-proizvoda', [
-            'proizvodi' => $this->read(),
-        ]);
+        return view('livewire.bankomati.komponente.izbor-proizvoda');// , ['proizvodi' => $this->read(),]);
     }
 }

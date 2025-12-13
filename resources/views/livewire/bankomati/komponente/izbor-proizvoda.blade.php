@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-yellow-50 divide-y divide-gray-200"> 
-                @foreach ($proizvodi as $value)
+                @foreach ($this->readProizvode() as $value)
                     <tr class="hover:bg-gray-100" wire:click="izabraniProizvod({{ $value->blid }})" >
                     {{--  <tr class="hover:bg-gray-100" wire:click="$set('nova_lokacija', {{ $value->id }})" >  --}}   
                             <td></td>
@@ -55,7 +55,7 @@
                 </tbody>
             <table>
             <div class="mt-4">
-                {{ $proizvodi->links() }}
+                {{ $this->readProizvode()->links() }}
             </div>
         </div>  
     @endif
