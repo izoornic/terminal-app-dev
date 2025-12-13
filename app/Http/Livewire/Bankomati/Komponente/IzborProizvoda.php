@@ -44,7 +44,7 @@ class IzborProizvoda extends Component
             'region' => $this->searchPlokacijaRegion
         ];
         $builder = BankomatiReadActions::BankomatiRead($search);
-        // paginate the builder
+        // paginate the builder g
         $perPage = Config::get('global.terminal_paginate');
         $terms = $builder->paginate($perPage, ['*'], 'proizvodi');
         return $terms;
