@@ -3,11 +3,13 @@
 namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Actions\Bankomati\BankomatiReadActions;
 use Illuminate\Support\Facades\Config;
 
 class IzborProizvoda extends Component
 {
+    use WithPagination;
     //USER ROLE
     public $role_region;
     public $proizvod_model_tip;
