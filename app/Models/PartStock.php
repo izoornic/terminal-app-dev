@@ -36,6 +36,11 @@ class PartStock extends Model
         return $this->belongsTo(Lokacija::class, 'lokacija_id');
     }
 
+    public function kategorija(): BelongsTo
+    {
+        return $this->belongsTo(TerminalTip::class, 'part_type_id', 'id');
+    }
+
     // Accessor za dostupnu količinu (ako nije stored computed column)
     public function getKolicinaDostupnaAttribute(): int
     {

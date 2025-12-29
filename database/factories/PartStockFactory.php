@@ -23,7 +23,7 @@ class PartStockFactory extends Factory
 
         return [
             'part_type_id' => PartType::inRandomOrder()->first()?->id ?? PartType::factory()->create()->id,
-            'lokacija_id' => Lokacija::inRandomOrder()->first()?->id ?? Lokacija::factory()->create()->id,
+            'lokacija_id' => Lokacija::whereIn('lokacija_tipId', [1, 2])->inRandomOrder()->first()?->id ?? Lokacija::factory()->create()->id,
             'kolicina_ukupno' => $kolicinaUkupno,
             'kolicina_rezervisana' => $kolicinaRezervisana,
             // kolicina_dostupna je generated column - ne treba je postavljati

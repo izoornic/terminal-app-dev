@@ -9,15 +9,14 @@ class BankomatTiketReadActions
      /**
      * read
      *
-     * @param  mixed $search - array of search parameters
-     * @param  mixed $sortField - field to sort by
-     * @param  mixed $sortAsc - sort direction
-     * @return void
+     * @param  array $search - array of search parameters
+     * @param  string $sortField - field to sort by
+     * @param  bool $sortAsc - sort direction
+     * @return object
      */
-    public static function read($search, $sortField=null, $sortAsc=false)
+    public static function read(array $search, string $sortField=null, bool $sortAsc=false):object 
     {
-        
-       // Extract search parameters
+        // Extract search parameters
         $searchProductTip = $search['searchProductTip'] ?? null;
         $searchStatus = $search['searchStatus'] ?? null;
         $searchLokacijaNaziv = $search['searchLokacijaNaziv'] ?? null;
@@ -25,9 +24,11 @@ class BankomatTiketReadActions
         $searchRegion = $search['searchRegion'] ?? null;
         $dodeljeniUsersIds = $search['serviseri'] ?? null;
         $searchUsersRegion = $search['searchUsersRegion'] ?? null;
-        
+
+        // If search status is 'Svi', set it to null
         if($searchStatus == 'Svi')  $searchStatus = null;
 
+        // If sort field is not set, set it to 'bankomat_tikets.id'
         if(!$sortField) $sortField='bankomat_tikets.id';
 
         return BankomatTiket::select(

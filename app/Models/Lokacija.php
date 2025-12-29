@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Lokacija extends Model
 {
@@ -28,6 +29,11 @@ class Lokacija extends Model
         'mb',
         'email'
     ];
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class, 'regionId');
+    }   
 
     public static function userLokacijeList($tip_id = 1)
     {

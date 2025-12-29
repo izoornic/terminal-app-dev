@@ -20,7 +20,7 @@ class PartTypeFactory extends Factory
             'sifra' => strtoupper($this->faker->unique()->bothify('PT-####-???')),
             'naziv' => $this->faker->words(3, true),
             'opis' => $this->faker->optional(0.7)->sentence(12),
-            'category_id' => null, //$this->faker->optional(0.8)->numberBetween(1, 5),
+            'category_id' => $this->faker->optional(0.8)->numberBetween(1, 5),
             'cena' => $this->faker->randomFloat(2, 10, 5000),
             'jedinica_mere' => $this->faker->randomElement(['kom', 'kg', 'l', 'm', 'm2', 'set', 'par']),
             'min_kolicina' => $this->faker->numberBetween(0, 50),

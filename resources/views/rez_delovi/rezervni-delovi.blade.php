@@ -1,10 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        <span class="float-left mr-2 pr-2">
-            <x-heroicon-c-cog class="fill-gray-500 w-6 h-6"/>
-        </span>    
-            {{ __('Rezervni delovi') }}
+        <h2 class="flex justify-between mb-0 font-semibold text-xl text-gray-800 leading-tight">
+            <div class="flex">
+                <span class="mr-2">
+                    <x-heroicon-c-cog class="fill-gray-500 w-6 h-6"/>
+                </span>    
+                {{ __('Rezervni delovi') }}
+            </div>
+            <div class="max-h-6" >
+                @if(Auth::user()->can('parts.types.manage'))
+                <span class="mr-2 pr-2"> 
+                    <livewire:komponente.add-new-item-button 
+                            btn_name="Novi deo"
+                            btn_event="newPart" />
+                </span>
+                @endif
+            </div>
         </h2>
     </x-slot>
 

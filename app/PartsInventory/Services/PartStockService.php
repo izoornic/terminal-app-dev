@@ -5,7 +5,7 @@ namespace App\PartsInventory\Services;
 
 use App\Models\PartStock;
 use App\Models\PartMovement;
-use App\Models\PartType;
+
 use Illuminate\Support\Facades\DB;
 use Exception;
 

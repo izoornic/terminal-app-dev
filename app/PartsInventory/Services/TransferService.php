@@ -12,11 +12,11 @@ use Exception;
 
 class TransferService
 {
-    protected PartStockService $stockService;
+    //protected PartStockService $stockService;
 
-    public function __construct(PartStockService $stockService)
+    public function __construct()            //PartStockService $stockService)
     {
-        $this->stockService = $stockService;
+        //$this->stockService = $stockService;
     }
 
     /**
@@ -112,7 +112,7 @@ class TransferService
     /**
      * Transferuj jedan deo između dve lokacije
      */
-    protected function transferItem(
+    public function transferItem(
         int $partTypeId,
         int $sourceLocationId,
         int $destinationLocationId,

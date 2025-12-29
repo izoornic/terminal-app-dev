@@ -314,3 +314,6 @@ V 1.0.8.2 (22.11.2025.) @main
 
 V 1.0.8.4 (22.11.2025.) @Rezervni-delovi
     - Prvi komit 'Rezervni delovi' sa napravljenim modelima, migracijama, observerima...
+
+V 1.0.9.0 (29.12.2025.) @Rezervni-delovi
+    - Pva funkcionalna verzija samo za Admina
