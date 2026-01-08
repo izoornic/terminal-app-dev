@@ -317,3 +317,6 @@ V 1.0.8.4 (22.11.2025.) @Rezervni-delovi
 
 V 1.0.9.0 (29.12.2025.) @Rezervni-delovi
     - Pva funkcionalna verzija samo za Admina
+
+V 1.0.9.2 (8.1.2026.) @Rezervni-delovi
+    - Update stranice "Terminali" - prikaz naziva distributera u tabeli

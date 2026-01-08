@@ -36,7 +36,8 @@ class TerminaliReadActions
             'terminals.sn', 
             'terminals.broj_kutije', 
             'terminal_tips.model', 
-            'lokacija_tips.lt_naziv', 
+            //'lokacija_tips.lt_naziv', 
+            'licenca_distributer_tips.distributer_naziv',
             'regions.r_naziv', 
             'terminal_status_tips.ts_naziv', 
             'terminal_status_tips.id as statusid', 
@@ -48,9 +49,10 @@ class TerminaliReadActions
         ->join('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
         ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
-        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+        //->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+        ->leftJoin('licenca_distributer_tips', 'terminal_lokacijas.distributerId', '=', 'licenca_distributer_tips.id')
         ->when($searchDistId, function ($query, $searchDistId) {
             return $query->where('terminal_lokacijas.distributerId', '=', $searchDistId);
         })

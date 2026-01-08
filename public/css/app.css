@@ -1405,6 +1405,9 @@ select {
 .max-w-2xl {
   max-width: 42rem;
 }
+.max-w-\[30px\] {
+  max-width: 30px;
+}
 .max-w-lg {
   max-width: 32rem;
 }
@@ -2011,14 +2014,14 @@ select {
 .bg-no-repeat {
   background-repeat: no-repeat;
 }
+.fill-current {
+  fill: currentColor;
+}
 .fill-gray-500 {
   fill: #6b7280;
 }
 .fill-neutral-500 {
   fill: #737373;
-}
-.fill-current {
-  fill: currentColor;
 }
 .fill-orange-600 {
   fill: #ea580c;

@@ -17,6 +17,7 @@ use App\Models\TerminalLokacijaHistory;
 use App\Models\DistributerLokacijaIndex;
 use App\Models\TiketAkcijaKorisnikPozicija;
 
+use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -206,7 +207,7 @@ class Terminal extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelTiketData()
     {
@@ -221,7 +222,6 @@ class Terminal extends Component
             'tiket_prioritetId'     =>  $this->prioritetTiketa,
             'br_komentara'          =>  0,
             'korisnik_zatvorio_id'  =>  $this->zatvorioId
-
         ];
     }
 
@@ -243,7 +243,7 @@ class Terminal extends Component
     /**
      * selectedUserInfo
      *
-     * @return void
+     * @return Model
      */
     private function selectedUserInfo($user_id)
     {
@@ -277,7 +277,7 @@ class Terminal extends Component
      /**
      * prioritetInfo
      *
-     * @return void
+     * @return Model
      */
     private function prioritetInfo()
     {
@@ -309,7 +309,7 @@ class Terminal extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
