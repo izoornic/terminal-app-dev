@@ -24,6 +24,7 @@ class TerminaliReadActions
         $searchTipLokacije = $search['searchTipLokacije'] ?? null;
         $searchStatus = $search['searchStatus'] ?? null;
         $searchPib = $search['searchPib'] ?? null;
+        $searchVendor = $search['searchVendor'] ?? null;
         //this one can be null, 1 or 2 ( 1-only blacklisted, 2-only fields that are set to null in db)
         $searchBlackist = $search['searchBlackist'] ?? null;
 
@@ -36,7 +37,6 @@ class TerminaliReadActions
             'terminals.sn', 
             'terminals.broj_kutije', 
             'terminal_tips.model', 
-            //'lokacija_tips.lt_naziv', 
             'licenca_distributer_tips.distributer_naziv',
             'regions.r_naziv', 
             'terminal_status_tips.ts_naziv', 
@@ -45,14 +45,16 @@ class TerminaliReadActions
             'terminal_lokacijas.blacklist', 
             'terminal_lokacijas.distributerId',
             'terminal_lokacijas.br_komentara',
+            'terminal_vendors.name as vendor_name',
+            'terminal_vendors.id as vendor_id'
             )
         ->join('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
         ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
-        //->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
         ->leftJoin('licenca_distributer_tips', 'terminal_lokacijas.distributerId', '=', 'licenca_distributer_tips.id')
+        ->leftJoin('terminal_vendors', 'terminals.vendor_id', '=', 'terminal_vendors.id')
         ->when($searchDistId, function ($query, $searchDistId) {
             return $query->where('terminal_lokacijas.distributerId', '=', $searchDistId);
         })
@@ -72,6 +74,9 @@ class TerminaliReadActions
         })
         ->when($searchRegion, function ($query, $searchRegion) {
             return $query->where('lokacijas.regionId', '=', $searchRegion);
+        })
+        ->when($searchVendor, function ($query, $searchVendor) {
+            return $query->where('terminals.vendor_id', '=', $searchVendor);
         })
         ->when($searchTipLokacije, function ($query, $searchTipLokacije) {
             return $query->where('lokacijas.lokacija_tipId', '=' , $searchTipLokacije);

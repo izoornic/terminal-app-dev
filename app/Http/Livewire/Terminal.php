@@ -5,10 +5,10 @@ namespace App\Http\Livewire;
 use App\Models\User;
 use App\Models\Tiket;
 use App\Models\Lokacija;
+use App\Models\Terminal as TerminalModel;
 use App\Models\LicencaServisna;
 use App\Models\TerminalLokacija;
 use App\Models\TiketPrioritetTip;
-use App\Models\TiketOpisKvaraTip;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerCena;
@@ -73,6 +73,7 @@ class Terminal extends Component
     public $searchTip;
     public $searchStatus;
     public $searchPib;
+    public $searchVendor;
 
     //multi selected
     public $multiSelected;
@@ -97,8 +98,9 @@ class Terminal extends Component
     public $tiketStatusId;
     public $opisKvataTxt;
     public $zatvorioId;
-    
 
+    public $modalVendorVisible;
+    
     //search korisnika kome se dodeljuje tiket
     public $searchUserName;
     public $searchUserLokacija;
@@ -140,7 +142,10 @@ class Terminal extends Component
     public $info_sn;
     public $kutija;
     public $terminals_id;
+    
     public $terminalZaEditImaLicencu;
+    public $terminal_id;
+    public $vendor_id;
 
     public function newTiketShowModal($tid)
     {
@@ -785,6 +790,22 @@ class Terminal extends Component
         $this->editTerminalInfoVisible = false;
     }
 
+    public function vendorShowModal($id, $terminal_id, $vendor_id=null)
+    {
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->terminal_id = $terminal_id;
+        $this->vendor_id = $vendor_id;
+        $this->modalVendorVisible = true;
+    }
+
+    public function vendorSave()
+    {
+        //dd($this->modelId, $this->terminal_id, $this->vendor_id);
+        if($this->vendor_id == '') $this->vendor_id = null;
+        TerminalModel::where('id', $this->terminal_id) -> update(['vendor_id' => $this->vendor_id]);
+        $this->modalVendorVisible = false;
+    }
+
     /**
      * The read function.
      *
@@ -803,6 +824,7 @@ class Terminal extends Component
             'searchTipLokacije' => $this->searchTip,
             'searchStatus' => $this->searchStatus,
             'searchPib' => $this->searchPib,
+            'searchVendor' => $this->searchVendor,
         ];
 
         $builder = TerminaliReadActions::TerminaliRead($search);

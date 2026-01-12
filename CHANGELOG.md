@@ -320,3 +320,6 @@ V 1.0.9.0 (29.12.2025.) @Rezervni-delovi
 
 V 1.0.9.2 (8.1.2026.) @Rezervni-delovi
     - Update stranice "Terminali" - prikaz naziva distributera u tabeli
+
+V 1.1.0 (12.1.2026.) @Rezervni-delovi
+    - Dodata funkcionalnost "Vendor" u bazi i na stranici "Terminali"

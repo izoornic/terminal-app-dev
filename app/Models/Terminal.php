@@ -18,5 +18,6 @@ class Terminal extends Model
         'sn',
         'terminal_tipId',
         'broj_kutije',
+        'vendor_id',
     ];
 }

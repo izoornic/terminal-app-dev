@@ -19,7 +19,12 @@
                                     <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" />
                                 </td>
                                 <td class="text-center text-gray-400">
-                                    Tip lokacije
+                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">-- Tip lokacije --</option>
+                                        @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td class="text-center text-gray-400">
                                     Status
@@ -40,9 +45,9 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="">---</option>
-                                        @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
+                                    <select wire:model="searchVendor" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                            <option value="">-- Vendor --</option>
+                                        @foreach (App\Models\TerminalVendor::allList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
@@ -129,25 +134,30 @@
                                             {{ $item->distributer_naziv }}
                                         </td> 
                                         {{-- LOKACIJA TIP --}}
-                                        <td class="px-1 py-2">
+                                        <td class="px-1 py-2 text-center">
+                                            
                                             @switch($item->lokacija_tipId)
                                                 @case(1)
                                                     {{-- Servisni centar --}}
-                                                    <x-heroicon-o-wrench-screwdriver class="text-red-400 w-5 h-5" />
+                                                    <x-heroicon-o-wrench-screwdriver class="text-red-400 mx-auto w-5 h-5" />
                                                 @break
                                                 @case(2)
                                                     {{-- Magacin --}}
-                                                    <x-heroicon-o-building-library class="text-gray-400 w-5 h-5"/>
+                                                    <x-heroicon-o-building-library class="text-gray-400 mx-auto w-5 h-5"/>
                                                 @break
                                                 @case(3)
                                                     {{-- Korisnik terminala --}}
-                                                    <x-heroicon-o-building-storefront class="text-sky-400 w-5 h-5"/>
+                                                    <x-heroicon-o-building-storefront class="text-sky-400 mx-auto w-5 h-5"/>
                                                 @break
                                                 @case(4)
                                                     {{-- Distributer --}}
-                                                    <x-icon-distributer class="fill-emerald-400 w-5 h-5" />
+                                                    <x-icon-distributer class="fill-emerald-400 mx-auto w-5 h-5" />
                                                 @break
                                             @endswitch
+                                            
+                                            <button class="px-2 py-0.5 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="vendorShowModal({{ $item->tlid}}, {{ $item->tid}}, {{ $item->vendor_id }})">
+                                                @if($item->vendor_name == null) <x-heroicon-o-plus-circle class="w-5 h-5" /> @else {{ $item->vendor_name }} @endif
+                                            </button>
                                         </td>
                                         {{-- STATUS --}}
                                         <td class="px-1 py-2">
@@ -359,8 +369,6 @@
             @endif            
         </x-slot>
     </x-jet-dialog-modal>
-
-
 
 
     {{-- PREMESTI Modal ############################################################################--}}
@@ -925,6 +933,48 @@
             <x-jet-button class="ml-2" wire:click="updateTerminalInfo" wire:loading.attr="disabled">
                     {{ __('Update') }}
                 </x-jet-danger-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+        {{-- VENDOR MODAL ##############################################################################  --}}
+    <x-jet-dialog-modal wire:model="modalVendorVisible">
+        <x-slot name="title">
+            {{ __('Promeni vendora') }}
+        </x-slot>
+
+        <x-slot name="content">
+            @if($modalVendorVisible)
+                @if ($multiSelected)
+                    <livewire:komponente.terminal-info :terminal_lokacija_id="0" :multySelectedArray="$selectedTerminals" :multySelected="true"  />
+                @else
+                    <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+                @endif
+                
+            @endif
+            <div class="mt-4 bg-gray-50 p-4 border-t-4 border-grey-800 rounded-b text-grey-900 shadow-md mb-6" role="alert">
+            <div><span class="font-bold">Vendor:</span></div>
+                <select wire:model.defer="vendor_id" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">---</option>
+                    @foreach (App\Models\TerminalVendor::allList() as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('vendor_id') <span class="error">{{ $message }}</span> @enderror
+            </div>  
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalVendorVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+
+            @if ($modelId || $multiSelected)
+                <x-jet-button class="ml-2" wire:click="vendorSave" wire:loading.attr="disabled">
+                    {{ __('Sačuvaj') }}
+                </x-jet-danger-button>
+            @else
+               <div>Nešto nije u redu?!?</div>
+            @endif            
         </x-slot>
     </x-jet-dialog-modal>
 
