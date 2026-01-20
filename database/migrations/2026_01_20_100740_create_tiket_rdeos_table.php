@@ -8,10 +8,12 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('{{ table }}', function (Blueprint $table) {
+        Schema::create('tiket_rdeos', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
@@ -19,9 +21,11 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('{{ table }}');
+        Schema::dropIfExists('tiket_rdeos');
     }
 };
