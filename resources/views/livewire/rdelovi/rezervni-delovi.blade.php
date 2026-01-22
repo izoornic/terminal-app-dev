@@ -6,10 +6,19 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pretraga</label>
                 <input type="text" 
-                    wire:model.debounce.300ms="searchTerm" 
-                    placeholder="Naziv ili šifra..."
+                    wire:model.debounce.300ms="searchNaziv" 
+                    placeholder="Naziv"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pretraga</label>
+                <input type="text" 
+                    wire:model.debounce.300ms="searchSifra" 
+                    placeholder="Šifra"
+                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Lokacija</label>

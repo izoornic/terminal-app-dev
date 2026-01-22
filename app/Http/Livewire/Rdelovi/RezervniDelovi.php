@@ -9,15 +9,17 @@ use App\Models\PartType;
 use App\Models\Lokacija;
 use App\Models\TerminalTip;
 use Livewire\WithPagination;
+use App\Actions\Rdelovi\RdeloviReadAction;
 
 use Illuminate\Support\Facades\Config;
 class RezervniDelovi extends Component
 {
     use WithPagination;
 
-    public $locationId = '';
-    public $categoryId = '';
-    public $searchTerm = '';
+    public $locationId;
+    public $categoryId;
+    public $searchNaziv;
+    public $searchSifra;
     public $showLowStockOnly = false;
 
     //new part
@@ -116,7 +118,8 @@ class RezervniDelovi extends Component
     {
         $this->locationId = request()->get('locationId');
         $this->categoryId = request()->get('categoryId');
-        $this->searchTerm = request()->get('searchTerm');
+        $this->searchSifra = request()->get('searchSifra');
+        $this->searchNaziv = request()->get('searchNaziv');
         $this->showLowStockOnly = request()->get('showLowStockOnly');
 
         //dd(auth()->user()->can('parts.types.manage'));
@@ -128,42 +131,25 @@ class RezervniDelovi extends Component
 
     public function read()
     {
-        return PartStock::query()
-            ->select(
-                'part_stocks.*', 
-                'part_types.id as tipid',
-                'part_types.sifra',
-                'part_types.naziv',
-                'part_types.category_id', 
-                'lokacijas.l_naziv',
-                'regions.r_naziv',
-                'terminal_tips.model as kategorija',
-                'terminal_tips.proizvodjac'
-                )
-            ->leftJoin('part_types', 'part_types.id', '=', 'part_stocks.part_type_id')
-            ->leftJoin('lokacijas', 'lokacijas.id', '=', 'part_stocks.lokacija_id')
-            ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-            ->leftJoin('terminal_tips', 'terminal_tips.id', '=', 'part_types.category_id')
-            ->when($this->searchTerm, function ($q) {
-                    $q->where('naziv', 'like', '%' . $this->searchTerm . '%')
-                        ->orWhere('sifra', 'like', '%' . $this->searchTerm . '%');
-            })
-            ->when($this->locationId, function ($q) {
-                    $q->where('lokacija_id', $this->locationId);
-            })
-            ->when($this->categoryId, function ($q) {
-                    $q->where('category_id', $this->categoryId);
-            })
-            ->when($this->showLowStockOnly, function ($q) {
-                $q->whereRaw('part_stocks.kolicina_dostupna <= part_types.min_kolicina');
-            })
-            ->orderBy('kolicina_dostupna')
-            ->paginate(Config::get('global.terminal_paginate'), ['*'], 'tik');
+        $search =[
+            'locationId' => $this->locationId,
+            'categoryId' => $this->categoryId,
+            'searchNaziv' => $this->searchNaziv,
+            'searchSifra' => $this->searchSifra,
+            'showLowStockOnly' => $this->showLowStockOnly
+        ];
+
+        $builder = RdeloviReadAction::PartStockRead($search);
+        // paginate the builder
+        $perPage = Config::get('global.terminal_paginate');
+        $terms = $builder->paginate($perPage, ['*'], 'terminali');
+
+        return $terms;
     }
 
     public function locations()
     {
-        return Lokacija::whereIn('lokacija_tipId', [1, 2])->get();;
+        return Lokacija::whereIn('lokacija_tipId', [1, 2])->get();
     }
 
     public function categories()

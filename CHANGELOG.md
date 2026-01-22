@@ -323,3 +323,7 @@ V 1.0.9.2 (8.1.2026.) @Rezervni-delovi
 
 V 1.1.0 (12.1.2026.) @Rezervni-delovi
     - Dodata funkcionalnost "Vendor" u bazi i na stranici "Terminali"
+
+V 1.1.1 (22.1.2026.) @Rezervni-delovi
+    - Dodata funkcionalnost ugradnja rezervnih delova na stranici "Tiketwiev"
+    - Nova tabela "tiket_part_types" loguje ugradjene rezervne delove
