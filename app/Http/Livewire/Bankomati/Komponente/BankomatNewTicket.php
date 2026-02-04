@@ -46,6 +46,9 @@ class BankomatNewTicket extends Component
 
     public $role_region;
 
+    public $selectedBankomatTip;
+    public $productTipId;
+
     public function mount($bankomat_lokacija_id)
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();

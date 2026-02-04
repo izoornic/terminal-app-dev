@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 use App\Models\Blokacija;
 
 use Illuminate\Support\Facades\Config;
+use Livewire\WithPagination;
 
 class IzborLokacije extends Component
 {

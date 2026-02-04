@@ -12,9 +12,11 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @foreach (Auth::user()->userPozicijeList(Auth::user()->id) as $key => $value)
+                        @if(Route::has($key))
                         <x-jet-nav-link href="{{ route( $key ) }}" :active="request()->routeIs($key)">
                             {{ $value }}
                         </x-jet-nav-link>
+                        @endif
                     @endforeach
                 </div>
             </div>
