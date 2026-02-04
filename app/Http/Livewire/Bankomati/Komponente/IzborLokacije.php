@@ -3,8 +3,6 @@
 namespace App\Http\Livewire\Bankomati\Komponente;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-
 use App\Models\Blokacija;
 
 use Illuminate\Support\Facades\Config;
