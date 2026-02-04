@@ -208,4 +208,8 @@ Route::group(['middleware' => [
         return view('bankomati.ticket-view');
         })->name('bankomat-tiketview');
 
+    Route::get('/rezervni-delovi', function(){
+        return view('rez_delovi.rezervni-delovi');
+        })->name('rezervni-delovi');
+
 });

@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\DB;
 
 class TerminalHistory
 {
-
     public static function terminalHistoryData($terminalLokacijaId)
     {
         return DB::select(

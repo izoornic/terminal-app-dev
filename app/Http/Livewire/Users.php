@@ -135,7 +135,7 @@ class Users extends Component
      *           ],
      * 
      * 
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -394,7 +394,7 @@ class Users extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {

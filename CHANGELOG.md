@@ -311,3 +311,19 @@ V 1.0.8.2 (20.11.2025.) @main
 
 V 1.0.8.2 (22.11.2025.) @main
     - Promenjne FROM na mejlovima koji se salje servis bankomata.
+
+V 1.0.8.4 (22.11.2025.) @Rezervni-delovi
+    - Prvi komit 'Rezervni delovi' sa napravljenim modelima, migracijama, observerima...
+
+V 1.0.9.0 (29.12.2025.) @Rezervni-delovi
+    - Pva funkcionalna verzija samo za Admina
+
+V 1.0.9.2 (8.1.2026.) @Rezervni-delovi
+    - Update stranice "Terminali" - prikaz naziva distributera u tabeli
+
+V 1.1.0 (12.1.2026.) @Rezervni-delovi
+    - Dodata funkcionalnost "Vendor" u bazi i na stranici "Terminali"
+
+V 1.1.1 (22.1.2026.) @Rezervni-delovi
+    - Dodata funkcionalnost ugradnja rezervnih delova na stranici "Tiketwiev"
+    - Nova tabela "tiket_part_types" loguje ugradjene rezervne delove

@@ -96,6 +96,25 @@
                 </div>
             </div>
 
+            {{-- REZERVNI DELOVI --}}
+            @if($rezervniDelovi->count())
+                <div class="bg-purple-100 border-t-4 border-purple-500 rounded-b text-purple-900 px-4 py-3 shadow-md mb-6" role="alert">
+                    <div class="flex justify-between">
+                        <div class="flex">
+                            <div class="py-1"><x-heroicon-c-cog class="fill-current w-6 h-6 mr-2"/></div>
+                            <div>
+                                <p class="font-bold mb-2">Ugrađeni rezervni delovi</p>
+                                @foreach ($rezervniDelovi as $rdeo)
+                                <p class="text-sm">● deo: <span class="font-bold"> {{ $rdeo->partType->naziv }}</span> | Šifra:<span class="font-bold"> {{ $rdeo->partType->sifra }}</span></p>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            @endif
+
+            {{-- ISTORIJA TERMINALA --}}
             <div class="border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
                 <div class="mt-2 mb-6"><svg class="float-left fill-current w-4 h-4 mb-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C201.7 512 151.2 495 109.7 466.1C95.2 455.1 91.64 436 101.8 421.5C111.9 407 131.8 403.5 146.3 413.6C177.4 435.3 215.2 448 256 448C362 448 448 362 448 256C448 149.1 362 64 256 64C202.1 64 155 85.46 120.2 120.2L151 151C166.1 166.1 155.4 192 134.1 192H24C10.75 192 0 181.3 0 168V57.94C0 36.56 25.85 25.85 40.97 40.97L74.98 74.98C121.3 28.69 185.3 0 255.1 0L256 0zM256 128C269.3 128 280 138.7 280 152V246.1L344.1 311C354.3 320.4 354.3 335.6 344.1 344.1C335.6 354.3 320.4 354.3 311 344.1L239 272.1C234.5 268.5 232 262.4 232 256V152C232 138.7 242.7 128 256 128V128z"/></svg>
                     <span class="font-bold">Istorija terminala:</span>
@@ -126,7 +145,7 @@
                 @endif
             </div>
         </div>
-        
+        {{-- KOMENTARI --}}
         <div class="bg-slate-100 border-t-4 border-slate-500 rounded-b text-slate-900 px-4 py-3 shadow-md mb-6 w-3/5 flex-initial mx-2 my-2" role="alert">
             <div class="flex">
                 <div class="py-1"><svg class="fill-slate-500 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M416 176C416 78.8 322.9 0 208 0S0 78.8 0 176c0 39.57 15.62 75.96 41.67 105.4c-16.39 32.76-39.23 57.32-39.59 57.68c-2.1 2.205-2.67 5.475-1.441 8.354C1.9 350.3 4.602 352 7.66 352c38.35 0 70.76-11.12 95.74-24.04C134.2 343.1 169.8 352 208 352C322.9 352 416 273.2 416 176zM599.6 443.7C624.8 413.9 640 376.6 640 336C640 238.8 554 160 448 160c-.3145 0-.6191 .041-.9336 .043C447.5 165.3 448 170.6 448 176c0 98.62-79.68 181.2-186.1 202.5C282.7 455.1 357.1 512 448 512c33.69 0 65.32-8.008 92.85-21.98C565.2 502 596.1 512 632.3 512c3.059 0 5.76-1.725 7.02-4.605c1.229-2.879 .6582-6.148-1.441-8.354C637.6 498.7 615.9 475.3 599.6 443.7z"/></svg></div> 
@@ -151,9 +170,14 @@
                         <x-jet-label for="novi_komentar" value="{{ __('Dodaj komentar:') }}" />
                         <x-jet-textarea id="novi_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="newKoment" />
                         @error('novi_komentar') <span class="error">{{ $message }}</span> @enderror
-                        <x-jet-secondary-button wire:click="posaljiKomentar" wire:loading.attr="disabled" class="mt-2">
-                            {{ __('Posalji komentar') }}
-                        </x-jet-secondary-button>
+                        <div class="flex justify-between">
+                            <x-jet-secondary-button wire:click="posaljiKomentar" wire:loading.attr="disabled" class="mt-2">
+                                {{ __('Posalji komentar') }}
+                            </x-jet-secondary-button>
+                            <button class="flex text-sm bg-white text-gray-700 uppercase border border-gray-200 rounded-md p-2 mt-2 ml-4 hover:bg-gray-700 hover:text-white" wire:click="addPartShowModal({{ $terminal->tid }})" title="Istorija transvera">
+                                <x-heroicon-c-cog class="fill-current w-4 h-4 mr-2"/> Rezervni deo
+                            </button>
+                        </div>
                     @endif
                     </div> 
                 </div>
@@ -344,6 +368,78 @@
         </x-slot>
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('modalKomentariVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- Dodavanje rezervnog dela MODAL --}}
+    <x-jet-dialog-modal wire:model="modalAddPartVisible">
+        <x-slot name="title">
+            Dodaj rezervni deo
+        </x-slot>
+        <x-slot name="content"> 
+            @if($modalAddPartVisible)
+                <div class="mt-4">
+                    <p>Deo za dodelu:</p>
+                    @if(!$selected_part)
+                    <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
+                        <thead>
+                            <tr class="bg-orange-50">
+                                <td><x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /></svg></td>
+                                <td class="p-2">
+                                    <x-jet-input wire:model="p_searchNaziv" id="" class="block bg-orange-50 w-full my-1" type="text" placeholder="Naziv" />
+                                    <x-jet-input wire:model="p_searchSifra" id="" class="block bg-orange-50 w-full mb-1" type="text" placeholder="Šifra" />
+                                </td>
+                                <td>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Lokacija</label>
+                                    <select wire:model="p_locationId" 
+                                        class="w-full bg-orange-50 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="">Sve lokacije</option>
+                                        @foreach(App\Models\Lokacija::whereIn('lokacija_tipId', [1, 2])->get() as $location)
+                                            <option value="{{ $location->id }}">{{ $location->l_naziv }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td></td>
+
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"> 
+                        @foreach ($this->partStockdata() as $value)
+                            @if( $value->kolicina_dostupna > 0)
+                                <tr class="hover:bg-gray-100" wire:click="selectPart({{ $value }})" >    
+                                    <td></td>
+                                    <td>
+                                        <div class="text-sm font-medium text-gray-900">{{ $value->partType->naziv }}</div>
+                                        <div class="text-sm text-gray-500">{{ $value->partType->sifra }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="text-sm font-medium text-gray-900">{{ $value->location->l_naziv }}</div>
+                                        <div class="text-sm text-gray-500"> {{ $value->location->region->r_naziv }}</div>
+                                    </td>
+                                    <td>{{ $value->kolicina_dostupna }}</td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                    <div class="mt-5">
+                        {{ $this->partStockdata() ->links() }}
+                    </div>
+                    @else
+                        <livewire:rdelovi.komponente.rzervni-deo-info :partType_id="$selected_part['part_type_id']" :key="time()" />
+                    @endif
+                </div>
+            @endif
+        </x-slot>
+        <x-slot name="footer">
+            @if($selected_part)
+                <x-jet-danger-button class="mr-2" wire:click="addPartToTiket" wire:loading.attr="disabled">
+                    {{ __('Dodaj rezervni deo') }}
+                </x-jet-danger-button>
+            @endif
+            <x-jet-secondary-button wire:click="$toggle('modalAddPartVisible')" wire:loading.attr="disabled">
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
         </x-slot>

@@ -90,7 +90,7 @@ class Tiketi extends Component
         $builder = BankomatTiketReadActions::read($search);
         // paginate the builder
         $perPage = Config::get('global.terminal_paginate');
-        $terms = $builder->paginate($perPage, ['*'], 'tiketi');
+        $terms = $builder->paginate($perPage, ['*'], 'tiketi'); 
         return $terms;
     }
  

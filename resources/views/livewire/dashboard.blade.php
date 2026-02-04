@@ -24,6 +24,13 @@
                     {{ __('Statistika licenci') }}
                     </x-jet-nav-link>
                 </div>
+                <div>
+                    <x-jet-nav-link class="mt-4" href="{{ route( 'rezervni-delovi' ) }}" :active="request()->routeIs('rezervni-delovi')" >
+                     <x-heroicon-c-cog class="fill-gray-500 w-4 h-4 mr-2"/>
+
+                    {{ __('Rezervni delovi') }}
+                    </x-jet-nav-link>
+                </div>
             </div>
         </div>
         @endif

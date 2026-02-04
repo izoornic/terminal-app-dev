@@ -44,13 +44,14 @@ class IzborProizvoda extends Component
             'region' => $this->searchPlokacijaRegion
         ];
         $builder = BankomatiReadActions::BankomatiRead($search);
-        // paginate the builder
+        // paginate the builder g
         $perPage = Config::get('global.terminal_paginate');
         $terms = $builder->paginate($perPage, ['*'], 'proizvodi');
+        
         return $terms;
     }
     public function render()
     {
-        return view('livewire.bankomati.komponente.izbor-proizvoda');// , ['proizvodi' => $this->read(),]);
+        return view('livewire.bankomati.komponente.izbor-proizvoda'); //, [            'proizvodi' => $this->read(),        ]
     }
 }

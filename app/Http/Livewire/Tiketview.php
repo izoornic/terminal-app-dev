@@ -19,6 +19,8 @@ use App\Models\Region;
 use App\Models\TiketPrioritetTip;
 use App\Models\SmsLog;
 
+use App\Actions\Rdelovi\RdeloviReadAction;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
@@ -27,6 +29,9 @@ use App\Ivan\TerminalHistory;
 use App\Ivan\SelectedTerminalInfo;
 
 use App\Http\Helpers;
+use App\Models\TiketPartType;
+use App\PartsInventory\Services\PartStockService;
+use Illuminate\Database\Eloquent\Model;
 
 class Tiketview extends Component
 {
@@ -34,7 +39,6 @@ class Tiketview extends Component
     public $tikid;
     public $tiket;
     public $kvarAkcijaId;
-
     public $userKreirao;
 
     //komentari
@@ -58,26 +62,32 @@ class Tiketview extends Component
     public $prioritetTiketa;
     public $prioritetInfo;
     public $dodeljenUserInfo;
-
+    public $selectedTerminalCommentsCount;
+    public $selectedTerminalComments;
     public $listeners = ['tiketRefresh' => 'render'];
 
     //zatvori tiket MODAL
     public $modalZatvoriTiketVisible;
-
     public $zatvorioId;
     public $curentUserPozicija;
-
     public $obrisiTiketModalVisible;
-
     public $kreiranOlineInfo;
-
     private $mailToUser;
 
     //komentari na terminalu
     public $modelId;
     public $selectedTerminal;
     public $modalKomentariVisible;
-    
+
+    //Novi rezervni deo
+    public $modalAddPartVisible;
+    public $part_id;
+    public $part_category_id;
+     public $p_locationId;
+    public $p_searchNaziv;
+    public $p_searchSifra;
+    public $selected_part;
+    public $terminal_lokacija_id;
     /**
      * mount
      *
@@ -123,12 +133,13 @@ class Tiketview extends Component
                 }
             }
             
-            $curTiket = Tiket::select('korisnik_prijavaId', 'korisnik_dodeljenId', 'tiket_prioritetId', 'korisnik_zatvorio_id')
+            $curTiket = Tiket::select('korisnik_prijavaId', 'korisnik_dodeljenId', 'tiket_prioritetId', 'korisnik_zatvorio_id', 'tremina_lokacijalId')
                                     ->where('tikets.id', '=', $this->tikid)
                                     ->first();
             $this->prioritetTiketa = $curTiket->tiket_prioritetId;
             $this->dodeljenUserId = $curTiket->korisnik_dodeljenId;
             $this->zatvorioId = $curTiket->korisnik_zatvorio_id;
+            $this->terminal_lokacija_id = $curTiket->tremina_lokacijalId;
 
             if($this->tiketAkcija[1] == "dodeljen" ){
                 $this->validTiket = false;
@@ -210,7 +221,7 @@ class Tiketview extends Component
     /**
      * history of onre terminal
      *
-     * @return void
+     * @return array
      */
     public function historyData()
     {
@@ -264,7 +275,7 @@ class Tiketview extends Component
     /**
      * prioritetInfo
      *
-     * @return void
+     * @return Model
      */
     private function prioritetInfo()
     {
@@ -274,7 +285,7 @@ class Tiketview extends Component
      /**
      * selectedUserInfo
      *
-     * @return void
+     * @return Model
      */
     private function selectedUserInfo()
     {
@@ -288,7 +299,7 @@ class Tiketview extends Component
      /**
      * selectedUserInfo
      *
-     * @return void
+     * @return Model
      */
     private function selectedNoviUserInfo()
     {
@@ -445,6 +456,71 @@ class Tiketview extends Component
         $this->emit('tiketRefresh');
     }
 
+    public function addPartShowModal($tid)
+    {
+        $this->part_category_id = $tid;
+        $this->p_locationId = null;
+        $this->p_searchSifra = null;
+        $this->p_searchNaziv = null;
+        $this->selected_part = [];
+        $this->modalAddPartVisible = true;
+    }
+   
+    public function partStockdata()
+    {
+       $search =[
+            'locationId' => $this->p_locationId,
+            'categoryId' => $this->part_category_id,
+            'searchSifra' => $this->p_searchSifra,
+            'searchNaziv' => $this->p_searchNaziv
+        ];
+        //dd($search);
+
+        $builder = RdeloviReadAction::PartStockRead($search);
+        // paginate the builder
+        $perPage = Config::get('global.terminal_paginate');
+        $terms = $builder->paginate($perPage, ['*'], 'terminali');
+
+        return $terms;
+    }
+
+    public function selectPart($part) // $stock_id, $location_id, $part_type_id, $part_naziv, $part_sifra)
+    {
+        $this->selected_part = [
+            "stock_id" => $part['id'], //$stock_id,
+            "location_id" => $part['lokacija_id'], //$location->lokacija_id,
+            "part_type_id" => $part['part_type_id'], //$location->part_type_id,
+            "part_naziv" => $part['naziv'], //$location->naziv,
+            "part_sifra" => $part['sifra'], //$location->sifra
+        ];
+    }
+
+    public function addPartToTiket()
+    {
+        //remove stock
+        $partStockService = new PartStockService();
+        $partStockService->removeStock($this->selected_part['part_type_id'], $this->selected_part['location_id'], 1, auth()->user()->id);
+        //add to log
+        TiketPartType::create([
+            'tiket_id' => $this->tikid,
+            'part_type_id' => $this->selected_part['part_type_id'],
+            'part_location_id' => $this->selected_part['location_id'],
+            'user_id' => auth()->user()->id,
+            'terminal_lokacija_id' => $this->terminal_lokacija_id
+        ]);
+
+        $this->newKoment = 'Ugrađen je rezervni deo: ' . $this->selected_part['part_naziv'] . ' sifra: ' . $this->selected_part['part_sifra'];
+        $this->posaljiKomentar();
+        $this->modalAddPartVisible = false;
+        $this->emit('tiketRefresh');
+        
+    }
+
+    public function partsAdded()
+    {
+        return TiketPartType::where('tiket_id', $this->tikid)->get();
+    }
+
     public function updated()
     {
         if($this->modalDodeliTiketVisible){
@@ -476,7 +552,8 @@ class Tiketview extends Component
                 'akcije'=>$this->kvarAkcije(), 
                 'terminal' => SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId), 
                 'historyData' => $this->historyData(), 
-                'komentari' => $this->readComments()]);
+                'komentari' => $this->readComments(),
+                'rezervniDelovi' => $this->partsAdded()]);
         }else{
             return view('livewire.errortiket', []);
         }

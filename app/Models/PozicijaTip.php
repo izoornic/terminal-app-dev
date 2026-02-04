@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PozicijaTip extends Model
 {
@@ -17,12 +18,20 @@ class PozicijaTip extends Model
     protected $fillable = [
         'naziv',
         'opis',
+        'dashboard_path',
+        'kat_id',
     ];
+
+    // Relationship to users
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'pozicija_tipId');
+    }
     
     /**
      * vraca poyicije koje moze da ima user
      *
-     * @return void
+     * @return array
      */
     public static function userRoleList(){
         foreach(PozicijaTip::all() as $pozicija){
@@ -34,7 +43,7 @@ class PozicijaTip extends Model
     /**
      * vraca sve pozicije koje moze da ima user za search polje
      *
-     * @return void
+     * @return array
      */
     public static function userRoleListAll(){
         foreach(PozicijaTip::all() as $pozicija){

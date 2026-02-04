@@ -7,6 +7,16 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
+use App\Models\User;
+use App\Models\PozicijaTip;
+use App\Observers\UserObserver;
+use App\Observers\PozicijaTipObserver;
+
+use App\Models\PartMovement;
+use App\Models\PartStock;
+use App\Observers\PartMovementObserver;
+use App\Observers\PartStockObserver;
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -20,6 +30,11 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
+    protected $observers = [
+        PartMovement::class => [PartMovementObserver::class],
+        PartStock::class => [PartStockObserver::class],
+    ];
+
     /**
      * Register any events for your application.
      *
@@ -27,7 +42,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        User::observe(UserObserver::class);
+        PozicijaTip::observe(PozicijaTipObserver::class);
     }
 
     /**
