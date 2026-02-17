@@ -14,7 +14,7 @@ class BankomatTiketReadActions
      * @param  bool $sortAsc - sort direction
      * @return object
      */
-    public static function read(array $search, string $sortField=null, bool $sortAsc=false):object 
+    public static function read(array $search, ?string $sortField=null, bool $sortAsc=false):object 
     {
         // Extract search parameters
         $searchProductTip = $search['searchProductTip'] ?? null;
@@ -24,6 +24,10 @@ class BankomatTiketReadActions
         $searchRegion = $search['searchRegion'] ?? null;
         $dodeljeniUsersIds = $search['serviseri'] ?? null;
         $searchUsersRegion = $search['searchUsersRegion'] ?? null;
+        $searchTid = $search['searchTid'] ?? null;
+        $searchDatumPocetak = $search['searchDatumPocetak'] ?? null;
+        $searchDatumKraj = $search['searchDatumKraj'] ?? null;
+        $searchComments = $search['searchComments'] ?? null;
 
         // If search status is 'Svi', set it to null
         if($searchStatus == 'Svi')  $searchStatus = null;
@@ -82,6 +86,21 @@ class BankomatTiketReadActions
             }else{
                 return $query->where('bankomat_tikets.status', '=', $searchStatus);
             }     
+        })
+        ->when($searchTid, function ($query, $searchTid) {
+            return $query->where('bankomat_tikets.id', '=', $searchTid);
+        })
+        ->when($searchDatumPocetak, function ($query, $searchDatumPocetak) {
+            return $query->whereDate('bankomat_tikets.created_at', '>=', $searchDatumPocetak);
+        })
+        ->when($searchDatumKraj, function ($query, $searchDatumKraj) {
+            return $query->whereDate('bankomat_tikets.created_at', '<=', $searchDatumKraj);
+        })
+        ->when($searchComments, function ($query, $searchComments) {
+            $sk = '%'.$searchComments.'%';
+            return $query->whereHas('komentari', function ($query2) use ($sk) {
+                $query2->where('komentar', 'like', '%'.$sk.'%'); 
+            });
         })
         ->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

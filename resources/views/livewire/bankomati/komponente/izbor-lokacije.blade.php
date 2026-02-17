@@ -28,10 +28,13 @@
                     <thead>
                         {{-- search row --}}
                         <tr class="bg-orange-50">
-                            <td></td>
-                            <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                            <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
-                            <td>
+                            <td class="p-1">
+                                <x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" />
+                            </td>
+                            <td class="p-1">
+                                <x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" />
+                            </td>
+                            <td class="p-1">
                                 @if($role_region['role'] == 'admin')
                                     <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">---</option>
@@ -41,21 +44,19 @@
                                     </select>
                                 @endif
                             </td>
-                            <td></td>
                         </tr>
                     </thead>
                     <tbody class="bg-yellow-50 divide-y divide-gray-200"> 
                     @foreach ($this->lokacijeTipa($vrsta_lokacije) as $value)
                         <tr class="hover:bg-gray-100" wire:click="novaLokacija({{ $value->id }})" >
                         {{--  <tr class="hover:bg-gray-100" wire:click="$set('nova_lokacija', {{ $value->id }})" >  --}}   
-                                <td></td>
-                                <td>
+                                <td class="p-1">
                                     @if($value->is_duplicate)<span class="text-red-500">*</span>@endif
-                                    {{ $value->bl_naziv }}&nbsp;{{ $value->bl_naziv_sufix }}
+                                    {{ $value->bl_naziv }}
+                                    @if($value->is_duplicate)<br />{{ $value->bl_naziv_sufix }}@endif
                                 </td>
-                                <td>{{ $value->bl_mesto}}</td>
-                                <td>{{ $value->r_naziv}}</td>
-                                <td></td>
+                                <td class="p-1">{{ $value->bl_adresa }}</td>
+                                <td class="p-1">{{ $value->bl_mesto}}<br /><span class="text-sm text-red-400"> {{ $value->r_naziv}}</span></td>
                         </tr>
                     @endforeach
                     </tbody>

@@ -18,7 +18,23 @@ class Tiketi extends Component
     public $searchLokacijaNaziv;
     public $searchMesto;
     public $searchRegion;
+    public $searchTid;
+    public $searchDatumPocetak;
+    public $searchDatumKraj;
+    public $searchComments;
 
+    public $filter_clear_buttons = [
+        'searchProductTip' => 'Tip proizvoda',
+        'searchStatus' => 'Status tiketa',
+        'searchLokacijaNaziv' => 'Naziv lokacije',
+        'searchMesto' => 'Mesto',
+        'searchRegion' => 'Region',
+        'searchTid' => 'ID proizvoda',
+        'searchDatumPocetak' => 'Datum početak',
+        'searchDatumKraj' => 'Datum kraj',
+        'searchComments' => 'Komentari'
+    ];
+    public $filter_displayed_buttons = [];
     public $searchVanRegionaProductTip;
     public $searchVanRegionaStatus;
     public $searchVanRegionaLokacijaNaziv;
@@ -73,9 +89,92 @@ class Tiketi extends Component
             }else{
                 $this->serviseri = [auth()->user()->id];
             }
-            //dd($this->serviseri);
+
         }
-        $this->searchStatus = 'Aktivan';
+        
+        $this->searchProductTip = session()->get('searchProductTip') ?? null;
+        $this->searchStatus = session()->get('searchStatus') ?? 'Aktivan';
+        $this->searchLokacijaNaziv = session()->get('searchLokacijaNaziv') ?? null;
+        $this->searchMesto = session()->get('searchMesto') ?? null;
+        $this->searchTid = session()->get('searchTid') ?? null;
+        $this->searchDatumPocetak = session()->get('searchDatumPocetak') ?? null;
+        $this->searchDatumKraj = session()->get('searchDatumKraj') ?? null;
+        $this->searchComments = session()->get('searchComments') ?? null;
+
+        if($this->role_region['role'] != 'admin') {
+            $this->searchRegion = $this->role_region['region'];
+        }else{
+            $this->searchRegion = session()->get('searchRegion') ?? null;
+        }
+
+        $this->showFilterClearButtons();
+    }
+
+    public function updated($propertyName)
+    {
+        session()->put('searchProductTip', $this->searchProductTip);
+        session()->put('searchStatus', $this->searchStatus);
+        session()->put('searchLokacijaNaziv', $this->searchLokacijaNaziv);
+        session()->put('searchMesto', $this->searchMesto);
+        //session()->put('searchRegion', $this->searchRegion);
+        session()->put('searchTid', $this->searchTid);
+        session()->put('searchDatumPocetak', $this->searchDatumPocetak);
+        session()->put('searchDatumKraj', $this->searchDatumKraj);
+        session()->put('searchComments', $this->searchComments);
+
+         if($this->role_region['role'] == 'admin') {
+            session()->put('searchRegion', $this->searchRegion);
+         }
+
+        $this->showFilterClearButtons();
+    }
+
+    public function showFilterClearButtons(){
+        foreach ($this->filter_clear_buttons as $key => $value) {
+            //dd(session()->get('$key'));
+            if(session()->get($key) != null){
+                $this->filter_displayed_buttons[$key] = $value;
+                if($key == 'searchStatus' && $this->searchStatus == 'Aktivan'){
+                    unset($this->filter_displayed_buttons[$key]);
+                }
+            }else{
+                unset($this->filter_displayed_buttons[$key]);
+            }
+        }
+    }
+
+    public function clearFilter($key){
+        session()->put($key, null);
+        //clear public vars
+        switch ($key) {
+            case 'searchProductTip':
+                $this->searchProductTip = null;
+                break;
+            case 'searchStatus':
+                $this->searchStatus = 'Aktivan';
+                break;
+            case 'searchLokacijaNaziv':
+                $this->searchLokacijaNaziv = null;
+                break;
+            case 'searchMesto':
+                $this->searchMesto = null;
+                break;
+            case 'searchRegion':
+                $this->searchRegion = null;
+                break;
+            case 'searchTid':
+                $this->searchTid = null;
+                break;
+            case 'searchDatumPocetak':
+                $this->searchDatumPocetak = null;
+                break;
+            case 'searchDatumKraj':
+                $this->searchDatumKraj = null;
+                break;
+            case 'searchComments':
+                $this->searchComments = null;
+        }
+        $this->showFilterClearButtons();
     }
 
     public function read()
@@ -86,6 +185,10 @@ class Tiketi extends Component
             'searchLokacijaNaziv' => $this->searchLokacijaNaziv,
             'searchMesto' => $this->searchMesto,
             'searchRegion' => $this->searchRegion,
+            'searchTid' => $this->searchTid,
+            'searchDatumPocetak' => $this->searchDatumPocetak,
+            'searchDatumKraj' => $this->searchDatumKraj,
+            'searchComments' => $this->searchComments
         ];
         $builder = BankomatTiketReadActions::read($search);
         // paginate the builder
@@ -104,7 +207,11 @@ class Tiketi extends Component
             'searchLokacijaNaziv' => $this->searchVanRegionaLokacijaNaziv,
             'searchMesto' => $this->searchVanRegionaMesto,
             'serviseri' => $this->serviseri,
-            'searchUsersRegion' => $this->searchRegion
+            'searchUsersRegion' => $this->searchRegion,
+            'searchTid' => $this->searchTid,
+            'searchDatumPocetak' => $this->searchDatumPocetak,
+            'searchDatumKraj' => $this->searchDatumKraj,
+            'searchComments' => $this->searchComments
         ];
         $builder = BankomatTiketReadActions::read($search);
         // paginate the builder

@@ -135,7 +135,7 @@
                                             </button>
                                         </td>
                                         <td class="px-1 py-1">
-                                            <button class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="premestiShowModal({{ $item->blid }}, {{ $item->statusid }})">
+                                            <button class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="premestiShowModal({{ $item->blid }}, {{ $item->statusid }}, {{ $item->id }})">
                                                 <x-heroicon-o-arrows-right-left class="w-4 h-4 mr-2" />
                                                 Premesti
                                             </button>
@@ -359,38 +359,14 @@
 
         <x-slot name="content">
             @if($modalStatusFormVisible)
-                {{-- <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="0" :multySelectedArray="$selectedTerminals" :multySelected="$multiSelected" /> --}}
-                <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
+               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$modelId" :status="$bankomat_status" :key="time()" />
             @endif
-            <div class="mt-4">
-                <x-jet-label for="bankomat_status" value="Status bankomata" />   
-                <select wire:model="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                    @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('bankomat_status') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            <div class="mt-4">
-                <x-jet-label for="datum_promene" value="Datum promene" />
-                <div class="flex">
-                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
-                </div>
-                @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
-                @if($datum_promene_error != '')
-                    <p class="text-red-500"> {{$datum_promene_error}} </p>
-                @endif
-            </div>
         </x-slot>
 
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('modalStatusFormVisible')" wire:loading.attr="disabled">
                 Otkaži
             </x-jet-secondary-button>
-
-            <x-jet-button class="ml-2" wire:click="statusUpdate" wire:loading.attr="disabled">
-                Sačuvaj
-            </x-jet-button>     
         </x-slot>
     </x-jet-dialog-modal>
 
@@ -410,7 +386,7 @@
                 <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
                 <p class="font-bold">Nova lokacija proizvoda:</p>
                 @if(!$nova_lokacija)
-                    <livewire:bankomati.komponente.izbor-lokacije :key="$flashKey" comp_index="premesti" />
+                    <livewire:bankomati.komponente.izbor-lokacije :key="$flashKey" comp_index="premesti" :trenutna_lokacija="$trenutna_lokacija_id" />
                 @else
                     {{-- Izabrao je lokaciju menjam prikaz --}}
                     <p>Nova lokacija:</p>

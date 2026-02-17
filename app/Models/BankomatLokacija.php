@@ -36,4 +36,9 @@ class BankomatLokacija extends Model
     {
         return $this->hasOne(User::class);
     }
+
+    public function status():HasOne
+    {
+        return $this->hasOne(BankomatStatusTip::class, 'id', 'bankomat_status_tip_id');
+    }
 }

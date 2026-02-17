@@ -1,5 +1,18 @@
 <div class="p-6">
     <livewire:komponente.session-flash-message />
+    @if(count($filter_displayed_buttons) > 0)
+        <div>
+            <p class="font-bold">Filteri:</p>
+        </div>
+    @endif
+    <div class="flex mb-2">
+        @foreach($filter_displayed_buttons as $key => $value) 
+            <button class="flex bg-orange-50 text-sm text-gray-700 border rounded-md p-1.5 hover:bg-orange-700 hover:text-white ml-3" wire:click="clearFilter('{{$key}}')" title="Obriši filter">
+                {{ $value }}
+                <x-heroicon-c-x-circle class="w-4 h-4 ml-2 mt-0.5" />
+            <button>
+        @endforeach
+    </div>
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -58,6 +71,26 @@
                                 </td>
                                 <td></td>
                             </tr>
+                            <tr class="bg-orange-50">
+                                <td></td>
+                                <td> 
+                                    <x-jet-input wire:model="searchTid" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži TID" />
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <span class="p-1 text-sm text-red-400">@if($searchDatumPocetak){{ App\Http\Helpers::datumFormatDanFullYear($searchDatumPocetak) }} @else Početni datum @endif</span>
+                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumPocetak }}" wire:model="searchDatumPocetak" />
+                                </td>
+                                <td>
+                                    <span class="p-1 text-sm text-red-400">@if($searchDatumKraj){{ App\Http\Helpers::datumFormatDanFullYear($searchDatumKraj) }} @else Krajnji datum @endif</span>
+                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumKraj }}" wire:model="searchDatumKraj" />
+                                </td>
+                                <td></td>
+                                <td>
+                                    <x-jet-input wire:model.debounce.500ms="searchComments" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži komentare" /></td>
+                                <td></td>
+                            </tr>
                             
                             <!-- DATA  -->                   
                             @if ($data->count())
@@ -65,7 +98,12 @@
                                     <tr @if($loop->even) class="bg-gray-50" @endif >
 
                                         <td class="px-2 py-1">{{ $item->id }}</td> 
-                                        <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
+                                        <td class="px-1 py-2">
+                                            {{ $item->bp_tip_naziv }}
+                                             <br />
+                                            <span class="text-sm text-red-400">  @if($item->b_terminal_id){{ $item->b_terminal_id }}@endif</span> 
+                                        </td>
+                                        </td>
                                         <td class="px-1 py-2">{{ App\Http\Helpers::datumFormatDan($item->created_at) }}</td>
                                         <td class="px-1 py-2">{{ $item->status }}</br><span class="text-sm">{{ $item->name }}</span></td>
                                         <td class="px-1 py-2">
@@ -85,7 +123,6 @@
                                            <span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$item->tr_bg_collor}} text-{{$item->btn_collor}}" >{{ $item->btpt_naziv }}</span>
                                         </td>
                                         <td class="px-1 py-1">
-                                           
                                             <a class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" href="{{ route( 'bankomat-tiketview', ['id' => $item->id] ) }}" :active="request()->routeIs('bankomat-tiketview', ['id' => $item->id])">
                                                <x-heroicon-o-ticket class="w-4 h-4 mr-2 mt-0.5" />
                                                 Pregled

@@ -7,7 +7,14 @@
                         <x-heroicon-o-ticket class="text-{{$prioritet->btn_collor}} w-5 h-5 mr-2" />
                     </div>
 					<div>
-						<div>Prioritet: <span class="font-bold text-{{$prioritet->btn_collor}}">{{$prioritet->tp_naziv}}</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+						<div>Prioritet: &nbsp;
+                            @if($can_change_prioritet)
+                                <button class="bg-{{$prioritet->tr_bg_collor}} border border-{{$prioritet->btn_collor}} text-{{$prioritet->btn_collor}} hover:bg-{{$prioritet->btn_collor}} hover:text-white px-2 rounded relative" wire:click="prioritetShowModal" title='Promeni prioritet'>
+                                    {{$prioritet->btpt_naziv}}
+                                </button>
+                            @else
+                               <span class="font-bold text-{{$prioritet->btn_collor}}"> {{$prioritet->btpt_naziv}}</span>
+                            @endif &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
                             Status: <span class="font-bold text-{{$prioritet->btn_collor}}">{{$tiket->status}}</span></div>
 						<table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
 							<tr>
@@ -58,11 +65,28 @@
                         </div>
 					</div>
 				</div>
-        
+                
+                {{-- DUGMICI ZA MANIPULACIJU Zatvori - Obrisi --}}
 				<div>
                     @if($tiket->status != "Zatvoren") 
                         <x-jet-danger-button wire:click="zatvoriTiketShowModal" title='Zatvori tiket'>
-                            <x-heroicon-s-x-circle class="fill-current w-5 h-5 mr-2" /> zatvori tiket</x-jet-button> 
+                            <x-heroicon-s-x-circle class="fill-current w-5 h-5 mr-2" /> zatvori tiket
+                        </x-jet-button> 
+                        {{-- NAPLATA --}}
+                        <div class="mt-4">
+                            <p class="font-bold mb-2">Usluga se naplaćuje:</p>
+                            <div class="flex">
+                            <label class="inline-flex items-center ml-4 cursor-pointer">
+                                <input type="checkbox" wire:model="naplata" class="sr-only peer">
+                                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
+                            </label>
+                                @if($naplata)
+                                    <p class="font-bold text-teal-600 ml-4">Da</p>
+                                @else
+                                    <span class="font-bold text-red-600 ml-4">Ne</span>
+                                @endif
+                            </div>
+                        </div>
                     @else 
                         <a href="{{ route( 'bankomat-tiketi' ) }}">
                             <span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$prioritet->tr_bg_collor}} text-{{$prioritet->btn_collor}}">TIKETI</span>
@@ -88,13 +112,25 @@
     <div class="flex mx-4 my-4">
         <div class="w-2/5 flex-initial mx-2 my-2">
             <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$bankomat_lokacija_id" :key="time()" />
-           
+
+            <div class="bg-slate-100 border-t-4 border-slate-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
+                <div class="flex mt-2 mb-2">
+                    <x-heroicon-c-arrow-path-rounded-square class="fill-current w-4 h-4 mr-0 mr-4 mt-2"/>
+                    <span class="font-bold mt-1">Status proizvoda:</span>
+                    
+                        <button class="flex text-sm text-gray-700 bg-white uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white ml-4" wire:click="statusShowModal">
+                            <x-heroicon-c-arrow-path-rounded-square class="w-4 h-4 mr-2"/>
+                            {{ $this->bankomat_status }}
+                        </button>
+                </div>
+            </div>
+            
             <div class="border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
                 <div class="flex mt-2 mb-6">
                     <x-icon-history class="fill-current w-4 h-4 mr-0 mr-4 mt-1"/>
                     <span class="font-bold">Istorija proizvoda:</span>
                 </div>
-                <livewire:bankomati.komponente.bankomat-history :bankomat_lokacija_id="$bankomat_lokacija_id" />
+                <livewire:bankomati.komponente.bankomat-history :bankomat_lokacija_id="$bankomat_lokacija_id" :key="time()" />
                 
             </div>
         </div>
@@ -116,6 +152,25 @@
             <x-jet-label for="zatvori_komentar" value="Dodaj komentar:" />
             <x-jet-textarea id="zatvori_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="zatvori_komentar" />
             @error('zatvori_komentar') <span class="error">{{ $message }}</span> @enderror
+        
+
+            <div class="mt-4 flex justify-between">
+                <div>
+                    <x-jet-label for="zatvori_datum_promene" value="Datum:" />
+                    <div class="flex">
+                        <x-jet-input id="zatvori_datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="zatvori_datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($zatvori_datum_promene) }}</span>
+                    </div>
+                    @error('zatvori_datum_promene') <span class="error">{{ $message }}</span> @enderror
+                </div>
+                <div class="ml-4">
+                    <x-jet-label for="zatvori_vreme_promene" value="Vreme:" />
+                    <x-jet-input id="zatvori_vreme_promene" type="time" class="mt-1 block" value="{{ $zatvori_vreme_promene }}" wire:model="zatvori_vreme_promene" />
+                    @error('zatvori_vreme_promene') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+            @if($datum_promene_error != '')
+                <p class="text-red-500"> {{$datum_promene_error}} </p>
+            @endif
         </x-slot>
 
         <x-slot name="footer">
@@ -220,6 +275,61 @@
                 <x-jet-danger-button class="ml-2" wire:click="deleteTiket" wire:loading.attr="disabled">
                    Obriši tiket
                 </x-jet-danger-button>         
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- STATUS MODAL ############################################################### --}}
+    <x-jet-dialog-modal wire:model="modalStatusFormVisible">
+        <x-slot name="title">
+            <div class="flex justify-between">
+                <div class="flex">
+                    <x-heroicon-c-arrow-path-rounded-square class="w-6 h-6 mr-2"/>
+                   Status proizvoda 
+                </div>
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+           @if($modalStatusFormVisible)
+               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$bankomat_lokacija_id" :status="$bankomat_status_id" :key="time()" />
+            @endif
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalStatusFormVisible')" wire:loading.attr="disabled">
+                Otkaži
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- PRIORITET MODAL ############################################################### --}}
+    <x-jet-dialog-modal wire:model="modalPrioritetFormVisible">
+        <x-slot name="title">
+            <div class="flex justify-between">
+                <div class="flex">
+                   Prioritet tiketa 
+                </div>
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+           @if($modalPrioritetFormVisible)
+              @foreach (App\Models\BankomatTiketPrioritetTip::prList() as $value)
+                @if($prioritet->id == $value->id)
+                    <span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$value->tr_bg_collor}} text-{{$value->btn_collor}}">{{ $value->btpt_naziv }}</span>
+                @else
+                    <button wire:click="setPrioritet(' {{ $value->id }} ')" class="flex-none bg-{{ $value->btn_collor }} hover:bg-{{$value->btn_hover_collor}} text-white font-bold py-2 px-4 rounded mx-2">
+                        {{ $value->btpt_naziv }}
+                    </button>
+                @endif
+            @endforeach
+            @endif
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalPrioritetFormVisible')" wire:loading.attr="disabled">
+                Otkaži
+            </x-jet-secondary-button>
         </x-slot>
     </x-jet-dialog-modal>
 </div>

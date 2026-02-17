@@ -300,13 +300,28 @@
                         <button class="flex-none bg-red-500 hover:bg-red-200 text-white font-bold py-2 px-4 rounded mx-2">
                             <span class="bg-red-50 border-red-500 fill-red-500 text-red-500">TEST</span>
                         </button>
+                        <button class="flex-none hover:bg-red-500 bg-red-200 text-white font-bold py-2 px-4 rounded mx-2">
+                            <span class="bg-red-50 border-red-500 fill-red-500 text-red-500">TEST</span>
+                        </button>
+
                         <button class="flex-none bg-orange-500 hover:bg-orange-200 text-white font-bold py-2 px-4 rounded mx-2">
                             <span class="bg-orange-50 border-orange-500 fill-orange-500 text-orange-500">TEST</span>
                         </button>
+                        <button class="flex-none hover:bg-orange-500 bg-orange-200 text-white font-bold py-2 px-4 rounded mx-2">
+                            <span class="bg-orange-50 border-orange-500 fill-orange-500 text-orange-500">TEST</span>
+                        </button>
+
                         <button class="flex-none bg-yellow-500 hover:bg-yellow-200 text-white font-bold py-2 px-4 rounded mx-2">
                             <span class="bg-yellow-50 border-yellow-500 fill-yellow-500 text-yellow-500">TEST</span>
                         </button>
+                        <button class="flex-none hover:bg-yellow-500 bg-yellow-200 text-white font-bold py-2 px-4 rounded mx-2">
+                            <span class="bg-yellow-50 border-yellow-500 fill-yellow-500 text-yellow-500">TEST</span>
+                        </button>
+
                         <button class="flex-none bg-green-500 hover:bg-green-200 text-white font-bold py-2 px-4 rounded mx-2">
+                            <span class="bg-green-50 border-green-500 fill-green-500 text-green-500">TEST</span>
+                        </button>
+                        <button class="flex-none hover:bg-green-500 bg-green-200 text-white font-bold py-2 px-4 rounded mx-2">
                             <span class="bg-green-50 border-green-500 fill-green-500 text-green-500">TEST</span>
                         </button>
                 </div>

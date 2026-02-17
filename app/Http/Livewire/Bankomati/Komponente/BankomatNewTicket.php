@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Bankomati\Komponente;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+use App\Actions\Bankomati\BankomatTimeActions;
 use App\Actions\Bankomati\BankomatInformation;
 use App\Actions\Bankomati\BankomatTiketMailingActions;
 
@@ -49,6 +50,10 @@ class BankomatNewTicket extends Component
     public $selectedBankomatTip;
     public $productTipId;
 
+    public $datum_promene;
+    public $vreme_promene;
+    public $datum_promene_error;
+
     public function mount($bankomat_lokacija_id)
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
@@ -73,7 +78,8 @@ class BankomatNewTicket extends Component
         //$this->prioritetTiketa = 1;
         //$this->setPrioritetInfo($this->prioritetTiketa);
         //dd(BankomatTiketPrioritetTip::prList());
-       
+        $this->datum_promene = date('Y-m-d');
+        $this->vreme_promene = date('H:i:s');
     }
 
     public function setDodeljenUserInfo($dodeljenUserId)
@@ -121,7 +127,16 @@ class BankomatNewTicket extends Component
             'opis_kvara' => 'required|string|max:255',
             'dodeljenUserId' => 'required',
             'prioritetTiketa' => 'required',
+            'datum_promene' => 'required|date_format:Y-m-d',
+            'vreme_promene' => 'required|date_format:H:i:s',
         ]);
+
+       if(!BankomatTimeActions::compareTicketTime($this->bankomat_lokacija_id, $this->datum_promene, $this->vreme_promene)) {
+            $this->datum_promene_error = 'Datum promene ne može biti manji od datuma poslednje promene.';
+            return false;
+        }
+
+        $creation_time = $this->datum_promene . ' ' . $this->vreme_promene;
 
         $ticket = new BankomatTiket();
         $ticket->bankomat_lokacija_id = $this->bankomat_lokacija_id;
@@ -131,7 +146,9 @@ class BankomatNewTicket extends Component
         $ticket->user_prijava_id = auth()->user()->id;
         $ticket->user_dodeljen_id = $this->dodeljenUserId;
         $ticket->bankomat_tiket_prioritet_id = $this->prioritetTiketa;
+        $ticket->created_at = $creation_time;
         $ticket->br_komentara = 0;
+
         $ticket->save();
 
         $ticket->newHistroy(2);
@@ -144,7 +161,7 @@ class BankomatNewTicket extends Component
                 'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
                 'user_id' => auth()->user()->id,
                 'naplata' => $cuurent['naplata'],
-                'updated_at' => date('Y-m-d H:i:s'),
+                'created_at' => $creation_time,
                 'history_action_id' => 8,
                 'bankomat_tiket_id' => $ticket->id
             ]);  

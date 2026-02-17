@@ -14,18 +14,21 @@ class IzborLokacije extends Component
     public $role_region;
     public $vrsta_lokacije;
     public $comp_index;
+    public $trenutna_lokacija;
 
     public $searchPLokacijaNaziv;
     public $searchPlokacijaMesto;
     public $searchPlokacijaRegion;
 
-    public function mount($comp_index = null, $vrsta_lokacije=null )
+    public function mount($comp_index = null, $vrsta_lokacije=null, $trenutna_lokacija = null)
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
         $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin') ? 0 : $this->role_region['region'];
+
+        $this->trenutna_lokacija = $trenutna_lokacija;
 
         if($vrsta_lokacije) {
             $this->vrsta_lokacije = $vrsta_lokacije;
@@ -58,6 +61,9 @@ class IzborLokacije extends Component
             ->where('bl_mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
             ->when($this->searchPlokacijaRegion, function ($query) {
                 return $query->where('blokacijas.bankomat_region_id', $this->searchPlokacijaRegion);
+            })
+            ->when($this->trenutna_lokacija, function ($query) {
+                return $query->where('blokacijas.id', '!=', $this->trenutna_lokacija);
             })
             ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
     }

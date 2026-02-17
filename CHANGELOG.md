@@ -330,3 +330,13 @@ V 1.1.1 (22.1.2026.) @Rezervni-delovi
 
 V 1.1.2 (4.2.2026.) @main
     - @Rezervni-delovi pull to main
+
+V 1.1.3 (17.2.2026.) @Bnkomati_to_do
+    - Roletova to do lista 80% gotova
+    - Dodata uloga "Programer" i napravljena console akcija za sinch novih uloga php artisan pozicija:sync-roles
+    - Dodato polje u tabeli "bankomat_tikets" - "naplata" i dugme za ukljucenje i iskljucenje naplate
+    - Filteri na stranici "Tiketi" sa X dugmicima za gasenje a pretraga se cuva u sesiji
+    - Dodata promena statusa kao komponenta i sada moguca i iz tiketa.
+    - Didata promena vremena vremna za otvaranje i zatvaranje tiketa.
+    - U History tikata dodtat opis kvara
+    - Dodat TID u pregledu tiketa i tekstu maila za servis bankomata.

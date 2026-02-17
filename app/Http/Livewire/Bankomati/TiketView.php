@@ -13,6 +13,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Config;
 
 use App\Actions\Bankomati\BankomatTiketMailingActions;
+use Illuminate\Support\Facades\DB;
+
+use App\Actions\Bankomati\BankomatTimeActions;
 
 class TiketView extends Component
 {
@@ -27,6 +30,7 @@ class TiketView extends Component
     //public $kvarTip;
     public $kvatTipNaziv;
     public $bankomat_lokacija_id;
+    public $bankomat_status_id;
 
     //komentari
     public $modalKomentariVisible;
@@ -46,9 +50,40 @@ class TiketView extends Component
     public $searchUserPozicija;
     public $noviDodeljenUserId;
     public $dodeljenUserInfo;
+    public $serviseri;
+    public $prioritet;
+    public $kvarTipNaziv;
+    public $modalStatusFormVisible;
+    public $old_datum_promene;
+    public $bankomat_status;
+    public $datum_promene;
+    public $datum_promene_error;
 
     public $role_region;
-     public function mount()
+    public $can_change_prioritet = false;
+
+    public $modalPrioritetFormVisible;
+
+    public $zatvori_datum_promene;
+    public $zatvori_vreme_promene;
+
+    public $naplata;
+    public $old_naplata;
+    
+
+    /**
+     * Listeners for Livewire events
+     *
+     * @var array
+     */
+    protected $listeners = ['statusChanged'];
+
+    public function statusChanged()
+    {
+        $this->modalStatusFormVisible = false;
+    }
+
+    public function mount()
     {
         $this->tikid = request()->query('id');
         $this->tiket = BankomatTiket::where('id', '=', $this->tikid)->first();
@@ -57,7 +92,10 @@ class TiketView extends Component
             abort(404);
         }
         $this->bankomat_lokacija_id = $this->tiket->bankomat_lokacija_id;
+        $this->naplata = $this->tiket->naplata;
+        $this->old_naplata = $this->naplata;
         
+
         $this->tiketLokacija = $this->tiket->lokacija()->first();
         $this->ticketRegion = $this->tiketLokacija->bankomat_region_id;
         
@@ -85,6 +123,8 @@ class TiketView extends Component
             }
         }
 
+        $this->can_change_prioritet = ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'sef') ? true : false;
+
         $this->prioritet = $this->tiket->prioritet()->first();
         $this->userKreirao = User::where('id', '=', $this->tiket->user_prijava_id)->first();
         $this->userDodeljen = User::where('id', '=', $this->tiket->user_dodeljen_id)->first();
@@ -95,8 +135,64 @@ class TiketView extends Component
         $this->kvarTipNaziv = $kvarTip->btkt_naziv ?? 'Ostalo';
         
         $this->komentari = $this->tiket->komentari()->get();
+    }
 
-        //dd($this->prioritet);
+    public function prioritetShowModal()
+    {
+        $this->modalPrioritetFormVisible = true;
+    }
+
+    public function setPrioritet($prioritet){
+        //dd($prioritet);
+        /* BankomatTiket::where('id', '=', $this->tikid)->update(['bankomat_tiket_prioritet_id' => $prioritet]);
+        $this->tiket = BankomatTiket::where('id', '=', $this->tikid)->first(); */
+
+        $this->tiket->bankomat_tiket_prioritet_id = $prioritet;
+        $this->tiket->save();
+        $this->prioritet = $this->tiket->prioritet()->first();
+        $this->modalPrioritetFormVisible = false;
+    }
+
+    public function statusShowModal()
+    {
+        $this->datum_promene = date('Y-m-d');
+        $this->datum_promene_error = '';
+        $this->modalStatusFormVisible = true;
+    }
+
+    public function statusUpdate()
+   {
+        $this->validate(['datum_promene' => 'required|date']);
+
+        $cuurent = BankomatLokacija::where('id', '=', $this->modelId)->first();
+
+        if($cuurent->bankomat_status_tip_id == $this->bankomat_status) {
+            $this->datum_promene_error = 'Niste promenili status.';
+            return;
+        }
+
+        //Provera datuma koji je korisnik uneo za promenu statusa
+        if(!$this->validDatumPromene([1, 2, 4])) return;
+        
+        //dd($this->datum_promene);
+        DB::transaction(function()use($cuurent){
+            $cuurent->update(['bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
+
+            BankomatLocijaHirtory::create([
+                'bankomat_lokacija_id' => $this->modelId,
+                'bankomat_id' => $cuurent['bankomat_id'],
+                'blokacija_id' => $cuurent['blokacija_id'],
+                'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
+                'user_id' => $cuurent['user_id'],
+                'naplata' => $cuurent['naplata'],
+                'updated_at' => $cuurent['updated_at'],
+                'history_action_id' => 2
+            ]);  
+             
+            
+        });
+
+        $this->modalStatusFormVisible = false;
     }
 
     public function dodeliTiketShowModal()
@@ -161,13 +257,23 @@ class TiketView extends Component
     public function zatvoriTiketShowModal()
     {
         $this->modalZatvoriTiketVisible = true;
+        $this->zatvori_datum_promene = date('Y-m-d');
+        $this->zatvori_vreme_promene = date('H:i:s');
+        $this->datum_promene_error = '';
     }
 
     public function closeTiket()
     {
         $this->validate([
             'zatvori_komentar' => 'nullable|string|min:3|max:1000',
+            'zatvori_datum_promene' => 'required|date',
+            'zatvori_vreme_promene' => 'required|date_format:H:i:s',
         ]);
+
+        if(!BankomatTimeActions::compareTicketTime($this->bankomat_lokacija_id, $this->zatvori_datum_promene, $this->zatvori_vreme_promene, 'close')) {
+            $this->datum_promene_error = 'Datum zatvaranja tiketa ne može biti manji od datuma otvaranja tiketa.';
+            return false;
+        }
 
         $tiket_update = [
             'user_zatvorio_id' => auth()->user()->id,
@@ -211,6 +317,8 @@ class TiketView extends Component
 
         if($action == 9) {
             $new_histroy['bankomat_tiket_id'] = $this->tiket->id;
+            $created_at = $this->zatvori_datum_promene . ' ' . $this->zatvori_vreme_promene;
+            $new_histroy['created_at'] = $created_at;
         }
         BankomatLocijaHirtory::create($new_histroy);
     }
@@ -227,8 +335,24 @@ class TiketView extends Component
     {
         $this->obrisiTiketModalVisible = true;
     }
+
+    public function updated()
+    {
+       if($this->naplata != $this->old_naplata) {
+            $this->old_naplata = $this->naplata;
+            $this->tiket->naplata = $this->naplata;
+            $this->tiket->update();
+       };
+    }
     public function render()
     {
+        $this->bankomat_lokacija_id = $this->tiket->bankomat_lokacija_id;
+        //Promena statusa modal
+        $bankomat_lokacija_model = BankomatLokacija::where('id', '=', $this->bankomat_lokacija_id)->first();
+        $this->old_datum_promene = $bankomat_lokacija_model->updated_at;
+        $this->bankomat_status = $bankomat_lokacija_model->status->status_naziv;
+        $this->bankomat_status_id = $bankomat_lokacija_model->status->id;
+
         return view('livewire.bankomati.tiket-view');
     }
 }
