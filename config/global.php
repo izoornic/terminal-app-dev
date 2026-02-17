@@ -4,7 +4,7 @@ return [
 
 	'siteFooter' => '© '.date("Y").' Copyright: Zeta System EPOS',
 
-	'version' => 'V 1.1.3',
+	'version' => 'V 1.1.4',
 
 	'paginate' => 10,
 

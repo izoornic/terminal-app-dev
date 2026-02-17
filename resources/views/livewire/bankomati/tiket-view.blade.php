@@ -77,8 +77,8 @@
                             <p class="font-bold mb-2">Usluga se naplaćuje:</p>
                             <div class="flex">
                             <label class="inline-flex items-center ml-4 cursor-pointer">
-                                <input type="checkbox" wire:model="naplata" class="sr-only peer">
-                                <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
+                                <input type="checkbox" wire:model="naplata" class="form-checkbox h-6 w-6 text-blue-500"> {{-- class="sr-only peer" > --}}
+                               {{--  <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div> --}}
                             </label>
                                 @if($naplata)
                                     <p class="font-bold text-teal-600 ml-4">Da</p>
