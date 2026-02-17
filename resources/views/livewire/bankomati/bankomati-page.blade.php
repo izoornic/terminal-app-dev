@@ -497,7 +497,7 @@
                     <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
                 </div>
                 <div class="mt-4">
-                    <p class="font-bold mb-2">Naplata:</p>
+                    <p class="font-bold mb-2">Naplata: {{ $naplata }}</p>
                     <div class="flex">
                     <label class="inline-flex items-center ml-4 cursor-pointer">
                         <input type="checkbox" wire:model="naplata" {{-- value="{{ $naplata }}" --}} class="sr-only peer" {{-- onChange="changeBarVisability('nove')"  checked --}}>

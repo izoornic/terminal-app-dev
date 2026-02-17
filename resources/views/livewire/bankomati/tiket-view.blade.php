@@ -69,7 +69,7 @@
                         </x-jet-button> 
                         <!-- NAPLATA -->
                         <div class="mt-4">
-                            <p class="font-bold mb-2">Usluga se naplaćuje:</p>
+                            <p class="font-bold mb-2">Usluga se naplaćuje: {{ $naplata }}</p>
                             <div class="flex">
                                 <label class="inline-flex items-center ml-4 cursor-pointer">
                                     <input type="checkbox" wire:model="naplata" class="sr-only peer" />
