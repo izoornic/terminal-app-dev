@@ -92,7 +92,7 @@ class TiketView extends Component
             abort(404);
         }
         $this->bankomat_lokacija_id = $this->tiket->bankomat_lokacija_id;
-        $this->naplata = ($this->tiket->naplata) ? 1 : 0; //$this->tiket->naplata;
+        $this->naplata = ($this->tiket->naplata) ? 1 : 0;
         $this->old_naplata = ($this->tiket->naplata) ? 1 : 0;
         
 

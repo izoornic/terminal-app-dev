@@ -107,6 +107,8 @@ class Tiketi extends Component
             $this->searchRegion = session()->get('searchRegion') ?? null;
         }
 
+        $this->searchVanRegionaStatus = 'Aktivan';
+
         $this->showFilterClearButtons();
     }
 
@@ -208,10 +210,10 @@ class Tiketi extends Component
             'searchMesto' => $this->searchVanRegionaMesto,
             'serviseri' => $this->serviseri,
             'searchUsersRegion' => $this->searchRegion,
-            'searchTid' => $this->searchTid,
+            /* 'searchTid' => $this->searchTid,
             'searchDatumPocetak' => $this->searchDatumPocetak,
             'searchDatumKraj' => $this->searchDatumKraj,
-            'searchComments' => $this->searchComments
+            'searchComments' => $this->searchComments */
         ];
         $builder = BankomatTiketReadActions::read($search);
         // paginate the builder
