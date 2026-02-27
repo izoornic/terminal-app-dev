@@ -25,6 +25,8 @@ use App\Http\Helpers;
 
 use App\Ivan\SelectedTerminalInfo;
 use App\Actions\Lokacije\LokacijaInfo;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Lokacijes extends Component
 {
@@ -126,7 +128,7 @@ class Lokacijes extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -153,7 +155,7 @@ class Lokacijes extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return LengthAwarePaginator
      */
     public function read()
     {
@@ -337,7 +339,7 @@ class Lokacijes extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {
@@ -489,7 +491,7 @@ class Lokacijes extends Component
      * Lists all rows in all tables that use particular location
      *
      * @param  mixed $id
-     * @return void
+     * @return array
      */
     public function locationUsers($id)
     {
@@ -542,7 +544,7 @@ class Lokacijes extends Component
      * @param  mixed $id
      * @param  mixed $sn
      * @param  mixed $bk 
-     * @return void
+     * @return LengthAwarePaginator
      */
     public function terminaliZaLokaciju($id, $sn = '', $bk = '')
     { 
@@ -573,7 +575,7 @@ class Lokacijes extends Component
      * lokacijeTipa
      *
      * @param  mixed $tipId
-     * @return void
+     * @return LengthAwarePaginator
      */
     public function lokacijeTipa($tipId)
     {
@@ -617,7 +619,7 @@ class Lokacijes extends Component
                 if(SelectedTerminalInfo::terminalImaLicencu($item)){
                     $this->licencaError = 'multi';
                     $this->modalErorLicencaVisible = true;
-                    $this->selectedTerminals=[];
+                    //$this->selectedTerminals=[];
                     $this->modalAddTerminalVisible = false;
                     return;
                 }

@@ -3,6 +3,7 @@
 namespace App\Actions\Bankomati;
 
 use App\Models\BankomatTiket;   
+use Illuminate\Support\Facades\DB;
 
 class BankomatTiketReadActions
 {
@@ -28,6 +29,7 @@ class BankomatTiketReadActions
         $searchDatumPocetak = $search['searchDatumPocetak'] ?? null;
         $searchDatumKraj = $search['searchDatumKraj'] ?? null;
         $searchComments = $search['searchComments'] ?? null;
+        $seadchNaplata = $search['seadchNaplata'] ?? null;
 
         // If search status is 'Svi', set it to null
         if($searchStatus == 'Svi')  $searchStatus = null;
@@ -43,6 +45,7 @@ class BankomatTiketReadActions
             'bankomat_tips.model', 
             'bankomat_tiket_prioritet_tips.id as tipid',
             'bankomat_tiket_prioritet_tips.btpt_naziv',
+            'bankomat_tiket_prioritet_tips.time_frame',
             'bankomat_tiket_prioritet_tips.btn_collor',
             'bankomat_tiket_prioritet_tips.btn_hover_collor',	
             'bankomat_tiket_prioritet_tips.tr_bg_collor',
@@ -55,6 +58,7 @@ class BankomatTiketReadActions
             'users.name',
             'bankomat_tiket_kvar_tips.btkt_naziv',
         )
+        ->addSelect(DB::raw('CASE WHEN NOW() > DATE_ADD(bankomat_tikets.created_at, INTERVAL bankomat_tiket_prioritet_tips.time_frame SECOND) THEN 1 ELSE 0 END AS is_time_expired'))
         ->join('bankomat_lokacijas', 'bankomat_tikets.bankomat_lokacija_id', '=', 'bankomat_lokacijas.id')
         ->join('bankomats', 'bankomats.id', '=', 'bankomat_lokacijas.bankomat_id')
         ->leftJoin('users', 'users.id', '=', 'bankomat_tikets.user_dodeljen_id')
@@ -101,6 +105,9 @@ class BankomatTiketReadActions
             return $query->whereHas('komentari', function ($query2) use ($sk) {
                 $query2->where('komentar', 'like', '%'.$sk.'%'); 
             });
+        })
+        ->when($seadchNaplata, function ($query, $seadchNaplata) {
+            return $query->where('bankomat_tikets.naplata', '=', $seadchNaplata);
         })
         ->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

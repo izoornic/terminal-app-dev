@@ -22,6 +22,7 @@ class Tiketi extends Component
     public $searchDatumPocetak;
     public $searchDatumKraj;
     public $searchComments;
+    public $seadchNaplata;
 
     public $filter_clear_buttons = [
         'searchProductTip' => 'Tip proizvoda',
@@ -32,7 +33,8 @@ class Tiketi extends Component
         'searchTid' => 'ID proizvoda',
         'searchDatumPocetak' => 'Datum početak',
         'searchDatumKraj' => 'Datum kraj',
-        'searchComments' => 'Komentari'
+        'searchComments' => 'Komentari',
+        'seadchNaplata' => 'Naplata'
     ];
     public $filter_displayed_buttons = [];
     public $searchVanRegionaProductTip;
@@ -100,6 +102,7 @@ class Tiketi extends Component
         $this->searchDatumPocetak = session()->get('searchDatumPocetak') ?? null;
         $this->searchDatumKraj = session()->get('searchDatumKraj') ?? null;
         $this->searchComments = session()->get('searchComments') ?? null;
+        $this->seadchNaplata = session()->get('seadchNaplata') ?? null;
 
         if($this->role_region['role'] != 'admin') {
             $this->searchRegion = $this->role_region['region'];
@@ -123,6 +126,7 @@ class Tiketi extends Component
         session()->put('searchDatumPocetak', $this->searchDatumPocetak);
         session()->put('searchDatumKraj', $this->searchDatumKraj);
         session()->put('searchComments', $this->searchComments);
+        session()->put('seadchNaplata', $this->seadchNaplata);
 
          if($this->role_region['role'] == 'admin') {
             session()->put('searchRegion', $this->searchRegion);
@@ -175,6 +179,9 @@ class Tiketi extends Component
                 break;
             case 'searchComments':
                 $this->searchComments = null;
+                break;
+            case 'seadchNaplata':
+                $this->seadchNaplata = null;
         }
         $this->showFilterClearButtons();
     }
@@ -190,7 +197,8 @@ class Tiketi extends Component
             'searchTid' => $this->searchTid,
             'searchDatumPocetak' => $this->searchDatumPocetak,
             'searchDatumKraj' => $this->searchDatumKraj,
-            'searchComments' => $this->searchComments
+            'searchComments' => $this->searchComments,
+            'seadchNaplata' => $this->seadchNaplata
         ];
         $builder = BankomatTiketReadActions::read($search);
         // paginate the builder

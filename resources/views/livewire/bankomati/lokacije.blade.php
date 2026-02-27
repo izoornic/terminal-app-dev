@@ -207,6 +207,25 @@
     {{ $data->links() }}
     </div>
 
+    {{-- NOVA PODLOKACIJA - IZBOR GLAVNE LOKACIJE --}}
+    <x-jet-dialog-modal wire:model="modalNewSublocationVisible">
+        <x-slot name="title">
+            Nova podlokacija
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="mb-4">
+                <livewire:bankomati.komponente.izbor-lokacije :key="time()" comp_index="lokacija" izbor_glavne_lokacije="true" :tipovi_lokacija="[3]" />
+
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalNewSublocationVisible')" wire:loading.attr="disabled">
+                Zatvori
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
 
     {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
     <x-jet-dialog-modal wire:model="modalNewEditVisible">
@@ -219,14 +238,14 @@
                          Nova @if ($is_sublocation) podlokacija @else  lokacija @endif 
                     @endif
                 </div>
-                <div>
+                {{-- <div>
                     @if($is_edit && $blokacija_tip_id == 3 && !$is_duplicate)
                         <x-jet-secondary-button wire:click="dodajPodlokaciju" wire:loading.attr="disabled">
                             <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
                             Dodaj podlokaciju
                         </x-jet-secondary-button>
                     @endif
-                </div>
+                </div> --}}
 
             </div>
         </x-slot>

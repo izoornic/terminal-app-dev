@@ -98,7 +98,10 @@
                                                 <x-heroicon-o-pencil-square class="w-5 h-5 mx-2 my-1" />
                                             </button>
                                         </td> 
-                                        <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
+                                        <td class="px-1 py-2">
+                                            {{ $item->bp_tip_naziv }}
+                                            <br /><span class="text-xs text-red-500"> {{ $item->model }} </span>
+                                        </td>
                                         <td class="px-1 py-2">
                                             {{ $item->b_sn }}
                                             @if($item->b_terminal_id) <br /><span class="text-xs text-red-500"> {{ $item->b_terminal_id }} </span> @endif
@@ -135,7 +138,7 @@
                                             </button>
                                         </td>
                                         <td class="px-1 py-1">
-                                            <button class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="premestiShowModal({{ $item->blid }}, {{ $item->statusid }}, {{ $item->id }})">
+                                            <button class="flex text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="premestiShowModal({{ $item->blid }}, {{ $item->statusid }}, {{ $item->id }}, {{ $item->vlasnik_uredjaja }})">
                                                 <x-heroicon-o-arrows-right-left class="w-4 h-4 mr-2" />
                                                 Premesti
                                             </button>
@@ -386,7 +389,7 @@
                 <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
                 <p class="font-bold">Nova lokacija proizvoda:</p>
                 @if(!$nova_lokacija)
-                    <livewire:bankomati.komponente.izbor-lokacije :key="$flashKey" comp_index="premesti" :trenutna_lokacija="$trenutna_lokacija_id" />
+                    <livewire:bankomati.komponente.izbor-lokacije :key="$flashKey" comp_index="premesti" :trenutna_lokacija="$trenutna_lokacija_id" :premesti_vlasnik="$vlasnik_proizvoda" />
                 @else
                     {{-- Izabrao je lokaciju menjam prikaz --}}
                     <p>Nova lokacija:</p>

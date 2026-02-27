@@ -21,7 +21,7 @@ class Lokacije extends Component
 {
     use WithPagination;
 
-    protected $listeners = ['newLocation', 'sortClick'];
+    protected $listeners = ['newLocation', 'newSubLocation', 'sortClick', 'novaLokacija'];
 
     //OREDER BY
     public $orderBy = 'blokacijas.id';
@@ -54,6 +54,9 @@ class Lokacije extends Component
 
     public $pib_count = false;
     public $email_is_set = false;
+
+    //nrw sunlokacija
+    public $modalNewSublocationVisible = false;
 
     //kontakt osoba
     public $kontaktOsobaVisible;
@@ -105,6 +108,20 @@ class Lokacije extends Component
     public function newLocation()
     {
         $this->addNewLocation();
+    }
+
+    public function newSubLocation()
+    {
+        $this->addNewSubLocation();
+    }
+
+    public function novaLokacija($id, $key)
+    {
+       $this->modalNewSublocationVisible = false;
+       $this->modelId = $id;
+       $this->loadModel();
+       $this->is_duplicate = true;
+       $this->dodajPodlokaciju();
     }
 
     public function sortClick($field)
@@ -180,6 +197,15 @@ class Lokacije extends Component
         $this->resetValidation();
         $this->resetInputFields();
         $this->modalNewEditVisible = true;
+    }
+
+    public function addNewSubLocation()
+    {
+        $this->is_edit = false;
+        $this->is_sublocation = true;
+        $this->resetValidation();
+        $this->resetInputFields();
+        $this->modalNewSublocationVisible = true;
     }
 
     public function dodajPodlokaciju()
@@ -326,6 +352,7 @@ class Lokacije extends Component
     {
         return [
             'is_duplicate' => ($this->is_duplicate || $this->is_sublocation) ? 1 : 0,
+            'parent_id'=>  ($this->is_duplicate || $this->is_sublocation) ? $this->modelId : null,            
             'bl_naziv' => $this->bl_naziv,
             'bl_naziv_sufix' =>  $this->bl_naziv_sufix ?: null,
             'bl_adresa' => $this->bl_adresa,

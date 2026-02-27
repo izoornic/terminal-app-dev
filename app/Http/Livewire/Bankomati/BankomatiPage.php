@@ -302,7 +302,7 @@ class BankomatiPage extends Component
 
     }
 
-    public function premestiShowModal($id, $status, $blokacija_id)
+    public function premestiShowModal($id, $status, $blokacija_id, $vlasnik_uredjaja = null)
     {
         $this->resetInputFields();
         $this->resetValidation();
@@ -311,6 +311,7 @@ class BankomatiPage extends Component
         $this->flashKey ++;
         $this->trenutna_lokacija_id = $blokacija_id;
         $this->datum_promene = date('Y-m-d');
+        $this->vlasnik_proizvoda = $vlasnik_uredjaja;
         $this->modalPremestiVisible = true;
     }
 
