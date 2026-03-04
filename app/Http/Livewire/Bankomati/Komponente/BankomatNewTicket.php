@@ -70,7 +70,7 @@ class BankomatNewTicket extends Component
         // 9 - Admin bankomata
         // 10 - Šef servisa bankomata
         // 11 - Serviser bankomata
-        if($this->role_region['role'] == 'serviser'){
+        if($this->role_region['role'] == 'serviser' || $this->role_region['role'] == 'programer') {
             $this->dodeljenUserId = auth()->user()->id;
             $this->setDodeljenUserInfo($this->dodeljenUserId);
         }
@@ -97,7 +97,18 @@ class BankomatNewTicket extends Component
 
     public function searchUser()
     {
-        $pozicije_tips = ($this->role_region['role'] == 'admin') ? [9, 10, 11] : [10, 11];
+         switch ($this->role_region['role']) {
+             case 'admin':
+                 $pozicije_tips = [9, 10, 11, 12];
+                 break;
+             case 'programer':
+                 $pozicije_tips = [12];
+                 break;
+             default:
+                 $pozicije_tips = [10, 11];
+                 break;
+         }
+       // $pozicije_tips = ($this->role_region['role'] == 'admin') ? [9, 10, 11, 12] : [10, 11];
         return User::select('users.id', 'users.name', 'blokacijas.bl_naziv', 'pozicija_tips.naziv')
                     ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')

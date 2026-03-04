@@ -341,7 +341,10 @@ V 1.1.3 (17.2.2026.) @Bnkomati_to_do
     - U History tikata dodtat opis kvara
     - Dodat TID u pregledu tiketa i tekstu maila za servis bankomata.
 
-V 1.1.7 (--.2.2026.) @Bnkomati_to_do
-    - Premestanje Proizvoda (Bakomata) yavisi od vlasnika prozvoda
+V 1.1.7 (27.2.2026.) @Bnkomati_to_do
+    - Premestanje Proizvoda (Bakomata) zavisi od vlasnika prozvoda
     - Promenjena logika dodavanja lokacija i podlokacija. Sada dva dugmeta “Nova lokacija” i “Nova Podlokacija”
     - Podlokacija moguca samo za tip - Produkciona lokacija
+
+V 1.1.8 (4.2.2026.) @Bnkomati_to_do
+    - Uloga "Programer" - vidi sve proizvode i lokacije a tiket dodeljuje samo sebi.

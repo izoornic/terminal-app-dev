@@ -53,7 +53,7 @@
                                     <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    @if($role_region['role'] == 'admin')
+                                    @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
                                         <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                                 @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
@@ -338,7 +338,7 @@
             </div>      
             <div class="mt-4">
                 <x-jet-label for="bankomat_region_id" value="Region" />
-                @if($role_region['role'] == 'admin')
+                @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
                     <select wire:model="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">Odaberi region</option>
                         @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    

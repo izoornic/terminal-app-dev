@@ -78,7 +78,7 @@ class Tiketi extends Component
     public function mount()
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
-        if($this->role_region['role'] != 'admin') {
+        if($this->role_region['role'] != 'admin' || $this->role_region['role'] != 'programer') {
             $this->searchRegion = $this->role_region['region'];
             if($this->role_region['role'] == 'sef'){
                 //pokupi idjeve svih u servisu
@@ -104,7 +104,7 @@ class Tiketi extends Component
         $this->searchComments = session()->get('searchComments') ?? null;
         $this->seadchNaplata = session()->get('seadchNaplata') ?? null;
 
-        if($this->role_region['role'] != 'admin') {
+        if($this->role_region['role'] != 'admin' || $this->role_region['role'] != 'programer') {
             $this->searchRegion = $this->role_region['region'];
         }else{
             $this->searchRegion = session()->get('searchRegion') ?? null;
@@ -128,7 +128,7 @@ class Tiketi extends Component
         session()->put('searchComments', $this->searchComments);
         session()->put('seadchNaplata', $this->seadchNaplata);
 
-         if($this->role_region['role'] == 'admin') {
+         if($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') {
             session()->put('searchRegion', $this->searchRegion);
          }
 
@@ -209,7 +209,7 @@ class Tiketi extends Component
  
     public function readVanRegiona()
     {
-        if($this->role_region['role'] == 'admin') return [];
+        if($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') return [];
         
         $search = [
             'searchProductTip' => $this->searchVanRegionaProductTip,

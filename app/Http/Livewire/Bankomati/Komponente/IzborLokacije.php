@@ -32,7 +32,7 @@ class IzborLokacije extends Component
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
-        $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin') ? 0 : $this->role_region['region'];
+        $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? 0 : $this->role_region['region'];
 
         //iskljucije trenutnu lokaciju kada se proizvod premesta u neku drugu
         $this->trenutna_lokacija = $trenutna_lokacija;

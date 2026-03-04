@@ -100,6 +100,7 @@ class Lokacije extends Component
         9 	Admin bankomata
         10 	Šef servisa bankomata
         11 	Serviser bankomata 
+        12  Programer
         */
     }
     /*
@@ -163,7 +164,7 @@ class Lokacije extends Component
         $this->bl_mesto = '';
         $this->blokacija_tip_id = '';
         $this->blokacija_tip = '';
-        $this->bankomat_region_id = ($this->role_region['role'] == 'admin') ? '' : $this->role_region['region'];
+        $this->bankomat_region_id = ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? '' : $this->role_region['region'];
         $this->pib = '';
         $this->mb = '';
         $this->email = '';
@@ -471,7 +472,7 @@ class Lokacije extends Component
         $searchParams=[
             'naziv' => $this->searchName,
             'adresa' => $this->searchMesto,
-            'region' => ($this->role_region['role'] == 'admin') ? $this->searchRegion : $this->role_region['region'],
+            'region' => ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? $this->searchRegion : $this->role_region['region'],
             'tip_lokacije' => $this->searchTip,
             'pib' => $this->searchPib
         ];

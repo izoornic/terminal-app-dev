@@ -412,7 +412,7 @@ class BankomatiPage extends Component
             'b_terminal_id' => $this->searchTerminalId,
             'proizvod_model' => $this->searchModel,
             'lokacija_naziv' => $this->searchLokacijaNaziv,
-            'region' => ($this->role_region['role'] == 'admin') ? $this->searchRegion : $this->role_region['region'],
+            'region' => ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? $this->searchRegion : $this->role_region['region'],
             'tip' => $this->searchLocationTip,
             'status' => $this->searchStatus,
             'pib' => $this->searchPib,

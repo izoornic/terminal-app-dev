@@ -60,7 +60,7 @@
                                 </td>
                                 <td><x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" /></td>
                                 <td colspan="2">
-                                    @if($role_region['role'] == 'admin')
+                                    @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
                                         <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">Svi regioni</option>
                                                 @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
@@ -94,7 +94,7 @@
                                     <span class="p-1 text-sm text-red-400">Naplata</span>
                                     <label class="inline-flex items-center ml-4 cursor-pointer">
                                         <input type="checkbox" wire:model="seadchNaplata" class="sr-only peer" />
-                                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
+                                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
                                     </label>
                                 </td>
                             </tr>
@@ -157,7 +157,7 @@
 
 
     {{-- The data table za servisera i sefa servisa --}}
-    @if($role_region['role'] != 'admin')
+    @if($role_region['role'] != 'admin' && $role_region['role'] != 'programer')
     <div class="flex flex-col mt-16 pt-2 border-t-2 border-gray-200 bg-gray-100">
         <div><h3 class="text-red-400 text-lg font-bold mb-2 ml-4">Dodeljeni tiketi van regiona servisa:</h3></div>
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
