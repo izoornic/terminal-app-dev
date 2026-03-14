@@ -93,10 +93,19 @@ class LicencaTerminal extends Component
    
     //komentari
     public $modalKomentariVisible;
-    /* public $selectedTerminalComments;
-    public $selectedTerminalCommentsCount;
-    public $newKoment; */
 
+    /**
+     * Listeners for Livewire events
+     *
+     * @var array
+     */
+    protected $listeners = ['blacklistUpdate'];
+    
+    public function blacklistUpdate()
+    {
+         $this->modalFormVisible = false;
+        $this->read();
+    }
     /**
      * [Description for mount]
      *
@@ -350,7 +359,7 @@ class LicencaTerminal extends Component
      *
      * @return void
      */
-    public function blacklistUpdate()
+    /* public function blacklistUpdate()
     {
         if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
             TerminalBacklist::CreateBlacklistFile();
@@ -358,7 +367,7 @@ class LicencaTerminal extends Component
         $this->selectedTerminals=[];
         $this->canBlacklistErorr = '';
         $this->modalFormVisible = false;
-    }
+    } */
 
     /**
      * History MODAL

@@ -104,7 +104,7 @@ class Tiketi extends Component
         $this->searchComments = session()->get('searchComments') ?? null;
         $this->seadchNaplata = session()->get('seadchNaplata') ?? null;
 
-        if($this->role_region['role'] != 'admin' || $this->role_region['role'] != 'programer') {
+        if($this->role_region['role'] != 'admin' && $this->role_region['role'] != 'programer') {
             $this->searchRegion = $this->role_region['region'];
         }else{
             $this->searchRegion = session()->get('searchRegion') ?? null;

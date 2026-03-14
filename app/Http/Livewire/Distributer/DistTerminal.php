@@ -78,6 +78,15 @@ class DistTerminal extends Component
     public $selectedTerminalCommentsCount;
     public $newKoment;
 
+    public $multiSelectedInfo;
+
+    protected $listeners = ['blacklistUpdate'];
+    public function blacklistUpdate()
+    {
+        $this->blacklistFormVisible = false;
+        $this->read();
+    }
+
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
@@ -191,8 +200,6 @@ class DistTerminal extends Component
     /**
      * Prikaz kolekcije sa filterima
      *
-     * @return collection
-     * 
      */
     public function displayData($dataAll)
     {
@@ -343,20 +350,6 @@ class DistTerminal extends Component
         $this->canBlacklist = true;
         $this->multiSelected = false;
         $this->modelId = $id;
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        if($this->selectedTerminal->blacklist == 1){
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da uklonite terminal sa Blackliste?';
-        }else{
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da dodate terminal na Blacklistu?';
-        }
-        if($this->selectedTerminal->lokacija_tipId != 3){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali koji su instalirani korisnicima mogu se dodavti na Blacklistu!';
-        }
-        if($this->selectedTerminal->ts_naziv != 'Instaliran'){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali sa statsom "Instaliran" se mogu dodavti na Blacklistu!';
-        }
         $this->blacklistFormVisible = true;
     }
 
@@ -365,7 +358,7 @@ class DistTerminal extends Component
      *
      * @return void
      */
-    public function blacklistUpdate()
+    /* public function blacklistUpdate()
     {
         if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
             TerminalBacklist::CreateBlacklistFile();
@@ -373,7 +366,7 @@ class DistTerminal extends Component
         $this->selectedTerminals=[];
         $this->canBlacklistErorr = '';
         $this->blacklistFormVisible = false;
-    }
+    } */
 
 
     

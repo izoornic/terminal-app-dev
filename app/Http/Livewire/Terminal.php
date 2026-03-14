@@ -262,7 +262,7 @@ class Terminal extends Component
      /**
      * Pronadji korisnika kome dodeljujes tiket
      *
-     * @return void
+     * @return object
      */
     public function searchUser()
     {

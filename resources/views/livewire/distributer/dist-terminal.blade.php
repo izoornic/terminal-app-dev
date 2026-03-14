@@ -139,9 +139,7 @@
         <x-slot name="content">
         @if($blacklistFormVisible)
                 <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
-            <div class="font-bold text-xl text-red-500 mb-6">
-                {{$canBlacklistErorr}}
-            </div>
+                <livewire:komponente.blacklist-add-remove :terminal_lokacija_id="$modelId" />
         @endif
         </x-slot>
 
@@ -149,17 +147,6 @@
             <x-jet-secondary-button wire:click="$toggle('blacklistFormVisible')" wire:loading.attr="disabled">
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
-            @if($canBlacklist)
-                    @if($selectedTerminal->blacklist == 1)
-                        <x-jet-secondary-button class="ml-2" wire:click="blacklistUpdate" wire:loading.attr="disabled">
-                            {{ __('Ukloni sa Blackliste') }}
-                        </x-jet-secondary-button>
-                    @else
-                        <x-jet-button class="ml-2" wire:click="blacklistUpdate" wire:loading.attr="disabled">
-                            {{ __('Dodaj na Blacklistu') }}
-                        </x-jet-button>
-                    @endif
-            @endif   
         </x-slot>
     </x-jet-dialog-modal>
 

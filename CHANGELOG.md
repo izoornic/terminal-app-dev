@@ -346,5 +346,12 @@ V 1.1.7 (27.2.2026.) @Bnkomati_to_do
     - Promenjena logika dodavanja lokacija i podlokacija. Sada dva dugmeta “Nova lokacija” i “Nova Podlokacija”
     - Podlokacija moguca samo za tip - Produkciona lokacija
 
-V 1.1.8 (4.2.2026.) @Bnkomati_to_do
+V 1.1.8 (4.3.2026.) @Bnkomati_to_do
     - Uloga "Programer" - vidi sve proizvode i lokacije a tiket dodeljuje samo sebi.
+
+V 1.1.9 (14.3.2026.) @Bnkomati_to_do
+    - moguca promena email adrese lokacije.
+    - Distributer koji vidi kometare moze da produzava licence preko check polja. Samo ESIR licence koje su u statusu aktivne.
+    - Dodat obavezan komentar kod dodavnja i skidanja sa blackliste
+    - Ispravljen bug sa adminom bankomata i filterom za region tiketa
+

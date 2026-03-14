@@ -21,6 +21,7 @@ use App\Ivan\SelectedTerminalInfo;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Query\Builder;
@@ -105,6 +106,11 @@ class DistLicence extends Component
     //komentari na terminalima
     public $komentariTerminalVisible;
     public $modalKomentariVisible;
+
+    public $selectedTerminals = [];
+    public $selectAll;
+    public $allInPage = [];
+    public $produziCheckedMode = false;
     
 
 
@@ -194,70 +200,158 @@ class DistLicence extends Component
         $this->produziLicModalVisible = true;
     }
 
+    public function produziLicenceChecked()
+    {
+        if (empty($this->selectedTerminals)) return;
+
+        $neispravni = [];
+        foreach ($this->selectedTerminals as $lnid) {
+            $naplata = LicencaNaplata::where('id', $lnid)
+                ->where('distributerId', $this->distId)
+                ->where('aktivna', 1)
+                ->whereNotNull('razduzeno')
+                ->where('razduzeno', '>', 0)
+                ->whereRaw('LOWER(licenca_naziv) LIKE ?', ['%esir%'])
+                ->first();
+
+            if (!$naplata) {
+                $neispravni[] = $lnid;
+            }
+        }
+
+        if (count($neispravni)) {
+            $this->error_message = 'Greška! Nije moguće produžiti licence. Svi selektovani terminali moraju imati aktivnu ESIR licencu sa izvršenim razduženjima (ID licenci: ' . implode(', ', $neispravni) . ').';
+            $this->errorModalVisible = true;
+            return;
+        }
+
+        $prvaNaplata = LicencaNaplata::find($this->selectedTerminals[0]);
+
+        $this->resetTerm();
+        $this->naziv_licence = $prvaNaplata->licenca_naziv;
+        $this->licenca_distributer_cena_id = $prvaNaplata->licenca_distributer_cenaId;
+        $this->datum_pocetka_licence = $prvaNaplata->datum_kraj_licence;
+        $this->datum_kraja_licence = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
+        $this->produzenje_cene[0] = new CenaLicence($this->licenca_distributer_cena_id, $this->datum_pocetka_licence, $this->datum_kraja_licence);
+
+        $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($this->licenca_distributer_cena_id);
+        $this->produzenje_tip_licence = $licenceInf->licenca_tipId;
+
+        $this->parametri = LicencaParametarTerminal::where('terminal_lokacijaId', $prvaNaplata->terminal_lokacijaId)
+            ->where('distributerId', $prvaNaplata->distributerId)
+            ->where('licenca_distributer_cenaId', $prvaNaplata->licenca_distributer_cenaId)
+            ->pluck('licenca_parametarId')->all();
+        $this->licenca_tip_parametri = LicencaParametar::where('licenca_tipId', '=', $this->produzenje_tip_licence)->pluck('id')->all();
+
+        $this->produziCheckedMode = true;
+        $this->produziLicModalVisible = true;
+    }
+
     public function produziLicencu()
     {
-        $this->updated();
+        $this->updated(0, 0);
         $this->produzenje_cena_licence = preg_replace('/[,]/', '.', $this->produzenje_cena_licence);
         if($this->produzenje_cena_licence <= 0 || !is_numeric($this->produzenje_cena_licence)){
             $this->produzenje_unete_cene_error = 'Greška! Cena licence mora biti broj veći od 0!';
             return;
         }
         $this->produzenje_unete_cene_error = '';
-        $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
-        if($this->dani_trajanja < 1) return;
-        
 
-        $model_data = [
-            'datum_pocetak' => $this->datum_pocetka_licence,
-            'datum_kraj' => $this->datum_kraja_licence,
-            'licenca_broj_dana' => $this->dani_trajanja,
-        ];
-        
+        if ($this->produziCheckedMode) {
+            foreach ($this->selectedTerminals as $lnid) {
+                $naplata = LicencaNaplata::where('id', $lnid)
+                    ->where('distributerId', $this->distId)
+                    ->where('aktivna', 1)
+                    ->whereNotNull('razduzeno')
+                    ->where('razduzeno', '>', 0)
+                    ->whereRaw('LOWER(licenca_naziv) LIKE ?', ['%esir%'])
+                    ->first();
 
-        $datum_prekoracenja = Helpers::addDaysToDate($this->datum_kraja_licence, $this->ditributer_info->dani_prekoracenja_licence);
-        $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($this->licenca_distributer_cena_id);
-        $nazivLicence = $licenceInf->licenca_naziv;
+                if (!$naplata) continue;
+
+                $datum_pocetka = $naplata->datum_kraj_licence;
+                $datum_kraja = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($datum_pocetka, 1));
+
+                $parametri = LicencaParametarTerminal::where('terminal_lokacijaId', $naplata->terminal_lokacijaId)
+                    ->where('distributerId', $naplata->distributerId)
+                    ->where('licenca_distributer_cenaId', $naplata->licenca_distributer_cenaId)
+                    ->pluck('licenca_parametarId')->all();
+
+                $this->izvediProduzenjeLicence(
+                    $naplata->id,
+                    $naplata->terminal_lokacijaId,
+                    $naplata->licenca_distributer_cenaId,
+                    $datum_pocetka,
+                    $datum_kraja,
+                    $this->produzenje_cena_licence,
+                    $parametri,
+                    $naplata->licenca_naziv
+                );
+            }
+            $this->selectedTerminals = [];
+            $this->produziCheckedMode = false;
+        } else {
+            $this->izvediProduzenjeLicence(
+                $this->licenca_naplata_id,
+                $this->modelId,
+                $this->licenca_distributer_cena_id,
+                $this->datum_pocetka_licence,
+                $this->datum_kraja_licence,
+                $this->produzenje_cena_licence,
+                $this->parametri,
+                $this->naziv_licence
+            );
+        }
+
+        $this->produziLicModalVisible = false;
+    }
+
+    private function izvediProduzenjeLicence($naplata_id, $tre_loc_id, $licenca_distributer_cena_id, $datum_pocetka, $datum_kraja, $cena, $parametri, $naziv_licence)
+    {
+        if (Helpers::numberOfDaysBettwen($datum_pocetka, $datum_kraja) < 1) return;
+
+        $licenceInf = LicencaDistributerCena::licencaCenaIdInfo($licenca_distributer_cena_id);
         $licenca_tip_id = $licenceInf->id;
-        //dodaj licence terminalu za prezimanje        
+
         $key_arr = [
-            'terminal_lokacijaId' => $this->modelId,
+            'terminal_lokacijaId' => $tre_loc_id,
             'distributerId' => $this->distId,
-            'licenca_distributer_cenaId' => $this->licenca_distributer_cena_id,
+            'licenca_distributer_cenaId' => $licenca_distributer_cena_id,
         ];
-        //niz samo za API tabelu
-        $terminal_info = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        $kraj_licence_za_api = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
+
+        $terminal_info = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($tre_loc_id);
+        $kraj_licence_za_api = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($datum_pocetka, 1));
+
         $vals_ins = [
             'mesecId'=> 0,
             'terminal_sn' => $terminal_info->sn,
-            'datum_pocetak' => $this->datum_pocetka_licence,
-            'datum_kraj' =>  $kraj_licence_za_api,
+            'datum_pocetak' => $datum_pocetka,
+            'datum_kraj' => $kraj_licence_za_api,
             'datum_prekoracenja' => Helpers::addDaysToDate($kraj_licence_za_api, $this->ditributer_info->dani_prekoracenja_licence),
-            'naziv_licence' => $this->naziv_licence
+            'naziv_licence' => $naziv_licence
         ];
         $this->AddToLicenceZaTerminal($key_arr, $vals_ins);
 
         //oslobodi stari zapis u tabelu 'licenca_naplatas'
-        LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->update(['aktivna' => 0]);
+        LicencaNaplata::where('id', '=', $naplata_id)->update(['aktivna' => 0]);
 
         //dodaj red u tabelu 'licenca_naplatas'
+        $datum_prekoracenja = Helpers::addDaysToDate($datum_kraja, $this->ditributer_info->dani_prekoracenja_licence);
         $model_lic_nap = [
-        'datum_pocetka_licence' => $this->datum_pocetka_licence,
-        'datum_kraj_licence'  => $this->datum_kraja_licence,
-        'datum_isteka_prekoracenja' => $datum_prekoracenja,
-        'dist_zaduzeno' => $this->produzenje_cena_licence,
-        'dist_datum_zaduzenja' => Helpers::datumKalendarNow(),
-        'licenca_naziv' => $this->naziv_licence,
-        'terminal_sn' => $terminal_info->sn,
+            'datum_pocetka_licence' => $datum_pocetka,
+            'datum_kraj_licence'  => $datum_kraja,
+            'datum_isteka_prekoracenja' => $datum_prekoracenja,
+            'dist_zaduzeno' => $cena,
+            'dist_datum_zaduzenja' => Helpers::datumKalendarNow(),
+            'licenca_naziv' => $naziv_licence,
+            'terminal_sn' => $terminal_info->sn,
         ];
-        foreach($key_arr as $key=>$val){
+        foreach ($key_arr as $key => $val) {
             $model_lic_nap[$key] = $val;
         }
         LicencaNaplata::create($model_lic_nap);
 
-        if(count($this->parametri)) LicencaParametarTerminal::addParametarsToLicence($key_arr, $licenca_tip_id, $this->parametri);
-    
-        $this->produziLicModalVisible = false;
+        if (count($parametri)) LicencaParametarTerminal::addParametarsToLicence($key_arr, $licenca_tip_id, $parametri);
     }
 
     public function dodajIzPregledaLicenceShovModal($tre_loc_id)
@@ -280,7 +374,7 @@ class DistLicence extends Component
     /**
      * Koliko terminala ima distributer function.
      *
-     * @return object
+     * @return integer
      */
     public function prebrojLicenceDistributera()
     {
@@ -320,7 +414,7 @@ class DistLicence extends Component
     public function dodajLicenceTerminalu()
     {
         $this->validate();
-        $this->updated();
+        $this->updated(0, 0);
 
         if(Helpers::numberOfDaysBettwen(Helpers::datumKalendarNow(), $this->datum_pocetka_licence) > 10){
             $this->datum_pocetak_error = 'Greška! Datum počteka licence ne može biti više od 10 dana od današnje dana';
@@ -666,10 +760,11 @@ class DistLicence extends Component
     /**
      * The read function. searchTipLicence
      *
-     * @return void
+     * @return object
      */
     public function read()
     {
+        $this->allInPage = [];
         $search = [
             'searchSB' => $this->searchTerminalSn,
             'searchLokacija' => $this->searchMesto,
@@ -680,50 +775,17 @@ class DistLicence extends Component
         $builder = TerminaliReadActions::DistributerTerminaliRead($this->distId, $search);
 
         $perPage = Config::get('global.terminal_paginate');
-        return $builder->paginate($perPage, ['*'], 'terminali');   
+        $licens = $builder->paginate($perPage, ['*'], 'terminali');   
+
+        $licens->getCollection()->transform(function ($item) {
+            /* $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
+            $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0; */
+            $this->allInPage[] = $item->lnid;
+            return $item;
+        });
+
+        return $licens;
         
-        /* return TerminalLokacija::select(
-                            'terminal_lokacijas.id as tmlokId', 
-                            'terminal_lokacijas.br_komentara',
-                            'terminals.sn', 
-                            'lokacijas.l_naziv', 
-                            'lokacijas.mesto', 
-                            'lokacijas.adresa', 
-                            'lokacijas.pib',
-                            'licenca_naplatas.id as lnid', 
-                            'licenca_naplatas.datum_pocetka_licence', 
-                            'licenca_naplatas.datum_kraj_licence',
-                            'licenca_naplatas.nenaplativ', 
-                            'licenca_tips.licenca_naziv', 
-                            'licenca_tips.id as ltid',  
-                            'licenca_tips.broj_parametara_licence',
-                            'licenca_naplatas.dist_zaduzeno',
-                            'licenca_naplatas.dist_razduzeno',
-                            'licenca_naplatas.zaduzeno',
-                            'licenca_naplatas.razduzeno'
-                    )
-                    ->leftJoin('licenca_naplatas', function($join)
-                        {
-                            $join->on('licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id');
-                            $join->on('licenca_naplatas.aktivna', '=', DB::raw("1"));
-                        })
-                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
-                    ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
-                    ->where('terminal_lokacijas.distributerId', '=', $this->distId)
-                    ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
-                    ->where('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%')
-                    ->when($this->searchTipLicence > 0, function ($rtval){
-                        return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
-                    })
-                    ->when($this->searchPib, function ($rtval){
-                        return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
-                    })
-                    ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
-                    ->orderBy('terminal_lokacijas.id')
-                    ->orderBy('licenca_distributer_cenas.licenca_tipId')
-                    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali'); */
     }
 
     /**
@@ -733,8 +795,20 @@ class DistLicence extends Component
      * @param  mixed $value
      * @return void
      */
-    public function updated()
+    public function updated($key, $value)
     {
+        $exp = Str::of($key)->explode(delimiter: '.');
+        if($exp[0] === 'selectAll' && is_numeric($value)){
+            //dd($this->allInPage);
+           foreach($this->allInPage as $termid){
+               if(!in_array($termid, $this->selectedTerminals)){
+                array_push($this->selectedTerminals, $termid);
+               }  
+           }
+        }elseif($exp[0] === 'selectAll' && empty($value)){
+            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
+        }
+
         //setuje kraj licnece na prvi dan u izabranom mesecu
         if($this->dodajLicencuModalVisible){
             $this->datum_kraja_licence = Helpers::firstDayOfMounth($this->datum_kraja_licence);
@@ -753,6 +827,8 @@ class DistLicence extends Component
             $this->datum_kraja_licence = Helpers::firstDayOfMounth($this->datum_kraja_licence);
             $this->produzenje_cene[0] = new CenaLicence($this->licenca_distributer_cena_id, $this->datum_pocetka_licence, $this->datum_kraja_licence);
         }
+
+        
     }
 
     public function render()
