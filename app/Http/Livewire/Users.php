@@ -159,7 +159,6 @@ class Users extends Component
     /**
      * The read function.
      *
-     * @return void
      */
     public function read()
     {
@@ -345,7 +344,6 @@ class Users extends Component
      * lokacijeTipa
      *
      * @param  mixed $tipId
-     * @return void
      */
     public function lokacijeTipa($tipId = 4)
     {

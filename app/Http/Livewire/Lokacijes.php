@@ -9,10 +9,7 @@ use App\Models\Terminal;
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
 use App\Models\LokacijaKontaktOsoba;
-use App\Models\TerminalLokacijaHistory;
 use App\Models\DistributerLokacijaIndex;
-use App\Models\LicenceZaTerminal;
-use App\Models\LicencaParametarTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -23,7 +20,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Lokacije\LokacijaInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -66,6 +63,7 @@ class Lokacijes extends Component
 
     //order
     public $orderBy;
+    public $orderDirection;
 
     //delete check
     public $odabranaLokacija;
@@ -125,6 +123,28 @@ class Lokacijes extends Component
     public $lat_value;
     public $long_value;
 
+    //history modal
+    public $modalHistoryVisible;
+
+    protected $listeners = ['sortClick'];
+    public function sortClick($field)
+    {
+        if ($this->orderBy === $field) {
+            $this->orderDirection = $this->orderDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->orderBy = $field;
+            $this->orderDirection = 'desc';
+            $this->emit('fieldChange', $field);
+        }
+        $this->emit('sortChange', $this->orderDirection);
+    }
+
+    public function mount()
+    {
+        $this->orderBy = 'id';
+        $this->orderDirection = 'asc';
+        
+    }
     /**
      * The validation rules
      *
@@ -197,7 +217,7 @@ class Lokacijes extends Component
         ->when($this->searchTip, function ($rtval){
             return $rtval->where('lokacijas.lokacija_tipId','=', $this->searchTip);
         } )
-        ->orderBy($order)
+        ->orderBy($order, $this->orderDirection)
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }
 
@@ -238,6 +258,12 @@ class Lokacijes extends Component
         $this->resetValidation();
         $this->loc_reset();
         $this->modalFormVisible = true;
+    }
+
+    public function showHistroyModal($id)
+    {
+        $this->modelId = $id;
+        $this->modalHistoryVisible = true;
     }
 
      /**

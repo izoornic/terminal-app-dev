@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
-use App\Ivan\SelectedTerminalInfo;
-use App\Ivan\MailToUser;
+use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Tiket\MailToUser;
 
 //use App\Http\Controllers\SendEmailController;
 

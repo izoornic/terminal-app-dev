@@ -20,6 +20,8 @@ class TerminaliReadActions
         $searchSB = $search['searchSB'] ?? null;
         $searchKutija = $search['searchKutija'] ?? null;
         $searchNazivLokacije = $search['searchNazivLokacije'] ?? null;
+        $searchAdresa = $search['searchAdresa'] ?? null;
+        $searchMesto = $search['searchMesto'] ?? null;
         $searchRegion = $search['searchRegion'] ?? null;
         $searchTipLokacije = $search['searchTipLokacije'] ?? null;
         $searchStatus = $search['searchStatus'] ?? null;
@@ -27,6 +29,7 @@ class TerminaliReadActions
         $searchVendor = $search['searchVendor'] ?? null;
         //this one can be null, 1 or 2 ( 1-only blacklisted, 2-only fields that are set to null in db)
         $searchBlackist = $search['searchBlackist'] ?? null;
+        $searchCampagin = $search['searchCampagin'] ?? null;
 
         $searchDistId = $search['searchDistributer'] ?? null;
 
@@ -46,7 +49,8 @@ class TerminaliReadActions
             'terminal_lokacijas.distributerId',
             'terminal_lokacijas.br_komentara',
             'terminal_vendors.name as vendor_name',
-            'terminal_vendors.id as vendor_id'
+            'terminal_vendors.id as vendor_id',
+            'terminal_campagins.campagin_name'
             )
         ->join('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
@@ -55,6 +59,7 @@ class TerminaliReadActions
         ->leftJoin('terminal_status_tips','terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
         ->leftJoin('licenca_distributer_tips', 'terminal_lokacijas.distributerId', '=', 'licenca_distributer_tips.id')
         ->leftJoin('terminal_vendors', 'terminals.vendor_id', '=', 'terminal_vendors.id')
+        ->leftJoin('terminal_campagins', 'terminal_lokacijas.terminal_campagin_id', '=', 'terminal_campagins.id')
         ->when($searchDistId, function ($query, $searchDistId) {
             return $query->where('terminal_lokacijas.distributerId', '=', $searchDistId);
         })
@@ -68,9 +73,13 @@ class TerminaliReadActions
             return $query->where('terminal_lokacijas.terminal_statusId', '=', $searchStatus);
         })
         ->when($searchNazivLokacije, function ($query, $searchNazivLokacije) {
-            return $query->where('lokacijas.l_naziv', 'like', '%' .$searchNazivLokacije . '%')
-                         ->orWhere('lokacijas.adresa', 'like', '%' . $searchNazivLokacije . '%')    
-                         ->orWhere('lokacijas.mesto', 'like', '%' . $searchNazivLokacije . '%');
+            return $query->where('lokacijas.l_naziv', 'like', '%' .$searchNazivLokacije . '%');
+        })
+        ->when($searchAdresa, function ($query, $searchAdresa) {
+            return $query->where('lokacijas.adresa', 'like', '%' . $searchAdresa . '%');
+        })
+        ->when($searchMesto, function ($query, $searchMesto) {
+            return $query->where('lokacijas.mesto', 'like', '%' . $searchMesto . '%');
         })
         ->when($searchRegion, function ($query, $searchRegion) {
             return $query->where('lokacijas.regionId', '=', $searchRegion);
@@ -89,6 +98,9 @@ class TerminaliReadActions
         })
         ->when(!is_null($searchBlackist) && $searchBlackist == 2, function ($query) {
             return $query->whereNull('terminal_lokacijas.blacklist');
+        })
+        ->when($searchCampagin, function ($query, $searchCampagin) {
+            return $query->where('terminal_campagins.campagin_name', 'like', '%' .  $searchCampagin. '%');
         });
         //->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

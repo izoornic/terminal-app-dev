@@ -13,7 +13,7 @@ use Livewire\WithPagination;
 
 use App\Http\Helpers;
 
-use App\Ivan\CenaLicence;
+use App\Actions\Licence\CenaLicence;
 
 use App\Helpers\PaginationHelper;
 

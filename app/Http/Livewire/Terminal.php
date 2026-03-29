@@ -27,10 +27,10 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
-use App\Ivan\CryptoSign;
-use App\Ivan\TerminalHistory;
-use App\Ivan\SelectedTerminalInfo;
-use App\Ivan\MailToUser;
+use App\Actions\Licence\CryptoSign;
+use App\Actions\Terminali\TerminalHistory;
+use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Tiket\MailToUser;
 
 use App\Actions\Terminali\TerminaliReadActions;
 
@@ -75,13 +75,14 @@ class Terminal extends Component
     public $searchPib;
     public $searchVendor;
 
+    public $searchCampagin;
+
     //multi selected
     public $multiSelected;
     public $multiSelectedInfo;
 
     //terminal HISTORY
     public $terminalHistoryVisible;
-    public $historyData;
 
     //licence modal
     public $licencaModalVisible;
@@ -371,10 +372,8 @@ class Terminal extends Component
         //dd($this->modalStatus, TerminalLokacija::where('id', $this->modelId) -> first());
         foreach($this->selectedTerminals as $item){
             DB::transaction(function()use($item){
-                //terminal
-                $cuurent = TerminalLokacija::where('id', $item) -> first();
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
+                TerminalLokacijaHistory::createNewHistory($item);
                 //update current
                 TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
             });
@@ -505,7 +504,6 @@ class Terminal extends Component
             return;
         }
 
-
         $this->selectedTerminals=[];
         $this->modalConfirmPremestiVisible = false;
     }
@@ -518,10 +516,7 @@ class Terminal extends Component
      */
     public function terminalHistoryShowModal($id)
     {
-        $this->historyData = null;
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        
-        $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
         
         $this->terminalHistoryVisible = true;
     }
@@ -825,6 +820,7 @@ class Terminal extends Component
             'searchStatus' => $this->searchStatus,
             'searchPib' => $this->searchPib,
             'searchVendor' => $this->searchVendor,
+            'searchCampagin' => $this->searchCampagin
         ];
 
         $builder = TerminaliReadActions::TerminaliRead($search);

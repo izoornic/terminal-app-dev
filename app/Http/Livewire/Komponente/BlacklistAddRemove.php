@@ -3,8 +3,8 @@
 namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
-use App\Ivan\SelectedTerminalInfo;
-use App\Ivan\TerminalBacklist;
+use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Terminali\TerminalBacklist;
 use App\Actions\Terminali\TerminalCommentActions;
 
 class BlacklistAddRemove extends Component

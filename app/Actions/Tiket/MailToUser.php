@@ -1,5 +1,6 @@
 <?php
-namespace App\Ivan;
+
+namespace App\Actions\Tiket;
 
 use Auth;
 
@@ -10,14 +11,14 @@ use App\Models\Lokacija;
 use App\Models\TiketOpisKvaraTip;
 use App\Models\TiketPrioritetTip;
 
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use App\Http\Helpers;
 
 use Mail;
 use App\Mail\NotyfyMail;
 
-class MailToUser 
+class MailToUser
 {
     public $tiketId;
     public $tiket;
@@ -29,7 +30,7 @@ class MailToUser
     function __construct($tid) {
         $this->tiketId = $tid;
         $this->tiketRegion = $this->tiketRegion($this->tiketId);
-            
+
         $this->tiket = Tiket::select('*')
             ->where('tikets.id', '=', $this->tiketId)
             ->first();
@@ -38,7 +39,7 @@ class MailToUser
 
        $this->email_primaoci = $this->setEmailPrimaoce();
     }
-    
+
     public function sendEmails($subject, $comentari = null)
     {
 
@@ -78,7 +79,7 @@ class MailToUser
                                 array_push($retval, $primac->email);
                             }
                         }
-                    }   
+                    }
                 }else{
                     //online tiket
                     //zavisi od tipa kvara tiket je vec otvoren dakle gledam samo id dodeljenog
@@ -92,7 +93,7 @@ class MailToUser
         }
         return $retval;
     }
-    
+
     /**
      * userEmail
      *
@@ -104,7 +105,7 @@ class MailToUser
                     ->where('id', '=', $id)
                     ->first();
     }
-    
+
     /**
      * tiketRegion
      *
@@ -135,7 +136,7 @@ class MailToUser
                     ->where('regions.id', '=', $this->tiketRegion)
                     ->first();
     }
-        
+
     /**
      * userInfo
      *
@@ -160,7 +161,7 @@ class MailToUser
         //$this->tikedd(t);
         $dodeljen_ime = ($this->tiket->korisnik_dodeljenId != null) ? $this->userInfo($this->tiket->korisnik_dodeljenId)->name : 'Tiket nije dodeljen';
         $kreirao = ($this->tiket->korisnik_prijavaId != null) ? $this->userInfo($this->tiket->korisnik_prijavaId)->name : 'on line';
-        
+
         $subject = '';
         $heding = '';
         $zatvorio = '';
@@ -184,7 +185,7 @@ class MailToUser
                 $zatvorio = ' | Tiket zatvorio: '.auth()->user()->name;
             break;
         }
-        
+
         $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $this->tiket->opis_kvaraId)->first();
         $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
        // Helpers::datumFormat($komentar->created_at)
@@ -208,7 +209,7 @@ class MailToUser
     }
 
     /**
-     * sef Servisa za izabrani Terminal 
+     * sef Servisa za izabrani Terminal
      *
      * @param  mixed $terminalLokacijaId
      * @return object
@@ -223,7 +224,7 @@ class MailToUser
                     ->regionId;
         //ovde mora dodatna logika
         // da se proveri da li sef servisa radi
-    
+
         return User::select('users.id', 'users.name', 'users.tel', 'users.email', 'users.pozicija_tipId')
         ->join('lokacijas', 'lokacijas.id', '=', 'users.lokacijaId')
         ->where('users.pozicija_tipId', '=', 3)

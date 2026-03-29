@@ -63,10 +63,13 @@ class DistLokacije extends Component
     //kontakt osoba u prodavnici
     public $kontaktOsobaVisible;
     public $kontaktOsobaInfo;
+    public $odabranaLokacija;
 
     //delete or info modal
     public $deletePosible;
     public $modalConfirmDeleteVisible;
+    public $brTerminala;
+    public $terminaliList;
 
     //search PIB
     public $modalSearchPIBFormVisible;
@@ -74,6 +77,13 @@ class DistLokacije extends Component
     public $search_pib_error;
     public $lokacija_row;
     public $nova_lokacija_postoji_u_bazi;
+
+    protected $listeners = ['novaLokacijaAdd'];
+
+    public function novaLokacijaAdd()
+    {
+        $this->searchPIBShowModal();
+    }
 
     public function mount()
     {
@@ -83,7 +93,7 @@ class DistLokacije extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -179,7 +189,7 @@ class DistLokacije extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {
@@ -465,7 +475,6 @@ class DistLokacije extends Component
      * Lists all rows in all tables that use particular location
      *
      * @param  mixed $id
-     * @return void
      */
     public function locationUsers($id)
     {
@@ -544,7 +553,6 @@ class DistLokacije extends Component
     /**
      * Prikaz kolekcije sa filterima
      *
-     * @return collection
      * 
      */
     public function displayData()
@@ -559,7 +567,6 @@ class DistLokacije extends Component
      /**
      * The read function.
      *
-     * @return void
      */
     public function read()
     {
@@ -570,7 +577,6 @@ class DistLokacije extends Component
    /**
      * Priprema podatke za prikaz.
      *
-     * @return void
      */
     private function prepareData()
     {        

@@ -174,7 +174,7 @@
 
                                         <td class="px-2 pt-2 flex">
                                                 @if($item->latitude != '' && $item->longitude != '') 
-                                                    <a class="my-auto text-sky-800 border rounded-md border-sky-800 pt-2 hover:bg-sky-800 hover:text-white" href="{{ App\Ivan\HelperFunctions::createGmapLink($item->latitude, $item->longitude) }}" target="_blank">
+                                                    <a class="my-auto text-sky-800 border rounded-md border-sky-800 pt-2 hover:bg-sky-800 hover:text-white" href="{{ App\Http\Helpers::createGmapLink($item->latitude, $item->longitude) }}" target="_blank">
                                                     <x-heroicon-o-map class="w-6 h-6 mx-2 mb-1 -mt-1"/>
                                                    </a> 
                                                 @endif 

@@ -1,5 +1,5 @@
 <?php
-namespace App\Ivan;
+namespace App\Actions\Terminali;
 
 use App\Models\TerminalLokacija;
 use App\Models\TerminalLokacijaHistory;
@@ -15,9 +15,9 @@ class TerminalBacklist
      * [Description for AddRemoveBlacklist]
      *
      * @param mixed $tlid
-     * 
+     *
      * @return [boolean]
-     * 
+     *
      */
     public static function AddRemoveBlacklist($tlid)
     {
@@ -34,13 +34,13 @@ class TerminalBacklist
             //throw $th
             return false;
         }
-        return true; 
+        return true;
     }
 
     public static function CreateBlacklistFile()
     {
         $blaclist_file_content = '';
-        $terminals = TerminalLokacija::select('terminals.sn') 
+        $terminals = TerminalLokacija::select('terminals.sn')
                         ->where('blacklist', 1)
                         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                         ->get();

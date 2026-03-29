@@ -355,3 +355,7 @@ V 1.1.9 (14.3.2026.) @Bnkomati_to_do
     - Dodat obavezan komentar kod dodavnja i skidanja sa blackliste
     - Ispravljen bug sa adminom bankomata i filterom za region tiketa
 
+V 1.1.10 (29.3.2026.) @Bnkomati_to_do
+    - Dodaata nova komponenta "Istrorija lokacije" samo za lokacije tipa "Korisnik terminala" na stranici "Lokacije" za uloge Admin, Šef servisa, Serviser i Call center
+    - Dodate "Kampanje" za ulogu Distributer. Kao i funkcionalnost da je kampanja obavezna prilikom premetanja terminala na lokaciju tipa "Korisnik terminala". Premeštanje terminala na lokaciju drugog tipa ili iz druge uloge setuje kampanju na null.
+    - Rediyajnirana stranica Terminali za Menadzera licence i Admina

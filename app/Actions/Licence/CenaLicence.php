@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Ivan;
+namespace App\Actions\Licence;
 
 use App\Http\Helpers;
 use App\Models\KursEvra;
 use App\Models\LicencaDistributerCena;
 
-class CenaLicence 
+class CenaLicence
 {
     public $zeta_cena_eur;
     public $zeta_cena_din;
@@ -27,9 +27,9 @@ class CenaLicence
      * @param mixed $licenca_tip_cena_id
      * @param mixed $datum_pocetak
      * @param mixed $datum_kraj
-     * 
+     *
      * @return [type]
-     * 
+     *
      */
     public function izracunajCenuLicence($licenca_distributer_cenas_id, $datum_pocetak, $datum_kraj, $cena_evr_input=0)
     {
@@ -53,7 +53,7 @@ class CenaLicence
             $datum_pocetak_meseca = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($datum_pocetak, 1));
         }
         $broj_celih_meseci = Helpers::numberOfMounthsBettwen($datum_pocetak_meseca, $datum_kraj) ?: 0;
-        
+
         //cena licence u evrima ZETA
         $this->zeta_cena_eur = ($days_till_end) ? ($zeta_cena / $broj_dana_u_mesecu) * $days_till_end : 0;
         $this->zeta_cena_eur = round($this->zeta_cena_eur, 2);
@@ -63,7 +63,7 @@ class CenaLicence
         $this->dist_cena_eur = ($days_till_end) ? ($dist_cena / $broj_dana_u_mesecu) * $days_till_end : 0;
         $this->dist_cena_eur = round($this->dist_cena_eur, 2);
         $this->dist_cena_eur += ($broj_celih_meseci) ? $broj_celih_meseci * $dist_cena : 0;
-        
+
         //cena u dinarima
         $this->zeta_cena_din = round($this->zeta_cena_eur * $this->cena_evra, 2);
         $this->dist_cena_din = round($this->dist_cena_eur * $this->cena_evra, 2);

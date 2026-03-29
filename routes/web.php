@@ -212,4 +212,8 @@ Route::group(['middleware' => [
         return view('rez_delovi.rezervni-delovi');
         })->name('rezervni-delovi');
 
+    Route::get('/distributer-kampanja', function(){
+        return view('distributer.distr-campagin');
+        })->name('distributer-kampanja');
+
 });

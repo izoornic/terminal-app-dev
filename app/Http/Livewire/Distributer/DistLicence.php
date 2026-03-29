@@ -14,9 +14,9 @@ use App\Models\LicencaParametarTerminal;
 
 use App\Http\Helpers;
 
-use App\Ivan\CryptoSign;
-use App\Ivan\CenaLicence;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Licence\CryptoSign;
+use App\Actions\Licence\CenaLicence;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use Livewire\Component;
 use Livewire\WithPagination;

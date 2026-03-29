@@ -189,4 +189,9 @@ class Helpers
         return $d->format('Y-m-d');
     }
 
+    public static function createGmapLink($lat, $log)
+    {
+        return 'https://www.google.com/maps/search/?api=1&query='.$lat.','.$log;
+    }
+
 }
