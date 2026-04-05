@@ -15,8 +15,8 @@ use App\Models\TiketOpisKvaraTip;
 
 use Validator;
 
-use App\Ivan\MailToUser;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Tiket\MailToUser;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use Auth;
 

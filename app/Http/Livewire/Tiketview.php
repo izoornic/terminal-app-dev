@@ -8,12 +8,10 @@ use Auth;
 use App\Models\Tiket;
 use App\Models\TiketHistory;
 use App\Models\TerminalLokacija;
-use App\Models\TerminalLokacijaHistory;
 Use App\Models\TiketKomentar;
 use App\Models\User;
 use App\Models\TiketOpisAkcijaIndex;
 use App\Models\TiketAkcijaKorisnikPozicija;
-use App\Models\TiketOpisKvaraTip;
 use App\Models\Lokacija;
 use App\Models\Region;
 use App\Models\TiketPrioritetTip;
@@ -24,9 +22,9 @@ use App\Actions\Rdelovi\RdeloviReadAction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
-use App\Ivan\MailToUser;
-use App\Ivan\TerminalHistory;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Tiket\MailToUser;
+use App\Actions\Terminali\TerminalHistory;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use App\Http\Helpers;
 use App\Models\TiketPartType;
@@ -183,7 +181,6 @@ class Tiketview extends Component
     /**
      * podaci o tiketu
      *
-     * @return void
      */
     public function read()
     {
@@ -207,7 +204,6 @@ class Tiketview extends Component
     /**
      * Lista akcija koje preuzima serviser
      *
-     * @return void
      */
     public function kvarAkcije(){
         return TiketOpisAkcijaIndex::select('tka_opis')
@@ -255,7 +251,6 @@ class Tiketview extends Component
      * Pronadji korisnika kome dodeljujes tiket
      *
      * ->simplePaginate(Config::get('global.modal_search'), ['*'], 'usersp');
-     * @return void
      */
     public function searchUser()
     {

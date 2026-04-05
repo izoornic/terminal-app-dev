@@ -53,7 +53,7 @@
                                     <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    @if($role_region['role'] == 'admin')
+                                    @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
                                         <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                                 @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
@@ -174,7 +174,7 @@
 
                                         <td class="px-2 pt-2 flex">
                                                 @if($item->latitude != '' && $item->longitude != '') 
-                                                    <a class="my-auto text-sky-800 border rounded-md border-sky-800 pt-2 hover:bg-sky-800 hover:text-white" href="{{ App\Ivan\HelperFunctions::createGmapLink($item->latitude, $item->longitude) }}" target="_blank">
+                                                    <a class="my-auto text-sky-800 border rounded-md border-sky-800 pt-2 hover:bg-sky-800 hover:text-white" href="{{ App\Http\Helpers::createGmapLink($item->latitude, $item->longitude) }}" target="_blank">
                                                     <x-heroicon-o-map class="w-6 h-6 mx-2 mb-1 -mt-1"/>
                                                    </a> 
                                                 @endif 
@@ -207,6 +207,25 @@
     {{ $data->links() }}
     </div>
 
+    {{-- NOVA PODLOKACIJA - IZBOR GLAVNE LOKACIJE --}}
+    <x-jet-dialog-modal wire:model="modalNewSublocationVisible">
+        <x-slot name="title">
+            Nova podlokacija
+        </x-slot>
+
+        <x-slot name="content">
+            <div class="mb-4">
+                <livewire:bankomati.komponente.izbor-lokacije :key="time()" comp_index="lokacija" izbor_glavne_lokacije="true" :tipovi_lokacija="[3]" />
+
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalNewSublocationVisible')" wire:loading.attr="disabled">
+                Zatvori
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
 
     {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
     <x-jet-dialog-modal wire:model="modalNewEditVisible">
@@ -219,14 +238,14 @@
                          Nova @if ($is_sublocation) podlokacija @else  lokacija @endif 
                     @endif
                 </div>
-                <div>
+                {{-- <div>
                     @if($is_edit && $blokacija_tip_id == 3 && !$is_duplicate)
                         <x-jet-secondary-button wire:click="dodajPodlokaciju" wire:loading.attr="disabled">
                             <x-heroicon-o-plus-circle class="w-4 h-4 mr-2"/>
                             Dodaj podlokaciju
                         </x-jet-secondary-button>
                     @endif
-                </div>
+                </div> --}}
 
             </div>
         </x-slot>
@@ -319,7 +338,7 @@
             </div>      
             <div class="mt-4">
                 <x-jet-label for="bankomat_region_id" value="Region" />
-                @if($role_region['role'] == 'admin')
+                @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
                     <select wire:model="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">Odaberi region</option>
                         @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    

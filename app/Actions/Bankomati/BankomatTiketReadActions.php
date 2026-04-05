@@ -3,6 +3,7 @@
 namespace App\Actions\Bankomati;
 
 use App\Models\BankomatTiket;   
+use Illuminate\Support\Facades\DB;
 
 class BankomatTiketReadActions
 {
@@ -14,7 +15,7 @@ class BankomatTiketReadActions
      * @param  bool $sortAsc - sort direction
      * @return object
      */
-    public static function read(array $search, string $sortField=null, bool $sortAsc=false):object 
+    public static function read(array $search, ?string $sortField=null, bool $sortAsc=false):object 
     {
         // Extract search parameters
         $searchProductTip = $search['searchProductTip'] ?? null;
@@ -24,6 +25,11 @@ class BankomatTiketReadActions
         $searchRegion = $search['searchRegion'] ?? null;
         $dodeljeniUsersIds = $search['serviseri'] ?? null;
         $searchUsersRegion = $search['searchUsersRegion'] ?? null;
+        $searchTid = $search['searchTid'] ?? null;
+        $searchDatumPocetak = $search['searchDatumPocetak'] ?? null;
+        $searchDatumKraj = $search['searchDatumKraj'] ?? null;
+        $searchComments = $search['searchComments'] ?? null;
+        $seadchNaplata = $search['seadchNaplata'] ?? null;
 
         // If search status is 'Svi', set it to null
         if($searchStatus == 'Svi')  $searchStatus = null;
@@ -39,6 +45,7 @@ class BankomatTiketReadActions
             'bankomat_tips.model', 
             'bankomat_tiket_prioritet_tips.id as tipid',
             'bankomat_tiket_prioritet_tips.btpt_naziv',
+            'bankomat_tiket_prioritet_tips.time_frame',
             'bankomat_tiket_prioritet_tips.btn_collor',
             'bankomat_tiket_prioritet_tips.btn_hover_collor',	
             'bankomat_tiket_prioritet_tips.tr_bg_collor',
@@ -51,6 +58,7 @@ class BankomatTiketReadActions
             'users.name',
             'bankomat_tiket_kvar_tips.btkt_naziv',
         )
+        ->addSelect(DB::raw('CASE WHEN NOW() > DATE_ADD(bankomat_tikets.created_at, INTERVAL bankomat_tiket_prioritet_tips.time_frame SECOND) THEN 1 ELSE 0 END AS is_time_expired'))
         ->join('bankomat_lokacijas', 'bankomat_tikets.bankomat_lokacija_id', '=', 'bankomat_lokacijas.id')
         ->join('bankomats', 'bankomats.id', '=', 'bankomat_lokacijas.bankomat_id')
         ->leftJoin('users', 'users.id', '=', 'bankomat_tikets.user_dodeljen_id')
@@ -82,6 +90,24 @@ class BankomatTiketReadActions
             }else{
                 return $query->where('bankomat_tikets.status', '=', $searchStatus);
             }     
+        })
+        ->when($searchTid, function ($query, $searchTid) {
+            return $query->where('bankomat_tikets.id', '=', $searchTid);
+        })
+        ->when($searchDatumPocetak, function ($query, $searchDatumPocetak) {
+            return $query->whereDate('bankomat_tikets.created_at', '>=', $searchDatumPocetak);
+        })
+        ->when($searchDatumKraj, function ($query, $searchDatumKraj) {
+            return $query->whereDate('bankomat_tikets.created_at', '<=', $searchDatumKraj);
+        })
+        ->when($searchComments, function ($query, $searchComments) {
+            $sk = '%'.$searchComments.'%';
+            return $query->whereHas('komentari', function ($query2) use ($sk) {
+                $query2->where('komentar', 'like', '%'.$sk.'%'); 
+            });
+        })
+        ->when($seadchNaplata, function ($query, $seadchNaplata) {
+            return $query->where('bankomat_tikets.naplata', '=', $seadchNaplata);
         })
         ->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

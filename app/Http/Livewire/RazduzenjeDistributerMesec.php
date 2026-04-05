@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 use App\Helpers\PaginationHelper;
 
-use App\Ivan\CryptoSign;
+use App\Actions\Licence\CryptoSign;
 
 class RazduzenjeDistributerMesec extends Component
 {

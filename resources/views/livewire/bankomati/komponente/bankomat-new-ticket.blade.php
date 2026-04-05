@@ -105,6 +105,25 @@
             @endif
             @error('prioritetTiketa') <span class="error">{{ $message }}</span> @enderror
         </div> 
+
+        <div class="mt-4 flex justify-between">
+            <div>
+                <x-jet-label for="datum_promene" value="Datum:" />
+                <div class="flex">
+                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                </div>
+                @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            <div class="ml-4">
+                <x-jet-label for="vreme_promene" value="Vreme:" />
+                <x-jet-input id="vreme_promene" type="time" class="mt-1 block" value="{{ $vreme_promene }}" wire:model="vreme_promene" />
+                @error('vreme_promene') <span class="error">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        @if($datum_promene_error != '')
+            <p class="text-red-500"> {{$datum_promene_error}} </p>
+        @endif
+
         @if ($dodeljenUserId && $prioritetTiketa)
             <hr class="my-4" />
             <div class="flex justify-center items-center">

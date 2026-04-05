@@ -20,7 +20,7 @@
                     @endif
                 </span> 
                 <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - 
-                    <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span> - 
+                    <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->created_at) }}</span> - 
                     <span class="text-sky-900 text-sm font-medium py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-1">{{$item->akcija}}</span>
                 </h3>
                 @if($item->vrsta_akcije == 1)
@@ -35,10 +35,15 @@
                             Lokacija: <span class="font-bold">{{ $item->bl_naziv }} , {{ $item->bl_mesto }}</span>
                         </p>
                     @endif
+
                 @elseif($item->vrsta_akcije == 2)
                     {{-- AKCIJA TIKET --}}
                     <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'bankomat-tiketview', ['id' => $item->bankomat_tiket_id] ) }}">Tiket #{{ $item->bankomat_tiket_id }}</span></x-jet-nav-link></p>
-                    <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Opis kvara: <span class="font-bold">@if($item->btkt_naziv) {{ $item->btkt_naziv }} @else Ostalo @endif</span></p>
+
+                    <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Tip kvara: <span class="font-bold">@if($item->btkt_naziv) {{ $item->btkt_naziv }} @else Ostalo @endif</span></p>
+
+                    <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Opis: <span class="font-bold">{{ $item->opis }}</span></p>
+
                 @elseif($item->vrsta_akcije == 3)
                     {{-- AKCIJA NAPLATE --}}
                     

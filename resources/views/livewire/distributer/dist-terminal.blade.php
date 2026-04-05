@@ -1,103 +1,128 @@
 <div class="p-6">
-    
+    <div class="flex justify-between">
+        <p></p>
+        <a class="flex px-2 py-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white mb-2" href="{{ route( 'distributer-kampanja' ) }}">
+            <x-heroicon-o-megaphone class="w-4 h-4 mr-2" />
+           Kampanje
+        </a>
+    </div>
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
-                        <thead>
-                            <tr>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"><input type="checkbox" value="1" wire:model="selectAll.1"  class="form-checkbox h-6 w-6 text-blue-500"></th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Kutija</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Tip lokacije</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th colspan="3" class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno: <span class="font-bold">{{ $data->total() }}</span></th>
-                            </tr>
-                        </thead>
+                    <table class="min-w-full divide-y divide-gray-200 mb-4" style="width: 100% !important">
                         <tbody class="bg-white divide-y divide-gray-200"> 
-                        {{-- SEARCH ROW --}}
+                            {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
-                                <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                
-                                <td><x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
-                                <td><x-jet-input wire:model="searchKutija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" /></td>
-                                <td>
+                                <td><x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /></td>
+                                <td class="px-1 py-1"><x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
+                                <td class="px-1 py-1">
                                     <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /> 
                                 </td>
-                                <td>
+                                <td class="px-1 py-1">
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-32" type="text" placeholder="PIB" /> 
                                 </td>
-                                <td>
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="">---</option>
-                                        @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
-                                            <option value="{{ $key }}">{{ $value }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="">---</option>
+                                <td class="px-1 py-1" >
+                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">-- Status --</option>
                                         @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td colspan="3" class="pr-4">
-                                    <select wire:model="searchBlackist" id="" class="mx-4 block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <td class="px-1 py-1">
+                                    <select wire:model="searchBlackist" id="" class="mx-4 block appearance-none bg-orange-50 border border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">Blacklsta</option>
                                         <option value="2"> Ne</option>
                                         <option value="1"> Da </option>
                                     </select>
                                 </td>      
-                            </tr>                     
+                            </tr>  
+                            {{-- SEARCH 2nd ROW --}}    
+                            <tr class="bg-orange-50">
+                                <td></td>
+                                <td class="px-1 py-1"><x-jet-input wire:model="searchKutija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" /></td>
+                                <td>
+                                    <x-jet-input wire:model="searchCampagin" id="" class="block bg-orange-50 w-full" type="text" placeholder="Kampanja" />
+                                </td>
+                                <td>
+                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 border border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                                <option value="">-- Region --</option>
+                                            @foreach (App\Models\Region::regioni() as $key => $value)    
+                                                <option value="{{ $key }}">{{ $value }}</option>
+                                            @endforeach
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr>          
+                        </tbody>
+                    </table>
+
+                    <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
+                        <thead>
+                            {{-- DATA THEAD --}}
+                            <tr>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500  tracking-wider"><input type="checkbox" value="1" wire:model="selectAll.1"  class="form-checkbox h-6 w-6 text-blue-500"></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500  tracking-wider">
+                                    Serijski broj <br />
+                                    <span class=" text-red-400">Kutija</span>
+                                </th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 tracking-wider">
+                                    Lokacija<br />
+                                    <span class=" text-green-600">Kampanja</span>
+                                </th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 tracking-wider">Region</th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 tracking-wider">Status</th>
+                                <th colspan="3" class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 tracking-wider">Ukupno: <span class="font-bold">{{ $data->total() }}</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"> 
+                        
+                            {{-- DATA TABLE --}}        
                             @if ($data->count())
                                 @foreach ($data as $item)
                                     <tr @if($loop->even) class="bg-gray-50" @endif >
                                         <td class="px-1 py-1"><input type="checkbox" value="{{ $item->tlid }}" wire:model="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
-                                        <td class="px-1 py-2">{{ $item->sn }}</td>
-                                        <td class="px-1 py-2">{{ $item->broj_kutije }}</td>
+                                        <td class="px-1 py-2">
+                                            {{ $item->sn }}<br />
+                                            <span class="text-red-500 text-xs">{{ $item->broj_kutije }}</span>
+                                        </td>
                                         <td class="px-1 py-2">
                                              @if($item->is_duplicate)<span class="text-red-500">*</span>@endif
                                             {{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}
+                                            @if( $item->campagin_name )<br /><span class="text-xs text-green-600">{{ $item->campagin_name }}</span>@endif
                                         </td>
                                         <td class="px-1 py-2">{{ $item->r_naziv }}</td> 
-                                        <td class="px-1 py-2">{{ $item->lt_naziv }}</td>
                                         <td class="px-1 py-2">
-                                            <x-jet-secondary-button wire:click="statusShowModal({{ $item->tlid}}, {{ $item->statusid }})">
+                                            <button class="px-2 py-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="statusShowModal({{ $item->tlid}}, {{ $item->statusid }})">
                                                 {{ $item->ts_naziv }}
-                                            </x-jet-button>
+                                            </button>
                                         </td>
                                         <td class="px-1 py-1">
-                                            <x-jet-secondary-button class="ml-2" wire:click="premestiShowModal({{ $item->tlid }}, {{ $item->statusid }})">
+                                            <button class="px-2 py-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="premestiShowModal({{ $item->tlid }}, {{ $item->statusid }})">
                                                 {{ __('Premesti') }}
-                                            </x-jet-button>
+                                            </button>
                                         </td>
                                         <td class="px-1 py-1">
                                             @if($item->blacklist == 1)
-                                                <x-jet-button class="ml-2" wire:click="blacklistShowModal({{  $item->tlid }})" title="Skloni sa Blckiste">
-                                                    <svg class="fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">	<path class="st1" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/> <path class="st1" d="M48,238c0,39.8,21.1,75.3,54,98.4c0,0.2,0,0.4,0,0.6v36c0,14.9,12.1,27,27,27h27v-27c0-5,4-9,9-9s9,4,9,9v27 h36v-27c0-5,4-9,9-9s9,4,9,9v27h27c14.9,0,27-12.1,27-27v-36c0-0.2,0-0.4,0-0.6c32.9-23.1,54-58.6,54-98.4	c0-22.2-6.6-43.1-18.1-61.2h-24.5c-40.6,0-75-27.1-86.2-64.1c-5-0.5-10.1-0.7-15.2-0.7C112.5,112,48,168.4,48,238z M138,292	c-19.9,0-36-16.1-36-36s16.1-36,36-36s36,16.1,36,36S157.9,292,138,292z M246,220c19.9,0,36,16.1,36,36s-16.1,36-36,36 s-36-16.1-36-36S226.1,220,246,220z"/></svg>
-                                                </x-jet-button>
+                                                <button class="p-2 text-sm relative text-white uppercase border rounded-md bg-gray-700 hover:bg-white hover:text-gray-600" wire:click="blacklistShowModal({{  $item->tlid }})" title="Skloni sa Blckiste">
+                                                    <x-icon-blacklist-scull class="fill-current w-5 h-5 ml-1" />
+                                                </button>
                                             @else
-                                                <x-jet-secondary-button class="ml-2" wire:click="blacklistShowModal({{  $item->tlid }})" title="Dodaj na Blckistu">
-                                                    <svg class="fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M373.1,134.6,253.4,15.3A52.7,52.7,0,0,0,216.3,0H59A59.11,59.11,0,0,0,0,59V453a59.11,59.11,0,0,0,59,59H325a59.11,59.11,0,0,0,59-59V160.9A36.9,36.9,0,0,0,373.1,134.6Zm-18.3,17.1H293.4a65.13,65.13,0,0,1-65-65V27.78A27.29,27.29,0,0,1,235.7,33ZM359,453a34.09,34.09,0,0,1-10,24,33.67,33.67,0,0,1-24,10H59a34.09,34.09,0,0,1-24-10,33.67,33.67,0,0,1-10-24V59A34.09,34.09,0,0,1,35,35,33.67,33.67,0,0,1,59,25H203.4V86.8a90.14,90.14,0,0,0,90,90H359Z"/><path d="M65.79,183.16a160.53,160.53,0,0,1,39.66-4.59c22.37,0,40.23,4.84,52.43,16.34,10.07,9.26,15.53,23.17,15.53,40,0,24.07-13.75,43.14-36.72,52v.87c26.36,6.91,44.3,28.19,44.3,60.16,0,19.29-6.46,35-17,46.4-13.58,15.07-35.71,21.12-62.73,21.12-17.56,0-28.27-1.1-35.48-2.29ZM90.24,279.7h15c23.86,0,43.4-17.34,43.4-42.3,0-23.08-11.81-39.4-42-39.4-7.51,0-12.85.68-16.41,1.74Zm0,114.7A79.63,79.63,0,0,0,106,395.68c29.46,0,49.5-16.13,49.5-47.94,0-33.33-24.05-48.9-51.26-49.14h-14Z"/><path d="M230.58,179.72h24.54V393.17h71.5V414h-96Z"/></svg>
-                                                </x-jet-button>
+                                                <button class="p-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="blacklistShowModal({{  $item->tlid }})" title="Dodaj na Blckistu">
+                                                    <x-icon-blacklist-scull class="fill-gray-400 w-5 h-5 ml-1" />
+                                                </button>
                                             @endif
                                         </td>
                                         <td>
                                             @if($komentariTerminalVisible)
-                                            <button class="p-2 text-sm relative text-gray-300 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
-                                                <div class="z-10 absolute ml-1 mb-1 text-gray-500 text-lg">{{ $item->br_komentara}}</div>
-                                                
-                                                <svg class="text-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
-
+                                            <button class="px-2 py-1 text-sm relative text-gray-600 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
+                                                <div class="mx-1 text-lg">{{ $item->br_komentara}}</div>
+                                                <x-heroicon-o-chat-bubble-bottom-center-text class="z-10 absolute top-1 right-1 text-gray-400 -mt-1.5 ml-2.5 w-4 h-4"/>
                                             </button>
                                             @endif
-
                                         </td>
                                     </tr>
                                 @endforeach
@@ -139,9 +164,7 @@
         <x-slot name="content">
         @if($blacklistFormVisible)
                 <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
-            <div class="font-bold text-xl text-red-500 mb-6">
-                {{$canBlacklistErorr}}
-            </div>
+                <livewire:komponente.blacklist-add-remove :terminal_lokacija_id="$modelId" />
         @endif
         </x-slot>
 
@@ -149,17 +172,6 @@
             <x-jet-secondary-button wire:click="$toggle('blacklistFormVisible')" wire:loading.attr="disabled">
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
-            @if($canBlacklist)
-                    @if($selectedTerminal->blacklist == 1)
-                        <x-jet-secondary-button class="ml-2" wire:click="blacklistUpdate" wire:loading.attr="disabled">
-                            {{ __('Ukloni sa Blackliste') }}
-                        </x-jet-secondary-button>
-                    @else
-                        <x-jet-button class="ml-2" wire:click="blacklistUpdate" wire:loading.attr="disabled">
-                            {{ __('Dodaj na Blacklistu') }}
-                        </x-jet-button>
-                    @endif
-            @endif   
         </x-slot>
     </x-jet-dialog-modal>
 
@@ -247,7 +259,23 @@
                     <p class="text-sm">Region: {{ $this->novaLokacija()->r_naziv }}</p>
                     </div>
                 </div>
-            </div>        
+            </div>
+            {{-- KAMPANJA PRODAJE --}}
+            @if($plokacijaTip == 3) 
+                <div class="mt-4">
+                <x-jet-label for="selectedCampagin" value="{{ __('Odaberi kampanju') }}" />
+                    <select wire:model="selectedCampagin" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">---</option>
+                        <option value="0">Bez kampanje</option>
+                        @foreach ($distCampagins as $item)    
+                            <option value="{{ $item->id }}">{{ $item->campagin_name }}</option>
+                        @endforeach
+                    </select>
+                    @error('selectedCampagin') <span class="error">{{ $message }}</span> @enderror
+                </div> 
+            @else
+
+            @endif
         @endif
 
             <div class="mt-4">

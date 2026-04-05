@@ -6,7 +6,7 @@
         
         <div class="w-full">
             @if($multySelected)
-                {{-- VISE BANKOMATA U LISTI --}}
+                <!-- VISE BANKOMATA U LISTI -->
                 @foreach ($multiSelectedInfo as $item)
                     <div class="w-full mb-2 border-b-2 border-sky-500">
                         <p class="font-bold">{{$item->bp_tip_naziv}}</p>
@@ -21,7 +21,7 @@
                     </div>
                 @endforeach
             @else
-                {{-- JEDAN BANKOMAT U LISTI --}}
+                <!-- JEDAN BANKOMAT U LISTI -->
                 <div>
                     <p class="font-bold">{{$selectedBankomat->bp_tip_naziv}}</p>
                     <p>SN: <span class="font-bold">{{$selectedBankomat->b_sn}}</span>

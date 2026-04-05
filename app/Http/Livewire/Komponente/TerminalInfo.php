@@ -4,7 +4,7 @@ namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
 use App\Models\TerminalLokacija;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 class TerminalInfo extends Component
 {
@@ -13,6 +13,7 @@ class TerminalInfo extends Component
     public $multySelected = false;
     public $multySelectedArray = [];
     public $multiSelectedInfo;
+    public $selectedTerminal;
 
     public function mount($terminal_lokacija_id)
     {

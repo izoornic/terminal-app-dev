@@ -37,6 +37,7 @@ class BankomatiReadActions
             'bankomats.id as bid', 
             'bankomats.b_sn',
             'bankomats.b_terminal_id', 
+            'bankomats.vlasnik_uredjaja',
             'bankomat_tips.model', 
             'blokacija_tips.id as tipid',
             'blokacija_tips.bl_tip_naziv', 

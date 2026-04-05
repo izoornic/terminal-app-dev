@@ -120,7 +120,8 @@ class User extends Authenticatable
         $roles = [
             9 => 'admin',
             10 => 'sef',
-            11 => 'serviser'
+            11 => 'serviser',
+            12 => 'programer'
         ];
         $retval = [];
         $retval['role'] = $roles[$this->pozicija_tipId];

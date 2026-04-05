@@ -6,10 +6,7 @@ use App\Models\Lokacija;
 use App\Models\Terminal;
 use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
-use App\Models\LicencaDistributerTip;
 use App\Models\DistributerLokacijaIndex;
-use App\Models\TerminalLokacijaHistory;
-use App\Models\LicencaParametarTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,9 +17,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
-use App\Ivan\TerminalHistory;
-use App\Ivan\TerminalBacklist;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use App\Actions\Terminali\TerminaliReadActions;
 
@@ -69,6 +64,7 @@ class LicencaTerminal extends Component
     public $searchStatus;
     public $searchBlackist;
     public $searchPib;
+    public $searchCampagin;
 
     //multi selected
     public $multiSelected;
@@ -76,7 +72,6 @@ class LicencaTerminal extends Component
 
     //terminal HISTORY
     public $terminalHistoryVisible;
-    public $historyData;
 
     //licence modal
     public $licencaModalVisible;
@@ -93,10 +88,24 @@ class LicencaTerminal extends Component
    
     //komentari
     public $modalKomentariVisible;
-    /* public $selectedTerminalComments;
-    public $selectedTerminalCommentsCount;
-    public $newKoment; */
 
+    /**
+     * Listeners for Livewire events
+     *
+     * @var array
+     */
+    protected $listeners = ['blacklistUpdate', 'newTerminal'];
+    
+    public function blacklistUpdate()
+    {
+         $this->modalFormVisible = false;
+        $this->read();
+    }
+
+    public function newTerminal()
+    {
+        $this->noviTerminalShowModal();
+    }
     /**
      * [Description for mount]
      *
@@ -137,6 +146,7 @@ class LicencaTerminal extends Component
             'searchStatus' => $this->searchStatus,
             'searchBlackist' => $this->searchBlackist,
             'searchPib' => $this->searchPib, 
+            'searchCampagin' => $this->searchCampagin,
         ];
 
         $builder = TerminaliReadActions::TerminaliRead($search);
@@ -326,40 +336,11 @@ class LicencaTerminal extends Component
         $this->canBlacklist = true;
         $this->multiSelected = false;
         $this->modelId = $id;
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        if($this->selectedTerminal->blacklist == 1){
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da uklonite terminal sa Blackliste?';
-        }else{
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da dodate terminal na Blacklistu?';
-        }
-        if($this->selectedTerminal->lokacija_tipId != 3){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali koji su instalirani korisnicima mogu se dodavti na Blacklistu!';
-        }
-        if($this->selectedTerminal->ts_naziv != 'Instaliran'){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali sa statsom "Instaliran" se mogu dodavti na Blacklistu!';
-        }
             
-        
         $this->modalFormVisible = true;
     }
 
-     /**
-     * The update function
-     *
-     * @return void
-     */
-    public function blacklistUpdate()
-    {
-        if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
-            TerminalBacklist::CreateBlacklistFile();
-        }
-        $this->selectedTerminals=[];
-        $this->canBlacklistErorr = '';
-        $this->modalFormVisible = false;
-    }
-
+    
     /**
      * History MODAL
      *
@@ -367,11 +348,8 @@ class LicencaTerminal extends Component
      */
     public function terminalHistoryShowModal($id)
     {
-        $this->historyData = null;
         $this->modelId = $id; //ovo je id terminal lokacija tabele
-        //$this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
-
+       
         $this->terminalHistoryVisible = true;
     }
 

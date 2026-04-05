@@ -23,11 +23,13 @@ class BankomatTiket extends Model
         'status',
         'bankomat_tiket_kvar_tip_id',
         'bankomat_tiket_prioritet_id',
+        'naplata',
         'opis',
         'user_prijava_id',
         'user_dodeljen_id',
         'user_zatvorio_id',
         'br_komentara',
+        'created_at',
     ];
 
     public function komentari()

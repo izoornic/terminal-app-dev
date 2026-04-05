@@ -197,7 +197,7 @@ class BankomatTiketMailingActions
         'row4'      =>  'Kvar: '.$opisKvara,
         'row5'      =>  'Opis: '.$this->tiket->opis,
         'row6'      =>  ' -::-  ---  -::-',
-        'row7'      =>  'Proizvod: '.$bankomat_info->bp_tip_naziv.' | sn: '.$bankomat_info->b_sn,
+        'row7'      =>  'Proizvod: '.$bankomat_info->bp_tip_naziv.' | sn: '.$bankomat_info->b_sn.' | tid: '. $bankomat_info->b_terminal_id,
         'row8'      =>  'Status: '.$bankomat_info->status_naziv,
         'row9'      =>  'Lokacija: '.$bankomat_lokacija,
         'row10'     =>  'Region: '. $bankomat_info->r_naziv,

@@ -5,10 +5,10 @@
     <div>
         <div class="flex justify-between">
             <div class="mt-2 font-bold">Komentari: </div>
-            <div class="font-light">{{$selectedTerminalComments->count()}}</div>
+            <div class="font-light">{{$terminalComments->count()}}</div>
         </div>
-        @if($selectedTerminalComments->count())
-            @foreach($selectedTerminalComments as $komentar)
+        @if($terminalComments->count())
+            @foreach($terminalComments as $komentar)
                 <div class="py-2">
                     <div class="flex justify-between">
                         <div class="flex">

@@ -26,6 +26,7 @@ class TerminalLokacija extends Model
         'terminalId',
         'lokacijaId',
         'terminal_statusId',
+        'terminal_campagin_id',
         'korisnikId',
         'korisnikIme',
         'updated_at',
@@ -71,9 +72,26 @@ class TerminalLokacija extends Model
 
             DB::transaction(function()use($item, $cuurent, $lokacija_id, $distributer_id, $datumPremestanja, $status_terminala_id){
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
+                TerminalLokacijaHistory::createNewHistory($item);
+                
                 //update current
-                TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $status_terminala_id, 'lokacijaId' => $lokacija_id, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$datumPremestanja, 'distributerId' => $distributer_id ]);
+                //da li terminal ima kampanju?
+                if($cuurent->terminal_campagin_id) $cuurent->terminal_campagin_id = null;
+                $cuurent->terminal_statusId = $status_terminala_id;
+                $cuurent->lokacijaId = $lokacija_id;
+                $cuurent->distributerId = $distributer_id;
+                $cuurent->korisnikId = auth()->user()->id;
+                $cuurent->korisnikIme = auth()->user()->name;
+                $cuurent->updated_at = $datumPremestanja;
+                $cuurent->save();
+
+                /* TerminalLokacija::where('id', $item)->update([
+                    'terminal_statusId'=> $status_terminala_id, 
+                    'lokacijaId' => $lokacija_id, 
+                    'korisnikId'=>auth()->user()->id, 
+                    'korisnikIme'=>auth()->user()->name, 
+                    'updated_at'=>$datumPremestanja, 
+                    'distributerId' => $distributer_id ]); */
             });
         }
 

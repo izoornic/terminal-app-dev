@@ -17,6 +17,7 @@ use App\Models\PartStock;
 use App\Observers\PartMovementObserver;
 use App\Observers\PartStockObserver;
 
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -33,6 +34,7 @@ class EventServiceProvider extends ServiceProvider
     protected $observers = [
         PartMovement::class => [PartMovementObserver::class],
         PartStock::class => [PartStockObserver::class],
+        PozicijaTip::class => [PozicijaTipObserver::class],
     ];
 
     /**

@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
 use App\Models\LokacijaKontaktOsoba;
-use App\Models\TerminalLokacijaHistory;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -16,8 +15,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
-use App\Ivan\TerminalBacklist;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\TerminalBacklist;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use App\Http\Helpers;
 
@@ -92,7 +91,6 @@ class LicencaLokacija extends Component
     /**
      * The read function.
      *
-     * @return void
      */
     public function read()
     {
@@ -135,7 +133,7 @@ class LicencaLokacija extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {
@@ -242,22 +240,10 @@ class LicencaLokacija extends Component
     }
     
     /**
-     * Creates Gmap link
-     *
-     * @param  mixed $lat
-     * @param  mixed $log
-     * @return void
-     */
-    public static function createGmapLink($lat, $log)
-    {
-        return 'https://www.google.com/maps/search/?api=1&query='.$lat.','.$log;
-    }
-    
-    /**
      * Lists all rows in all tables that use particular location
      *
      * @param  mixed $id
-     * @return void
+     * @return array
      */
     public function locationUsers($id)
     {

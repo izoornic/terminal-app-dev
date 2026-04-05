@@ -3,12 +3,11 @@
 namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
-use App\Models\TerminalLokacija;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\TerminalCommentActions;
 
 class Prikazkomentara extends Component
 {
-    public $selectedTerminalComments;
+    public $terminalComments;
     public $terminalLokacijaId;
     public $canEdit = false;
     public $newKoment = '';
@@ -16,8 +15,8 @@ class Prikazkomentara extends Component
     
     public function mount($canEdit = false)
     {
-        $this->selectedTerminalComments = TerminalLokacija::find($this->terminalLokacijaId)->comments()->where('is_active', true)->get();
-        //$selectedTerminalComments = $selectedTerminalComments;
+        $this->terminalComments = TerminalCommentActions::Comments($this->terminalLokacijaId);
+
         $this->canEdit = $canEdit;
     }
 
@@ -31,12 +30,8 @@ class Prikazkomentara extends Component
      */
     public function obrisiKomentar($id)
     {
-        $komentar = TerminalLokacija::find($this->terminalLokacijaId)->comments()->find($id);
-        if($komentar){
-            $komentar->update(['is_active' => false, 'deleted_at' => now()]);
-            $this->selectedTerminalComments = TerminalLokacija::find($this->terminalLokacijaId)->comments()->where('is_active', true)->get();
-            TerminalLokacija::where('id', $this->terminalLokacijaId)->update(['br_komentara' => $this->selectedTerminalComments->count()]);  
-        }
+        TerminalCommentActions::Delete($id);
+        $this->terminalComments = TerminalCommentActions::Comments($this->terminalLokacijaId);
     }
 
     /**
@@ -50,26 +45,16 @@ class Prikazkomentara extends Component
             'newKoment' => 'required|min:3|max:1000',
         ]);
 
-        TerminalLokacija::find($this->terminalLokacijaId)->comments()
-            ->create([
-                'comment' => $this->newKoment,
-                'userId' => auth()->user()->id,
-            ]);
-
-        $this->selectedTerminalComments = TerminalLokacija::find($this->terminalLokacijaId)->comments()->where('is_active', true)->get();
-        TerminalLokacija::where('id', $this->terminalLokacijaId)
-            ->update([
-                'br_komentara'          => $this->selectedTerminalComments->count(), 
-                'last_comment_userId'   => auth()->user()->id, 
-                'last_comment_at'       => now()
-            ]);
+        TerminalCommentActions::Create($this->terminalLokacijaId, $this->newKoment);
+        
+        $this->terminalComments = TerminalCommentActions::Comments($this->terminalLokacijaId);
         
         $this->newKoment = '';
     } 
 
     public function render()
     {
-        $this->selectedTerminalComments = TerminalLokacija::find($this->terminalLokacijaId)->comments()->where('is_active', true)->get();
+        $this->terminalComments = TerminalCommentActions::Comments($this->terminalLokacijaId);
         return view('livewire.komponente.prikazkomentara');
     }
 }

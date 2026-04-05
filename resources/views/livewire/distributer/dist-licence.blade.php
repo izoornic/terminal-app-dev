@@ -42,6 +42,11 @@
                     <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
                         <thead>
                             <tr>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">
+                                    @if($komentariTerminalVisible)
+                                        <input type="checkbox" value="1" wire:model="selectAll.1"  class="form-checkbox h-6 w-6 text-blue-500">
+                                    @endif
+                                </th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">::</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
                                 <th class="bg-gray-50 px-2 py-3 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
@@ -55,6 +60,7 @@
                         <tbody class="bg-white divide-y divide-gray-200">  
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
+                                <td></td>
                                 <td></td>
                                 <td>
                                     <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-44" type="text" placeholder="Serijski broj" />
@@ -81,6 +87,8 @@
                                 $olditem = new stdClass();
                                 $olditem->id = '';
                             @endphp
+
+                            {{-- THE DATA TABLE --}}
                             @if ($data->count())
                                 @foreach ($data as $item)
                                     @if($olditem->id == $item->id)
@@ -98,6 +106,11 @@
                                     @endphp
 
                                     <tr>
+                                        <td class="px-1 py-1">
+                                            @if($komentariTerminalVisible)
+                                                <input type="checkbox" value="{{ $item->lnid }}" wire:model="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500">
+                                            @endif
+                                        </td>
                                         <td class="pl-2">
                                             @if($item->blacklist)
                                                 <span><x-icon-blacklist-scull class="w-5 h-5" /></span>
@@ -213,6 +226,22 @@
     <div class="mt-5">
         {{ $data->links() }}
     </div>
+    {{-- selekciju više licenci moze da vrsi samo korisnik koji vidi komentare na terminalima --}}
+    @if($komentariTerminalVisible)
+        <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 my-4 flex flex-row" role="alert">
+            <div class="basis-1/2"><p class="text-sm">Ukupno izabranih licenci: <span class="font-bold"> {{ count($selectedTerminals) }}</span></p></div>
+            <div class="basis-1/4 text-right mr-6">
+            </div>
+            <div class="basis-1/4 text-right mr-6">
+                @if(count($selectedTerminals))
+                    <button class="flex border border-green-500 bg-green-50 hover:bg-green-500 text-green-700 hover:text-white font-bold rounded py-1 px-2" wire:click="produziLicenceChecked()">
+                        <svg class="fill-current w-8 h-8 px-1 py-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"/></svg>
+                        <span class="mt-1">{{ __('Produži licence') }}</span>
+                    </button>
+                @endif
+            </div>
+        </div>
+    @endif
 
     {{--  DODAJ LICENCU Modal ###############################################  --}}
     <x-jet-dialog-modal wire:model="dodajLicencuModalVisible">
@@ -627,8 +656,12 @@
             Produži licencu <span class="font-bold">@if($produziLicModalVisible){{$naziv_licence}}@endif</span>
         </x-slot>
         <x-slot name="content">
-            @if($produziLicModalVisible)
+            @if($produziLicModalVisible && !$produziCheckedMode)
                 <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+            @elseif($produziCheckedMode)
+                <div class="px-4 py-2 bg-blue-50 border-l-4 border-blue-400 mb-2">
+                    Produženje ESIR licence za <span class="font-bold">{{ count($selectedTerminals) }}</span> selektovanih terminala.
+                </div>
             @endif
             <div class="px-4 py-2 bg-green-50 border-t-4 border-green-400">
                 <p class="font-bold">Kurs evra:</p>

@@ -14,8 +14,6 @@ use App\Models\LicencaParametarTerminal;
 use App\Actions\Terminali\TerminaliReadActions;
 
 use App\Http\Helpers;
-//use App\Ivan\CryptoSign;
-//use App\Ivan\SelectedTerminalInfo;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -66,6 +64,7 @@ class DistributerTerminal extends Component
     public $lat_value;
     public $long_value;
     public $lokacijalId; // ID lokacije
+    public $odabranaLokacija;
 
     //komentari
     public $modalKomentariVisible;
@@ -101,7 +100,7 @@ class DistributerTerminal extends Component
     /**
      * Koliko terminala ima distributer function.
      *
-     * @return object
+     * @return array
      */
     private function prebrojLicenceITerminaleDistributera()
     {
@@ -176,7 +175,7 @@ class DistributerTerminal extends Component
      /**
      * The read function. searchTipLicence
      *
-     * @return void
+     * @return object
      */
     public function read()
     {

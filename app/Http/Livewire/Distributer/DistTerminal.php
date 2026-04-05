@@ -9,9 +9,8 @@ use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
 use App\Models\DistributerUserIndex;
-use App\Models\LicencaDistributerTip;
+use App\Models\TerminalCampagin;
 use App\Models\TerminalLokacijaHistory;
-use App\Models\DistributerLokacijaIndex;
 
 use App\Actions\Terminali\TerminaliReadActions;
 
@@ -21,9 +20,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
-use App\Ivan\TerminalHistory;
-use App\Ivan\TerminalBacklist;
-use App\Ivan\SelectedTerminalInfo;
+use App\Actions\Terminali\SelectedTerminalInfo;
 
 use App\Helpers\PaginationHelper;
 
@@ -39,9 +36,10 @@ class DistTerminal extends Component
     public $searchKutija;
     public $searchName;
     public $searchPib;
-    public $searchTip;
+    public $searchRegion;
     public $searchStatus;
     public $searchBlackist;
+    public $searchCampagin;
 
     //select all
     public $selectedTerminals = [];
@@ -78,11 +76,24 @@ class DistTerminal extends Component
     public $selectedTerminalCommentsCount;
     public $newKoment;
 
+    public $distCampagins = [];
+    public $selectedCampagin;
+
+    public $multiSelectedInfo;
+
+    protected $listeners = ['blacklistUpdate'];
+    public function blacklistUpdate()
+    {
+        $this->blacklistFormVisible = false;
+        $this->read();
+    }
+
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
         $this->komentariTerminalVisible = auth()->user()->vidi_komentare_na_terminalu ?: 0;
         $this->searchBlackist = 0;
+        $this->distCampagins = TerminalCampagin::where('distributer_id', $this->distId)->get();
     }
 
     /**
@@ -94,11 +105,13 @@ class DistTerminal extends Component
     public function premestiShowModal($id, $status)
     {
         $this->multiSelected = false;
+        $this->selectedTerminals=[];
         $this->modelId = $id;
         $this->plokacijaTip = 0;
         $this->plokacija = 0;
         $this->canMoveTerminal = 0;
         $this->modalStatusPremesti = $status;
+        $this->selectedCampagin = null;
 
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
@@ -125,6 +138,7 @@ class DistTerminal extends Component
         //status na listi se setuje prema prvom izabranom terminalu
         $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selectedTerminals[0])->first()->terminal_statusId;
         //dd($this->modalStatusPremesti);
+        $this->selectedCampagin = null;
 
         $this->plokacijaTip = 0;
         $this->plokacija = 0;
@@ -191,8 +205,6 @@ class DistTerminal extends Component
     /**
      * Prikaz kolekcije sa filterima
      *
-     * @return collection
-     * 
      */
     public function displayData($dataAll)
     {
@@ -248,22 +260,33 @@ class DistTerminal extends Component
      * @return void
      */
     public function moveTerminal(){
-
+        //samo za lokaciju tipa "Korisnik terminala" kampanja obavezna
+        if(Lokacija::where('id', '=', $this->plokacija)->first()->lokacija_tipId == 3){
+            $this->validate([
+                'selectedCampagin' => 'required|numeric',
+            ]);
+        }
+        
         if(!(bool)strtotime($this->datum_premestanja_terminala)) $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
         $this->datum_premestanja_terminala.= ' '.Helpers::vremeKalendarNow();
-
-        //da li se terminal dodaje Distributeru?
-        //$this->distId = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : NULL;
-        //dd($this->distId);          
 
         if($this->multiSelected){
             foreach($this->selectedTerminals as $item){
                 DB::transaction(function()use($item){
-                    $cuurent = TerminalLokacija::where('id', $item) -> first();
+                    $this->selectedCampagin = ($this->selectedCampagin == 0) ? NULL : $this->selectedCampagin;
+                    //$cuurent = TerminalLokacija::where('id', $item) -> first();
                     //insert to history table
-                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
+                    TerminalLokacijaHistory::createNewHistory($item);
+                    
                     //update current
-                    TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala ]);
+                    TerminalLokacija::where('id', $item)->update([
+                        'terminal_statusId'=> $this->modalStatusPremesti, 
+                        'lokacijaId' => $this->plokacija,
+                        'terminal_campagin_id' => $this->selectedCampagin,
+                        'korisnikId'=>auth()->user()->id, 
+                        'korisnikIme'=>auth()->user()->name, 
+                        'updated_at'=>$this->datum_premestanja_terminala 
+                        ]);
                 });
             }
         }else{
@@ -272,9 +295,18 @@ class DistTerminal extends Component
                 //terminal
                 $cuurent = TerminalLokacija::where('id', $this->modelId) -> first();
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
+                TerminalLokacijaHistory::createNewHistory($this->modelId);
+                
+               /*  ::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]); */
                 //update current
-                TerminalLokacija::where('id', $this->modelId)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala ]);
+                TerminalLokacija::where('id', $this->modelId)->update([
+                    'terminal_statusId'=> $this->modalStatusPremesti, 
+                    'lokacijaId' => $this->plokacija, 
+                    'terminal_campagin_id' => $this->selectedCampagin,
+                    'korisnikId'=>auth()->user()->id, 
+                    'korisnikIme'=>auth()->user()->name, 
+                    'updated_at'=>$this->datum_premestanja_terminala 
+                    ]);
             });
         }
         $this->selectedTerminals=[];
@@ -290,11 +322,9 @@ class DistTerminal extends Component
     public function statusShowModal($id, $status)
     {
         $this->multiSelected = false;
+        $this->selectedTerminals=[];
         $this->modelId = $id; //ovo je id terminal_lokacijas tabele
         $this->modalStatus = $status;
-        //$this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
-        //$this->resetValidation();
-        //$this->reset();
         $this->modalFormVisible = true;
     }
 
@@ -305,28 +335,18 @@ class DistTerminal extends Component
      */
     public function statusUpdate()
     {
-        if($this->multiSelected){
-            foreach($this->selectedTerminals as $item){
-                DB::transaction(function()use($item){
-                    //terminal
-                    $cuurent = TerminalLokacija::where('id', $item) -> first();
-                    //insert to history table
-                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
-                    //update current
-                    TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
-                });
-            }
-        }else{
-            //$this->validate();
-            DB::transaction(function(){
-                //terminal
-                $cuurent = TerminalLokacija::where('id', $this->modelId) -> first();
+        if(!$this->multiSelected){
+            $this->selectedTerminals[0] = $this->modelId;
+        }
+        foreach($this->selectedTerminals as $item){
+            DB::transaction(function()use($item){
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
+                TerminalLokacijaHistory::createNewHistory($item);
                 //update current
-                TerminalLokacija::where('id', $this->modelId)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                TerminalLokacija::where('id', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
             });
         }
+        
         $this->selectedTerminals=[];
         $this->modalFormVisible = false;
     }
@@ -342,40 +362,10 @@ class DistTerminal extends Component
         $this->canBlacklistErorr = '';
         $this->canBlacklist = true;
         $this->multiSelected = false;
+        $this->selectedTerminals=[];
         $this->modelId = $id;
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
-        if($this->selectedTerminal->blacklist == 1){
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da uklonite terminal sa Blackliste?';
-        }else{
-            $this->canBlacklistErorr = 'Da li ste sigurni da želite da dodate terminal na Blacklistu?';
-        }
-        if($this->selectedTerminal->lokacija_tipId != 3){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali koji su instalirani korisnicima mogu se dodavti na Blacklistu!';
-        }
-        if($this->selectedTerminal->ts_naziv != 'Instaliran'){
-            $this->canBlacklist = false;
-            $this->canBlacklistErorr = 'Samo terminali sa statsom "Instaliran" se mogu dodavti na Blacklistu!';
-        }
         $this->blacklistFormVisible = true;
     }
-
-    /**
-     * The update function
-     *
-     * @return void
-     */
-    public function blacklistUpdate()
-    {
-        if(TerminalBacklist::AddRemoveBlacklist($this->modelId)){
-            TerminalBacklist::CreateBlacklistFile();
-        }
-        $this->selectedTerminals=[];
-        $this->canBlacklistErorr = '';
-        $this->blacklistFormVisible = false;
-    }
-
-
     
     /**
      * Prikazuje komentare na terminalu
@@ -384,6 +374,8 @@ class DistTerminal extends Component
      */
      public function commentsShowModal($id)
     {
+        $this->multiSelected = false;
+        $this->selectedTerminals=[];
         $this->newKoment = '';
         $this->resetErrorBag();
         $this->modelId = $id; //ovo je id terminal lokacija tabele
@@ -431,11 +423,12 @@ class DistTerminal extends Component
             'searchSB' => $this->searchSB,
             'searchKutija' => $this->searchKutija,
             'searchNazivLokacije' => $this->searchName,
-            'searchTipLokacije' => $this->searchTip,
+            'searchRegion' => $this->searchRegion,
             'searchStatus' => $this->searchStatus,
             'searchBlackist' => $this->searchBlackist,
             'searchPib' => $this->searchPib,
-            'searchDistributer' => $this->distId
+            'searchDistributer' => $this->distId,
+            'searchCampagin' => $this->searchCampagin
         ];
 
         $builder = TerminaliReadActions::TerminaliRead($search);

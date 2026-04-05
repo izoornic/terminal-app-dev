@@ -330,3 +330,32 @@ V 1.1.1 (22.1.2026.) @Rezervni-delovi
 
 V 1.1.2 (4.2.2026.) @main
     - @Rezervni-delovi pull to main
+
+V 1.1.3 (17.2.2026.) @Bnkomati_to_do
+    - Roletova to do lista 80% gotova
+    - Dodata uloga "Programer" i napravljena console akcija za sinch novih uloga php artisan pozicija:sync-roles
+    - Dodato polje u tabeli "bankomat_tikets" - "naplata" i dugme za ukljucenje i iskljucenje naplate
+    - Filteri na stranici "Tiketi" sa X dugmicima za gasenje a pretraga se cuva u sesiji
+    - Dodata promena statusa kao komponenta i sada moguca i iz tiketa.
+    - Didata promena vremena vremna za otvaranje i zatvaranje tiketa.
+    - U History tikata dodtat opis kvara
+    - Dodat TID u pregledu tiketa i tekstu maila za servis bankomata.
+
+V 1.1.7 (27.2.2026.) @Bnkomati_to_do
+    - Premestanje Proizvoda (Bakomata) zavisi od vlasnika prozvoda
+    - Promenjena logika dodavanja lokacija i podlokacija. Sada dva dugmeta “Nova lokacija” i “Nova Podlokacija”
+    - Podlokacija moguca samo za tip - Produkciona lokacija
+
+V 1.1.8 (4.3.2026.) @Bnkomati_to_do
+    - Uloga "Programer" - vidi sve proizvode i lokacije a tiket dodeljuje samo sebi.
+
+V 1.1.9 (14.3.2026.) @Bnkomati_to_do
+    - moguca promena email adrese lokacije.
+    - Distributer koji vidi kometare moze da produzava licence preko check polja. Samo ESIR licence koje su u statusu aktivne.
+    - Dodat obavezan komentar kod dodavnja i skidanja sa blackliste
+    - Ispravljen bug sa adminom bankomata i filterom za region tiketa
+
+V 1.1.10 (29.3.2026.) @Bnkomati_to_do
+    - Dodaata nova komponenta "Istrorija lokacije" samo za lokacije tipa "Korisnik terminala" na stranici "Lokacije" za uloge Admin, Šef servisa, Serviser i Call center
+    - Dodate "Kampanje" za ulogu Distributer. Kao i funkcionalnost da je kampanja obavezna prilikom premetanja terminala na lokaciju tipa "Korisnik terminala". Premeštanje terminala na lokaciju drugog tipa ili iz druge uloge setuje kampanju na null.
+    - Rediyajnirana stranica Terminali za Menadzera licence i Admina

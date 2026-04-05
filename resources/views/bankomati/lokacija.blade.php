@@ -6,11 +6,16 @@
                    Lokacije
 
             </div>
-            <div class="max-h-6" >
+            <div class="max-h-6 flex" >
                 <span class="mr-2 pr-2"> 
                     <livewire:komponente.add-new-item-button 
                             btn_name="Nova lokacija"
                             btn_event="newLocation" />
+                </span>
+                <span class="mr-2 pr-2"> 
+                    <livewire:komponente.add-new-item-button 
+                            btn_name="Nova podlokacija"
+                            btn_event="newSubLocation" />
                 </span>
             </div>
         </h2>

@@ -52,7 +52,7 @@ class BankomatiPage extends Component
     public $bankomat_lokacija;
     public $datum_promene;
     public $datum_promene_error;
-    public $old_datum_promene;
+    //public $old_datum_promene;
     public $vlasnik_proizvoda;
     public $old_vlasnik_proizvoda;
     public $flashKey = 1;
@@ -65,6 +65,7 @@ class BankomatiPage extends Component
     public $modalPremestiVisible = false;
     public $vrsta_lokacije;
     public $nova_lokacija;
+    public $trenutna_lokacija_id;
 
     public $searchPLokacijaNaziv;
     public $searchPlokacijaMesto;
@@ -92,7 +93,7 @@ class BankomatiPage extends Component
      *
      * @var array
      */
-    protected $listeners = ['newBankomat', 'newTicketCreated', 'novaLokacija'];
+    protected $listeners = ['newBankomat', 'newTicketCreated', 'novaLokacija', 'statusChanged'];
 
     public function newBankomat()
     {
@@ -119,6 +120,10 @@ class BankomatiPage extends Component
         if($key == 'premesti') $this->nova_lokacija = $id; 
     }
     
+    public function statusChanged()
+    {
+        $this->modalStatusFormVisible = false;
+    }
     
     public function mount()
     {
@@ -136,6 +141,7 @@ class BankomatiPage extends Component
         $this->old_b_sn = '';
         $this->vrsta_lokacije = '';
         $this->nova_lokacija = '';
+        $this->trenutna_lokacija_id = '';
         $this->proizvod_model_tip = '';
         $this->datum_promene_error = '';
         $this->vlasnik_proizvoda = '';
@@ -288,57 +294,24 @@ class BankomatiPage extends Component
     {
         $this->resetInputFields();
         $this->modelId = $id; //ovo je id terminal_lokacijas tabele
-        $this->old_datum_promene =  BankomatLokacija::where('id', '=', $this->modelId)->first()->updated_at;
+        //$this->old_datum_promene =  BankomatLokacija::where('id', '=', $this->modelId)->first()->updated_at;
         $this->bankomat_status = $status;
-        $this->datum_promene = date('Y-m-d');
+        //$this->datum_promene = date('Y-m-d');
 
         $this->modalStatusFormVisible = true;
 
     }
 
-    public function statusUpdate()
-    {
-        $this->validate(['datum_promene' => 'required|date']);
-
-        $cuurent = BankomatLokacija::where('id', '=', $this->modelId)->first();
-
-        if($cuurent->bankomat_status_tip_id == $this->bankomat_status) {
-            $this->datum_promene_error = 'Niste promenili status.';
-            return;
-        }
-
-        //Provera datuma koji je korisnik uneo za promenu statusa
-        if(!$this->validDatumPromene([1, 2, 4])) return;
-        
-        //dd($this->datum_promene);
-        DB::transaction(function()use($cuurent){
-            $cuurent->update(['bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
-
-            BankomatLocijaHirtory::create([
-                'bankomat_lokacija_id' => $this->modelId,
-                'bankomat_id' => $cuurent['bankomat_id'],
-                'blokacija_id' => $cuurent['blokacija_id'],
-                'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
-                'user_id' => $cuurent['user_id'],
-                'naplata' => $cuurent['naplata'],
-                'updated_at' => $cuurent['updated_at'],
-                'history_action_id' => 2
-            ]);  
-             
-            
-        });
-
-        $this->modalStatusFormVisible = false;
-    }
-
-    public function premestiShowModal($id, $status)
+    public function premestiShowModal($id, $status, $blokacija_id, $vlasnik_uredjaja = null)
     {
         $this->resetInputFields();
         $this->resetValidation();
         $this->modelId = $id; //ovo je id terminal_lokacijas tabele
         $this->bankomat_status = $status;
         $this->flashKey ++;
+        $this->trenutna_lokacija_id = $blokacija_id;
         $this->datum_promene = date('Y-m-d');
+        $this->vlasnik_proizvoda = $vlasnik_uredjaja;
         $this->modalPremestiVisible = true;
     }
 
@@ -439,7 +412,7 @@ class BankomatiPage extends Component
             'b_terminal_id' => $this->searchTerminalId,
             'proizvod_model' => $this->searchModel,
             'lokacija_naziv' => $this->searchLokacijaNaziv,
-            'region' => ($this->role_region['role'] == 'admin') ? $this->searchRegion : $this->role_region['region'],
+            'region' => ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? $this->searchRegion : $this->role_region['region'],
             'tip' => $this->searchLocationTip,
             'status' => $this->searchStatus,
             'pib' => $this->searchPib,

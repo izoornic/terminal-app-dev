@@ -12,55 +12,56 @@
                                 <td>
                                     <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" />
                                 </td>
-                                <td>
+                                <td class="p-1">
                                     <x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" />
                                 </td>
-                                <td>
+                                <td class="p-1">
                                     <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" />
                                 </td>
-                                <td class="text-center text-gray-400">
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <td class="p-1">
+                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">-- Tip lokacije --</option>
                                         @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td class="text-center text-gray-400">
-                                    Status
+                                <td class="p-1">
+                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">-- Status --</option>
+                                        @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>
                             </tr>
+                            {{-- SEARCH 2nd ROW --}}
                             <tr class="bg-orange-50">
                                 <td></td>
-                                <td>
+                                <td class="p-1">
                                     <x-jet-input wire:model="searchKutija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" />
                                 </td>
-                                <td>
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <td class="p-1">
+                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">-- Region --</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
                                             @endforeach
                                     </select>
                                 </td>
-                                <td>
-                                    <select wire:model="searchVendor" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <td class="p-1">
+                                    <select wire:model="searchVendor" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">-- Vendor --</option>
                                         @foreach (App\Models\TerminalVendor::allList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td>
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="">---</option>
-                                        @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
-                                            <option value="{{ $key }}">{{ $value }}</option>
-                                        @endforeach
-                                    </select>
+                                <td class="p-1">
+                                    <x-jet-input wire:model="searchCampagin" id="" class="block bg-orange-50 w-full" type="text" placeholder="Kampanja" />
                                 </td>
-                                <td>
+                                <td class="p-1">
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>    
                             </tr>  
@@ -75,8 +76,8 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">L</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Serijski broj <br /><span class=" text-red-400">Kutija</span></th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Lokacija <br /><span class=" text-red-400">Region</span></th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Distributer</th>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">tip <br />lokacije</th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Lok. tip <br /><span class="text-gray-800">Vendor</span></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Distributer <br /><span class=" text-green-600">Kampanja</span></th></th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Status</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Premesti</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Istorija</th>
@@ -129,10 +130,6 @@
                                             {{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}<br />
                                             <span class="text-sm text-red-400"> {{ $item->r_naziv }}</span>
                                         </td>
-                                        {{-- DISTRIBUTER --}}
-                                        <td class="px-1 py-2 text-xs" style="max-width: 200px !important;">
-                                            {{ $item->distributer_naziv }}
-                                        </td> 
                                         {{-- LOKACIJA TIP --}}
                                         <td class="px-1 py-2 text-center">
                                             
@@ -159,6 +156,11 @@
                                                 @if($item->vendor_name == null) <x-heroicon-o-plus-circle class="w-5 h-5" /> @else {{ $item->vendor_name }} @endif
                                             </button>
                                         </td>
+                                        {{-- DISTRIBUTER/ KAMPANJA --}}
+                                        <td class="px-1 py-2 text-xs" style="max-width: 200px !important;">
+                                            {{ $item->distributer_naziv }}@if( $item->campagin_name )<br /><span class="text-xs text-green-600">{{ $item->campagin_name }}</span>@endif
+                                        </td> 
+                                        
                                         {{-- STATUS --}}
                                         <td class="px-1 py-2">
                                             <button class="px-2 py-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="statusShowModal({{ $item->tlid}}, {{ $item->statusid }})">
@@ -185,9 +187,9 @@
                                         </td>
                                         {{-- Komentari --}}
                                         <td>
-                                            <button class="px-2 text-sm relative text-gray-500 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
+                                            <button class="px-2 py-1 text-sm relative text-gray-600 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
                                                 <div class="mx-1 text-lg">{{ $item->br_komentara}}</div>
-                                                <x-heroicon-o-chat-bubble-bottom-center-text class="z-10 absolute top-0 text-gray-400 -mt-1.5 ml-2 w-3 h-3"/>
+                                                <x-heroicon-o-chat-bubble-bottom-center-text class="z-10 absolute top-1 right-1 text-gray-400 -mt-1.5 ml-2.5 w-4 h-4"/>
                                             </button>
                                         </td>
                                     </tr>
@@ -510,37 +512,13 @@
                 <div class="relative">
                     <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
                     
-                    
                     <div class="fixed top-3 right-3">
                         <x-jet-danger-button class="ml-2" wire:click="editTerminalInfoShowModal({{$modelId}})" wire:loading.attr="disabled">
                             <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1 24.97C401.2-3.147 446.8-3.147 474.9 24.97L487 37.09C515.1 65.21 515.1 110.8 487 138.9L289.8 336.2C281.1 344.8 270.4 351.1 258.6 354.5L158.6 383.1C150.2 385.5 141.2 383.1 135 376.1C128.9 370.8 126.5 361.8 128.9 353.4L157.5 253.4C160.9 241.6 167.2 230.9 175.8 222.2L373.1 24.97zM440.1 58.91C431.6 49.54 416.4 49.54 407 58.91L377.9 88L424 134.1L453.1 104.1C462.5 95.6 462.5 80.4 453.1 71.03L440.1 58.91zM203.7 266.6L186.9 325.1L245.4 308.3C249.4 307.2 252.9 305.1 255.8 302.2L390.1 168L344 121.9L209.8 256.2C206.9 259.1 204.8 262.6 203.7 266.6zM200 64C213.3 64 224 74.75 224 88C224 101.3 213.3 112 200 112H88C65.91 112 48 129.9 48 152V424C48 446.1 65.91 464 88 464H360C382.1 464 400 446.1 400 424V312C400 298.7 410.7 288 424 288C437.3 288 448 298.7 448 312V424C448 472.6 408.6 512 360 512H88C39.4 512 0 472.6 0 424V152C0 103.4 39.4 64 88 64H200z"/></svg>
                         </x-jet-danger-button>
                     </div>
                 </div>
-                @if(count($historyData))
-                    <ol class="relative border-l border-gray-200 dark:border-gray-700">
-                        @foreach($historyData as $item)                 
-                        <li class="mb-4 ml-6">            
-                            <span class="flex absolute -left-3 justify-center items-center w-6 h-6 bg-sky-100 rounded-full ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
-                                @if($item->tabela == 'tlh')
-                                    <svg class="w-3 h-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-                                @else
-                                    <svg class="fill-orange-600 w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M128 160H448V352H128V160zM512 64C547.3 64 576 92.65 576 128V208C549.5 208 528 229.5 528 256C528 282.5 549.5 304 576 304V384C576 419.3 547.3 448 512 448H64C28.65 448 0 419.3 0 384V304C26.51 304 48 282.5 48 256C48 229.5 26.51 208 0 208V128C0 92.65 28.65 64 64 64H512zM96 352C96 369.7 110.3 384 128 384H448C465.7 384 480 369.7 480 352V160C480 142.3 465.7 128 448 128H128C110.3 128 96 142.3 96 160V352z"/></svg>
-                                @endif
-                            </span>
-                            @if($item->tabela == 'tlh')
-                                <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span></h3>
-                                <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400">Status: <span class="font-bold">{{ $item->status_naziv }}</span></p>
-                                <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Lokacija: <span class="font-bold">{{ $item->lokacija }} , {{ $item->mesto }}</span> @if($item->distributer != null) <br />Distributer: <span class="font-bold"> {{ $item->distributer }} </span> @endif</p>
-                            @else
-                                <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span></h3>
-                                <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->lokacija] ) }}">Tiket #{{ $item->lokacija }}</span></x-jet-nav-link> , {{ $item->mesto }} : {{ $item->dodeljen }}</p>
-                                <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Opis kvara: <span class="font-bold">{{ $item->user_ime }}</span></p>
-                            @endif
-                        </li>
-                        @endforeach
-                    </ol>
-                @endif
+                <livewire:komponente.terminal-histroy-component :terminal_lokacija_id="$modelId" />
             @endif
         </x-slot>
 

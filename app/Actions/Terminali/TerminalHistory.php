@@ -1,5 +1,5 @@
 <?php
-namespace App\Ivan;
+namespace App\Actions\Terminali;
 
 use Illuminate\Support\Facades\DB;
 
@@ -9,33 +9,36 @@ class TerminalHistory
     {
         return DB::select(
             "SELECT * FROM (
-                SELECT 
-                    'tlh' as 'tabela', 
-                    terminal_lokacija_histories.korisnikIme as 'user_ime', 
-                    terminal_lokacija_histories.created_at, 
-                    terminal_lokacija_histories.updated_at, 
-                    terminal_status_tips.ts_naziv as 'status_naziv', 
-                    lokacijas.l_naziv as 'lokacija', 
-                    lokacijas.mesto as 'mesto', 
-                    'na' as 'dodeljen', 
-                    licenca_distributer_tips.distributer_naziv as 'distributer'
+                SELECT
+                    'tlh' as 'tabela',
+                    terminal_lokacija_histories.korisnikIme as 'user_ime',
+                    terminal_lokacija_histories.created_at,
+                    terminal_lokacija_histories.updated_at,
+                    terminal_status_tips.ts_naziv as 'status_naziv',
+                    lokacijas.l_naziv as 'lokacija',
+                    lokacijas.mesto as 'mesto',
+                    'na' as 'dodeljen',
+                    licenca_distributer_tips.distributer_naziv as 'distributer',
+                    terminal_campagins.campagin_name as 'campagin'
                 FROM terminal_lokacija_histories
                 LEFT JOIN terminal_status_tips ON terminal_lokacija_histories.terminal_statusId = terminal_status_tips.id
                 LEFT JOIN lokacijas ON terminal_lokacija_histories.lokacijaId = lokacijas.id
                 LEFT JOIN licenca_distributer_tips ON terminal_lokacija_histories.distributerId = licenca_distributer_tips.id
+                LEFT JOIN terminal_campagins ON terminal_lokacija_histories.terminal_campagin_id = terminal_campagins.id
                 WHERE terminal_lokacija_histories.terminal_lokacijaId = ?
             ) a
             UNION ALL
             SELECT * FROM (
-                SELECT 
-                    'tiketHist' as 'tabela', 
-                    tiket_opis_kvara_tips.tok_naziv as 'user_ime', 
-                    tiket_histories.created_at, tiket_histories.updated_at, 
-                    tiket_prioritet_tips.tp_naziv as 'status_naziv', 
-                    tiket_histories.tiketId as 'lokacija', 
-                    tiket_status_tips.tks_naziv as 'mesto', 
-                    users.name as 'dodeljen', 
-                    'na' as 'distributer' 
+                SELECT
+                    'tiketHist' as 'tabela',
+                    tiket_opis_kvara_tips.tok_naziv as 'user_ime',
+                    tiket_histories.created_at, tiket_histories.updated_at,
+                    tiket_prioritet_tips.tp_naziv as 'status_naziv',
+                    tiket_histories.tiketId as 'lokacija',
+                    tiket_status_tips.tks_naziv as 'mesto',
+                    users.name as 'dodeljen',
+                    'na' as 'distributer',
+                    '' as 'campagin'
                 FROM tiket_histories
                 LEFT JOIN tiket_opis_kvara_tips ON tiket_histories.opis_kvaraId = tiket_opis_kvara_tips.id
                 LEFT JOIN tiket_prioritet_tips ON tiket_histories.tiket_prioritetId = tiket_prioritet_tips.id
@@ -45,16 +48,17 @@ class TerminalHistory
             ) b
             UNION ALL
             SELECT * FROM (
-                SELECT 
-                    'tiket' as 'tabela', 
-                    tiket_opis_kvara_tips.tok_naziv as 'user_ime', 
-                    tikets.created_at, 
-                    tikets.updated_at, 
-                    tiket_prioritet_tips.tp_naziv as 'status_naziv', 
-                    tikets.id as 'lokacija', 
-                    tiket_status_tips.tks_naziv as 'mesto', 
-                    users.name as 'dodeljen', 
-                    'na' as 'distributer'
+                SELECT
+                    'tiket' as 'tabela',
+                    tiket_opis_kvara_tips.tok_naziv as 'user_ime',
+                    tikets.created_at,
+                    tikets.updated_at,
+                    tiket_prioritet_tips.tp_naziv as 'status_naziv',
+                    tikets.id as 'lokacija',
+                    tiket_status_tips.tks_naziv as 'mesto',
+                    users.name as 'dodeljen',
+                    'na' as 'distributer',
+                    '' as 'campagin'
                 FROM tikets
                 LEFT JOIN tiket_opis_kvara_tips ON tikets.opis_kvaraId = tiket_opis_kvara_tips.id
                 LEFT JOIN tiket_prioritet_tips ON tikets.tiket_prioritetId = tiket_prioritet_tips.id
