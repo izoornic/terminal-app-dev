@@ -510,7 +510,7 @@
         <x-slot name="content">
             @if($terminalHistoryVisible)
                 <div class="relative">
-                    <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+                    <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" :key="time()" />
                     
                     <div class="fixed top-3 right-3">
                         <x-jet-danger-button class="ml-2" wire:click="editTerminalInfoShowModal({{$modelId}})" wire:loading.attr="disabled">
@@ -518,7 +518,7 @@
                         </x-jet-danger-button>
                     </div>
                 </div>
-                <livewire:komponente.terminal-histroy-component :terminal_lokacija_id="$modelId" />
+                <livewire:komponente.terminal-histroy-component :terminal_lokacija_id="$modelId" :key="time()" />
             @endif
         </x-slot>
 
