@@ -42,7 +42,7 @@
         </div>
     </div> 
     <div>
-        @if($kontaktOsobe->count() && $multySelected == false)
+        @if($kontaktOsobe?->count() && $multySelected == false)
             <button onClick='if (document.getElementById("kontaktOsobe").style.display == "none") {
                                     document.getElementById("kontaktOsobe").style.display = "block";
                                 }else{

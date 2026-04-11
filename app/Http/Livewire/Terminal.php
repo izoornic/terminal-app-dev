@@ -524,7 +524,7 @@ class Terminal extends Component
     /**
      * Prikaz aktivnih licenci
      *
-     * @param mixed $tlid
+     * @param mixed $id
      * 
      * @return [type]
      * 
@@ -660,7 +660,6 @@ class Terminal extends Component
     /**
      * Pomeri prekoracenje
      *
-     * @param mixed $id
      * @param mixed $naziv
      * @param mixed $dist_id
      * @param mixed $dist_cena_id

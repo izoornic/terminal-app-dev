@@ -66,23 +66,25 @@
                                 <td>
                                     <div class="flex">
                                         <button id="states-button" data-dropdown-toggle="dropdown-states" class="shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-500 border border-gray-300 rounded-s-lg hover:bg-white focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
-                                            @if($searchTip)
-                                                @switch($searchTip)
-                                                    @case(1)
-                                                        <x-heroicon-o-wrench-screwdriver class="text-red-600 w-4 h-4 mr-2" />
-                                                    @break
-                                                    @case(2)
-                                                        <x-heroicon-o-building-library class="text-gray-600 w-4 h-4 mr-2"/>
-                                                    @break
-                                                    @case(3)
-                                                        <x-heroicon-o-building-storefront class="text-sky-600 w-4 h-4 mr-2"/>
-                                                    @break
-                                                @endswitch   
-                                                <span class="mr-2">{{ App\Models\BlokacijaTip::where('id', $searchTip)->first()->bl_tip_naziv }}</span>
-                                            @else
-                                               <span class="mx-2"> --- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                            @endif
-                                             <x-icon-o-down class="w-2.5 h-2.5 ml-2" />
+                                            <span wire:key="tip-icon-{{ $searchTip }}" class="inline-flex items-center">
+                                                @if($searchTip)
+                                                    @switch($searchTip)
+                                                        @case(1)
+                                                            <x-heroicon-o-wrench-screwdriver class="text-red-600 w-4 h-4 mr-2" />
+                                                        @break
+                                                        @case(2)
+                                                            <x-icon-warehouse class="fill-gray-400 w-5 h-5 mr-2"/>
+                                                        @break
+                                                        @case(3)
+                                                            <x-heroicon-o-building-library class="text-sky-400 w-5 h-5 mr-2"/>
+                                                        @break
+                                                    @endswitch
+                                                    <span class="mr-2">{{ App\Models\BlokacijaTip::where('id', $searchTip)->first()->bl_tip_naziv }}</span>
+                                                @else
+                                                    <span class="mx-2"> --- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                                @endif
+                                            </span>
+                                            <x-icon-o-down class="w-2.5 h-2.5 ml-2" />
                                         </button>
                                     <div id="dropdown-states" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
                                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="states-button">
@@ -101,10 +103,10 @@
                                                                     <x-heroicon-o-wrench-screwdriver class="text-red-600 w-4 h-4 mr-2" />
                                                                 @break
                                                                 @case(2)
-                                                                    <x-heroicon-o-building-library class="text-gray-600 w-4 h-4 mr-2"/>
+                                                                    <x-icon-warehouse class="fill-gray-400 w-5 h-5 mr-2"/>
                                                                 @break
                                                                 @case(3)
-                                                                    <x-heroicon-o-building-storefront class="text-sky-600 w-4 h-4 mr-2"/>
+                                                                    <x-heroicon-o-building-library class="text-sky-400 w-5 h-5"/>
                                                                 @break
                                                             @endswitch          
                                                             {{ $value }}
@@ -133,7 +135,7 @@
 
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    <tr>
+                                    <tr wire:key="{{ $item->id }}">
                                         <td class="px-2 py-1">
                                             <button class="mt-2 text-sm text-gray-700 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="editLocation('{{ $item->id }}')">
                                                 <x-heroicon-o-pencil-square class="w-5 h-5 mx-2 my-1" />
@@ -145,10 +147,10 @@
                                                     <x-heroicon-o-wrench-screwdriver class="text-red-400 w-4 h-4" />
                                                 @break
                                                 @case(2)
-                                                    <x-heroicon-o-building-library class="text-gray-400 w-4 h-4"/>
+                                                    <x-icon-warehouse class="fill-gray-400 w-5 h-5"/>
                                                 @break
                                                 @case(3)
-                                                    <x-heroicon-o-building-storefront class="text-sky-400 w-4 h-4"/>
+                                                    <x-heroicon-o-building-library class="text-sky-400 w-5 h-5"/>
                                                 @break
                                             @endswitch
                                         </td>

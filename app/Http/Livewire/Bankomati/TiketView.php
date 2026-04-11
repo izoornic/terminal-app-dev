@@ -236,7 +236,7 @@ class TiketView extends Component
 
     public function searchUser()
     {
-        $positions = ($this->role_region['role'] == 'admin') ? [9, 10, 11] : [10, 11];
+        $positions = ($this->role_region['role'] == 'admin') ? [9, 10, 11, 12] : [10, 11];
         return User::select('users.id', 'users.name', 'blokacijas.bl_naziv', 'pozicija_tips.naziv')
                     ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')

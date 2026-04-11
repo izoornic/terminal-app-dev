@@ -29,6 +29,7 @@ class BankomatiReadActions
         $searchProduct = $search['product_tip'] ?? null;
         $searchMesto = $search['mesto'] ?? null;
         $searchNazivSufix = $search['naziv_sufix'] ?? null;
+        $searchNaplata = $search['naplata'] ?? null;
 
         if(!$sortField) $sortField='bankomats.id';
         
@@ -90,6 +91,9 @@ class BankomatiReadActions
         })
         ->when($searchNazivSufix, function ($query, $searchNazivSufix) {
             return $query->where('blokacijas.bl_naziv_sufix',  'like', '%' . $searchNazivSufix . '%');
+        })
+        ->when($searchNaplata !== null, function ($query) use ($searchNaplata) {
+            return $query->where('bankomat_lokacijas.naplata', '=', $searchNaplata);
         })
         ->orderBy($sortField, $sortAsc ? 'asc' : 'desc');
     }

@@ -9,10 +9,10 @@
                             <x-heroicon-o-wrench-screwdriver class="text-red-400 w-4 h-4" />
                         @break
                         @case(2)
-                            <x-heroicon-o-building-library class="text-gray-400 w-4 h-4"/>
+                            <x-icon-warehouse class="fill-gray-400 w-5 h-5"/>
                         @break
                         @case(3)
-                            <x-heroicon-o-building-storefront class="text-sky-400 w-4 h-4"/>
+                            <x-heroicon-o-building-library class="text-sky-400 w-5 h-5"/>
                         @break
                     @endswitch
                     <span class="ml-2">{{ $value->bl_tip_naziv }}</span>

@@ -41,6 +41,7 @@ class BankomatiPage extends Component
     public $searchProductTip;
     public $searchMesto;
     public $searchNazivSufix;
+    public $searchNaplata;
 
     //NEW EDIT
     public $b_sn;
@@ -419,7 +420,7 @@ class BankomatiPage extends Component
             'product_tip' => $this->searchProductTip,
             'naziv_sufix' => $this->searchNazivSufix,
             'mesto' => $this->searchMesto,
-
+            'naplata' => ($this->searchNaplata !== null && $this->searchNaplata !== '') ? $this->searchNaplata : null,
         ]; 
         
        $builder = BankomatiReadActions::BankomatiRead($searchParams);

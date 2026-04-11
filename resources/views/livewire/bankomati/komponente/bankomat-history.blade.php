@@ -39,11 +39,25 @@
                 @elseif($item->vrsta_akcije == 2)
                     {{-- AKCIJA TIKET --}}
                     <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'bankomat-tiketview', ['id' => $item->bankomat_tiket_id] ) }}">Tiket #{{ $item->bankomat_tiket_id }}</span></x-jet-nav-link></p>
-
+                       
                     <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Tip kvara: <span class="font-bold">@if($item->btkt_naziv) {{ $item->btkt_naziv }} @else Ostalo @endif</span></p>
-
+                    {{-- OTVORTEN TIKET --}}
+                    @if($item->history_action_id == 8) 
                     <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Opis: <span class="font-bold">{{ $item->opis }}</span></p>
-
+                    {{-- ZATVOREN TIKET --}}
+                    @elseif($item->history_action_id == 9)
+                        {{-- PRIKAZI KOMENTARE --}}
+                        @if($item->komentari)
+                            @foreach($item->komentari as $koment)
+                                <p class="flex items-center mb-1 text-base font-normal text-gray-500 dark:text-gray-400">
+                                    <x-heroicon-o-chat-bubble-left-right class="text-slate-500 w-4 h-4 mr-2"/>
+                                    <span class="font-bold mr-2">{{ $koment->name }}</span>
+                                    <span class="text-sm">{{ App\Http\Helpers::datumFormat($koment->created_at) }}</span>
+                                </p>
+                                <p class="mb-2 ml-6 p-1 rounded text-base font-normal text-gray-500 dark:text-gray-400 bg-gray-100">{!! nl2br(e($koment->komentar)) !!}</p>
+                            @endforeach
+                        @endif
+                    @endif
                 @elseif($item->vrsta_akcije == 3)
                     {{-- AKCIJA NAPLATE --}}
                     

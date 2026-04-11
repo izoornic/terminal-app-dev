@@ -70,6 +70,7 @@
                                     <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                             </tr> 
+                            {{-- SEARCH 2nd ROW --}}
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td></td>
@@ -84,14 +85,20 @@
                                     <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td></td>
+                                <td colspan="2">
+                                    <select wire:model="searchNaplata" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">Naplata</option>
+                                        <option value="1">Da</option>
+                                        <option value="0">Ne</option>
+                                    </select>
+                                </td>
                                 <td></td>
-                                <td colspan="2"></td>
                             </tr> 
                             
                             <!-- DATA  -->                   
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    <tr @if($loop->even) class="bg-gray-50" @endif >
+                                    <tr wire:key="{{ $item->blid }}" @if($loop->even) class="bg-gray-50" @endif >
 
                                         <td class="px-2 py-1">
                                             <button class="mt-2 text-sm text-gray-700 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="editBankomat('{{ $item->bid }}')">
@@ -114,10 +121,10 @@
                                                     <x-heroicon-o-wrench-screwdriver class="text-red-400 w-4 h-4" />
                                                 @break
                                                 @case(2)
-                                                    <x-heroicon-o-building-library class="text-gray-400 w-4 h-4"/>
+                                                    <x-icon-warehouse class="fill-gray-400 w-5 h-5"/>
                                                 @break
                                                 @case(3)
-                                                    <x-heroicon-o-building-storefront class="text-sky-400 w-4 h-4"/>
+                                                    <x-heroicon-o-building-library class="text-sky-400 w-5 h-5"/>
                                                 @break
                                             @endswitch
                                         </td>
@@ -460,10 +467,17 @@
 
     {{-- TIKET Modal ################################################################################## --}}
     <x-jet-dialog-modal wire:model="modalNewTicketVisible">
-        <x-slot name="title">
-            <div class="flex">
-            <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
-            Novi tiket
+        <x-slot name="title" class="flex">
+            <div class="flex justify-between">
+                <div class="flex">
+                    <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
+                    <span>Novi tiket</span>
+                </div>
+                <div>
+                    <button class="flex text-lg font-bold bg-white text-red-900 uppercase border border-red-900 rounded-md p-1.5 hover:bg-red-900 hover:text-white"wire:click="$toggle('modalNewTicketVisible')" wire:loading.attr="disabled">
+                        <x-heroicon-c-x-mark class="fill-current w-6 h-6"/>
+                    </button>
+                </div>
             </div>
         </x-slot>
        
@@ -479,9 +493,7 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-jet-secondary-button wire:click="$toggle('modalNewTicketVisible')" wire:loading.attr="disabled">
-                Zatvori
-            </x-jet-secondary-button>
+            
         </x-slot>
     </x-jet-dialog-modal>
 
