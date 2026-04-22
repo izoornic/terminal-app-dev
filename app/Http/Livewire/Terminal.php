@@ -786,17 +786,32 @@ class Terminal extends Component
 
     public function vendorShowModal($id, $terminal_id, $vendor_id=null)
     {
+        $this->multiSelected = false;
         $this->modelId = $id; //ovo je id terminal lokacija tabele
         $this->terminal_id = $terminal_id;
         $this->vendor_id = $vendor_id;
         $this->modalVendorVisible = true;
     }
 
+    public function vendorSelectedShowModal()
+    {
+        $this->multiSelected = true;
+        $this->vendor_id = null;
+        $this->modalVendorVisible = true;
+    }
+
     public function vendorSave()
     {
-        //dd($this->modelId, $this->terminal_id, $this->vendor_id);
         if($this->vendor_id == '') $this->vendor_id = null;
-        TerminalModel::where('id', $this->terminal_id) -> update(['vendor_id' => $this->vendor_id]);
+
+        if(!$this->multiSelected){
+            TerminalModel::where('id', $this->terminal_id)->update(['vendor_id' => $this->vendor_id]);
+        } else {
+            $terminalIds = TerminalLokacija::whereIn('id', $this->selectedTerminals)->pluck('terminalId');
+            TerminalModel::whereIn('id', $terminalIds)->update(['vendor_id' => $this->vendor_id]);
+            $this->selectedTerminals = [];
+        }
+
         $this->modalVendorVisible = false;
     }
 

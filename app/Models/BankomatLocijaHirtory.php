@@ -20,6 +20,7 @@ class BankomatLocijaHirtory extends Model
         'created_at',
         'history_action_id',
         'bankomat_tiket_id',
+        'bankomat_history_id',
     ];
 
 }

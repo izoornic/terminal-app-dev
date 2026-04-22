@@ -36,6 +36,15 @@
                         </p>
                     @endif
 
+                    @if($item->history_action_id == 7)
+                        {{-- AKCIJA PROMENE PODATAKA O PROIZVODU --}}
+                        @foreach(explode(' | ', $item->komentar) as $linija)
+                            <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
+                                {{ $linija }}
+                            </p>
+                        @endforeach
+                    @endif
+
                 @elseif($item->vrsta_akcije == 2)
                     {{-- AKCIJA TIKET --}}
                     <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'bankomat-tiketview', ['id' => $item->bankomat_tiket_id] ) }}">Tiket #{{ $item->bankomat_tiket_id }}</span></x-jet-nav-link></p>

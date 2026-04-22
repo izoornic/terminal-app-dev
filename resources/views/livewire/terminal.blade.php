@@ -209,20 +209,23 @@
     <div class="mt-5">
         {{ $data->links() }}
     </div>
-    <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 my-4 flex flex-row" role="alert">
+    
+    
+    {{-- MULTI SELECTED ROW --}}
+    <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 my-4 flex flex-row items-center" role="alert">
         <div class="basis-1/2"><p class="text-sm">Ukupno izabranih terminala: <span class="font-bold"> {{ count($selectedTerminals) }}</span></p></div>
-        <div class="basis-1/4 text-right mr-6">
+        <div class="basis-1/2 flex justify-center gap-6">
             @if(count($selectedTerminals))
-                <x-jet-button class="ml-2" wire:click="statusSelectedShowModal()">
+                <button class="px-2 py-2 text-sm relative bg-white text-gray-800 uppercase border rounded-md hover:bg-blue-700 hover:text-white" wire:click="statusSelectedShowModal()">
                     {{ __('Promeni status') }}
-                </x-jet-button>
-            @endif
-        </div>
-        <div class="basis-1/4 text-right mr-6">
-            @if(count($selectedTerminals))
-                <x-jet-button class="ml-2" wire:click="premestiSelectedShowModal()">
+                </button>
+                <button class="flex px-2 py-2 text-sm relative bg-white text-gray-800 uppercase border rounded-md hover:bg-blue-700 hover:text-white" wire:click="premestiSelectedShowModal()">
+                    <x-heroicon-o-arrows-right-left class="fill-current w-4 h-4 mr-2 mt-1" />
                     {{ __('Premesti') }}
-                </x-jet-button>
+                </button>
+                <button class="flex px-2 py-2 text-sm relative bg-white text-gray-800 uppercase border rounded-md hover:bg-blue-700 hover:text-white" wire:click="vendorSelectedShowModal()">
+                    {{ __('Promeni vendora') }}
+                </button>
             @endif
         </div>
     </div>

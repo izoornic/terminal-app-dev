@@ -31,6 +31,8 @@ class BankomatHistory extends Component
                 'bankomat_tikets.opis',
                 'bankomat_tikets.naplata',
                 'bankomat_tiket_kvar_tips.btkt_naziv',
+                'bankomats_histories.id as bankomat_history_id',
+                'bankomats_histories.komentar'
                 )
             ->leftJoin('bankomat_lokacija_histroy_actions', 'bankomat_locija_hirtories.history_action_id', '=', 'bankomat_lokacija_histroy_actions.id')
             ->leftJoin('bankomat_status_tips', 'bankomat_locija_hirtories.bankomat_status_tip_id', '=', 'bankomat_status_tips.id')
@@ -38,6 +40,7 @@ class BankomatHistory extends Component
             ->leftJoin('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
             ->leftJoin('bankomat_tikets', 'bankomat_locija_hirtories.bankomat_tiket_id', '=', 'bankomat_tikets.id')
             ->leftJoin('bankomat_tiket_kvar_tips', 'bankomat_tikets.bankomat_tiket_kvar_tip_id', '=', 'bankomat_tiket_kvar_tips.id')
+            ->leftJoin('bankomats_histories', 'bankomat_locija_hirtories.bankomat_history_id', '=', 'bankomats_histories.id')
             ->where('bankomat_locija_hirtories.bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)
             ->orderBy('bankomat_locija_hirtories.created_at', 'desc')
             ->get();
