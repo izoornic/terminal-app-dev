@@ -370,3 +370,6 @@ V 1.1.14 ( 5.4.2026.) @Bnkomati_ff
 V 1.1.15 ( 22.4.2026.) @Bnkomati_ff
     - Doadta akcija "Promeni vendora" za multiselected na stranici terminali za admina
     - Bankomati - dodta promena vlasnika sn-a i terminal_id u History proizvoda
+
+V 1.1.16 ( 27.4.2026.) @Bnkomati_ff
+    - Ispravljeno vreme tiketa. Forma prikazuje lokalno vreme a u bazu se upisuje UTC

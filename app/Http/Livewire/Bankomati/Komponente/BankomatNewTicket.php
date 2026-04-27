@@ -52,6 +52,7 @@ class BankomatNewTicket extends Component
 
     public $datum_promene;
     public $vreme_promene;
+    public $utcOffset = 0;
     public $datum_promene_error;
 
     public function mount($bankomat_lokacija_id)
@@ -146,6 +147,11 @@ class BankomatNewTicket extends Component
             $this->datum_promene_error = 'Datum promene ne može biti manji od datuma poslednje promene.';
             return false;
         }
+        $localDt = new \DateTime("{$this->datum_promene} {$this->vreme_promene}");
+        $localDt->modify("{$this->utcOffset} minutes");
+        $this->vreme_promene = $localDt->format('H:i:s');
+        $this->datum_promene = $localDt->format('Y-m-d');
+        //dd($this->vreme_promene);
 
         $creation_time = $this->datum_promene . ' ' . $this->vreme_promene;
 
