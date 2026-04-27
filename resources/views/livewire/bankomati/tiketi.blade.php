@@ -71,6 +71,7 @@
                                 </td>
                                 <td></td>
                             </tr>
+                            {{-- SEARCH 2nd ROW --}}
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td> 
