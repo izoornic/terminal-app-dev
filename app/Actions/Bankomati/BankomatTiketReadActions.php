@@ -92,7 +92,7 @@ class BankomatTiketReadActions
             }     
         })
         ->when($searchTid, function ($query, $searchTid) {
-            return $query->where('bankomat_tikets.id', '=', $searchTid);
+            return $query->where('bankomats.b_terminal_id', 'like', '%'.$searchTid.'%');
         })
         ->when($searchDatumPocetak, function ($query, $searchDatumPocetak) {
             return $query->whereDate('bankomat_tikets.created_at', '>=', $searchDatumPocetak);

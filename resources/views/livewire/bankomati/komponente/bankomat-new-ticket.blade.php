@@ -116,7 +116,8 @@
             </div>
             <div class="ml-4">
                 <x-jet-label for="vreme_promene" value="Vreme:" />
-                <x-jet-input id="vreme_promene" type="time" class="mt-1 block" value="{{ $vreme_promene }}" wire:model="vreme_promene" />
+                <x-jet-input id="vreme_promene" type="time" class="mt-1 block" wire:model="vreme_promene"
+                    x-data x-init="const n=new Date(); $wire.set('vreme_promene', String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')); $wire.set('utcOffset', n.getTimezoneOffset())" />
                 @error('vreme_promene') <span class="error">{{ $message }}</span> @enderror
             </div>
         </div>

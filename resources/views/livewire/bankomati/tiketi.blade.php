@@ -71,6 +71,7 @@
                                 </td>
                                 <td></td>
                             </tr>
+                            {{-- SEARCH 2nd ROW --}}
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td> 
@@ -213,7 +214,6 @@
                             @if ($data_van_regiona->count())
                                 @foreach ($data_van_regiona as $item)
                                     <tr @if($loop->even) class="bg-gray-50" @endif >
-
                                         <td class="px-2 py-1">{{ $item->id }}</td> 
                                         <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
                                         <td class="px-1 py-2">{{ App\Http\Helpers::datumFormatDan($item->created_at) }}</td>
@@ -262,14 +262,22 @@
 
     {{-- NOVI tiket MODAL #################################################### --}}
     <x-jet-dialog-modal wire:model="newTicketShowModal">
-        <x-slot name="title">
-        <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
-            Novi tiket
-    </x-slot>
+        <x-slot name="title" class="flex">
+            <div class="flex justify-between">
+                <div class="flex">
+                    <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
+                    <span>Novi tiket</span>
+                </div>
+                <div>
+                    <button class="flex text-lg font-bold bg-white text-red-900 uppercase border border-red-900 rounded-md p-1.5 hover:bg-red-900 hover:text-white"wire:click="$toggle('newTicketShowModal')" wire:loading.attr="disabled">
+                        <x-heroicon-c-x-mark class="fill-current w-6 h-6"/>
+                    </button>
+                </div>
+            </div>
+        </x-slot>
 
         <x-slot name="content">
-           @if(!$bankomat_lokacija_id)
-                <livewire:bankomati.komponente.izbor-proizvoda :key="time()"/>
+           @if(!$bankomat_lokacija_id)                <livewire:bankomati.komponente.izbor-proizvoda :key="time()"/>
            @else
                 <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$bankomat_lokacija_id" />
                 <livewire:bankomati.komponente.bankomat-new-ticket :bankomat_lokacija_id="$bankomat_lokacija_id" />
@@ -277,9 +285,7 @@
         </x-slot>
 
         <x-slot name="footer">
-            <x-jet-secondary-button wire:click="$toggle('newTicketShowModal')" wire:loading.attr="disabled">
-                    Otkaži
-            </x-jet-secondary-button>    
+            
         </x-slot>
     </x-jet-dialog-modal>
 </div>

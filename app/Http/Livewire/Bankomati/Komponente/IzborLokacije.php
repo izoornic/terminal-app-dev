@@ -28,11 +28,12 @@ class IzborLokacije extends Component
 
     public function mount($comp_index = null, $tipovi_lokacija = null, $trenutna_lokacija = null, $izbor_glavne_lokacije = false, $premesti_vlasnik = false)
     {
+       
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
-        $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? 0 : $this->role_region['region'];
+        $this->searchPlokacijaRegion = ($this->role_region['role'] == 'admin' || $this->role_region['role'] == 'programer') ? null : $this->role_region['region'];
 
         //iskljucije trenutnu lokaciju kada se proizvod premesta u neku drugu
         $this->trenutna_lokacija = $trenutna_lokacija;
@@ -100,6 +101,7 @@ class IzborLokacije extends Component
             })
             ->orderBy('blokacijas.is_duplicate', 'asc')
             ->orderBy('blokacijas.bl_naziv', 'asc')
+            ->orderBy('blokacijas.id', 'asc')
             ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
     }
 

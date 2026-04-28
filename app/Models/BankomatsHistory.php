@@ -19,6 +19,6 @@ class BankomatsHistory extends Model
         'komentar',
         'created_at',
         'updated_at',
-        'vlasnik_uredjaja',
+        'vlasnik_uredjaja'
     ];
 }

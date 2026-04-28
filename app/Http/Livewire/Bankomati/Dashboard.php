@@ -13,23 +13,38 @@ class Dashboard extends Component
     public $main_locations;
     public $location_ids_by_main;
     public $sum_of_products;
+    public $sub_locations_products;
 
     public function mount()
     {
-        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+        $this->role_region = auth()->user()->userBankmatPositionAndRegion();
         $this->role_region_id = $this->role_region['region'];
 
-        //pick up all main locations
         $this->main_locations = Blokacija::where('is_duplicate', '=', 0)->where('blokacija_tip_id', '=', 3)->get();
 
-         $this->main_locations->each(function ($main_location) {
-            /* $this->location_ids_by_main[$main_location->id] = Blokacija::where('parent_id', '=', $main_location->id)->pluck('id')->toArray(); */
-            //let's tyu with relations
-            $this->location_ids_by_main[$main_location->id] = $main_location->children()->pluck('id')->toArray();
-            //let's count number of products for each location
+        $this->main_locations->each(function ($main_location) {
+            $children = $main_location->children()->get();
+
+            $this->location_ids_by_main[$main_location->id] = $children->pluck('id')->toArray();
+
             $this->sum_of_products[$main_location->bl_naziv] = BankomatLokacija::whereIn('blokacija_id', $this->location_ids_by_main[$main_location->id])->count();
-         });
-        //dd($this->sum_of_products);
+
+            $this->sub_locations_products[$main_location->bl_naziv] = $children->mapWithKeys(function ($child) {
+                $label = trim("{$child->bl_naziv} {$child->bl_naziv_sufix}");
+                $byTip = BankomatLokacija::where('bankomat_lokacijas.blokacija_id', $child->id)
+                    ->join('bankomats', 'bankomat_lokacijas.bankomat_id', '=', 'bankomats.id')
+                    ->join('bankomat_tips', 'bankomats.bankomat_tip_id', '=', 'bankomat_tips.id')
+                    ->selectRaw('bankomat_tips.model, count(*) as count')
+                    ->groupBy('bankomat_tips.model')
+                    ->orderBy('bankomat_tips.model')
+                    ->pluck('count', 'model')
+                    ->toArray();
+                return [$label => [
+                    'total' => array_sum($byTip),
+                    'tips'  => $byTip,
+                ]];
+            })->toArray();
+        });
     }
 
     public function render()

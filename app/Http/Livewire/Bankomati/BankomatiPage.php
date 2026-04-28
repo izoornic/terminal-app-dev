@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\Bankomat;
-//use App\Models\Blokacija;
+use App\Models\Blokacija;
 use App\Models\BankomatsHistory;
 use App\Models\BankomatLokacija;
 use App\Models\BankomatLocijaHirtory;
@@ -41,6 +41,7 @@ class BankomatiPage extends Component
     public $searchProductTip;
     public $searchMesto;
     public $searchNazivSufix;
+    public $searchNaplata;
 
     //NEW EDIT
     public $b_sn;
@@ -54,7 +55,7 @@ class BankomatiPage extends Component
     public $datum_promene_error;
     //public $old_datum_promene;
     public $vlasnik_proizvoda;
-    public $old_vlasnik_proizvoda;
+    //public $old_vlasnik_proizvoda;
     public $flashKey = 1;
     public $location_key = 100;
 
@@ -145,7 +146,7 @@ class BankomatiPage extends Component
         $this->proizvod_model_tip = '';
         $this->datum_promene_error = '';
         $this->vlasnik_proizvoda = '';
-        $this->old_vlasnik_proizvoda = '';
+        //$this->old_vlasnik_proizvoda = '';
 
         $this->searchPLokacijaNaziv = '';
         $this->searchPlokacijaMesto = '';
@@ -222,28 +223,48 @@ class BankomatiPage extends Component
             ]
         );
         $bankomat = Bankomat::where('id', '=', $this->modelId)->first();
+        $old_vlasnik_proizvoda = $bankomat->vlasnik_uredjaja;
+        $old_sn = $bankomat->b_sn;
+        $old_tid = $bankomat->b_terminal_id;
         $bankomat->update($this->modelData());
-        //ako je promenjen vlasnik proizvoda upisati u history
-        if($this->old_vlasnik_proizvoda != $this->vlasnik_proizvoda){
+
+        $komentari = [];
+
+        if ($old_sn != $this->b_sn) {
+            $komentari[] = 'Stari S/N: ' . $old_sn . ' - Novi S/N: ' . $this->b_sn;
+        }
+
+        if ($old_tid != $this->bankomat_tid) {
+            $komentari[] = 'Stari TID: ' . ($old_tid ?? 'N/A') . ' - Novi TID: ' . ($this->bankomat_tid ?? 'N/A');
+        }
+
+        if ($old_vlasnik_proizvoda != $this->vlasnik_proizvoda) {
+            $old = Blokacija::where('id', '=', $old_vlasnik_proizvoda)->first();
+            $new = Blokacija::where('id', '=', $this->vlasnik_proizvoda)->first();
+            $komentari[] = 'Stari vlasnik: ' . $old->bl_naziv . ' ' . $old->bl_naziv_sufix .' - Novi vlasnik: ' . $new->bl_naziv . ' ' . $new->bl_naziv_sufix;
+        }
+
+        if (!empty($komentari)) {
+            $bankoma_history = BankomatsHistory::create([
+                'bankomat_id' => $bankomat['id'],
+                'bankomat_tip_id' => $bankomat['bankomat_tip_id'],
+                'b_sn' => $old_sn,
+                'b_terminal_id' => $old_tid,
+                'komentar' => implode(' | ', $komentari),
+                'vlasnik_uredjaja' => $old_vlasnik_proizvoda
+            ]);
+
             $cuurent = BankomatLokacija::where('bankomat_id', '=', $bankomat->id)->first();
             BankomatLocijaHirtory::create([
                 'bankomat_lokacija_id' => $cuurent['id'],
-                'bankomat_id' => $bankomat['id'], 
+                'bankomat_id' => $bankomat['id'],
                 'blokacija_id' => $cuurent['blokacija_id'],
                 'bankomat_status_tip_id' => $cuurent['bankomat_status_tip_id'],
                 'user_id' => auth()->user()->id,
                 'naplata' => $cuurent['naplata'],
-                'history_action_id' => 7
-                ]);
-            BankomatsHistory::create([
-                'bankomat_id' => $bankomat['id'],
-                'bankomat_tip_id' => $bankomat['bankomat_tip_id'],
-                'b_sn' => $bankomat['b_sn'],
-                'b_terminal_id' => $bankomat['b_terminal_id'],
-                'komentar' => 'Promenjen vlasnik proizvoda',
-                'vlasnik_uredjaja' => $this->old_vlasnik_proizvoda,
-                'user_id' => auth()->user()->id
-                ]);
+                'history_action_id' => 7,
+                'bankomat_history_id' => $bankoma_history->id,
+            ]);
         }
 
         $this->resetInputFields();
@@ -253,6 +274,7 @@ class BankomatiPage extends Component
 
     private function modelData()
     {
+        //dd($this->vlasnik_proizvoda);
         return [
             'b_sn' => $this->b_sn,
             'b_terminal_id' => ($this->bankomat_tid) ?: null,
@@ -270,8 +292,6 @@ class BankomatiPage extends Component
         $this->bankomat_tid = $bankomat->b_terminal_id; 
         $this->proizvod_model = $bankomat->bankomat_tip_id;
         $this->vlasnik_proizvoda = $bankomat->vlasnik_uredjaja;
-        $this->old_vlasnik_proizvoda = $bankomat->vlasnik_uredjaja;
-        //dd($this->proizvod_model_tip, $this->b_sn, $this->bankomat_tid, $this->proizvod_model, $this->vlasnik_proizvoda);
     }
 
     private function validDatumPromene($history_a) 
@@ -304,6 +324,7 @@ class BankomatiPage extends Component
 
     public function premestiShowModal($id, $status, $blokacija_id, $vlasnik_uredjaja = null)
     {
+        //dd($blokacija_id, $vlasnik_uredjaja );
         $this->resetInputFields();
         $this->resetValidation();
         $this->modelId = $id; //ovo je id terminal_lokacijas tabele
@@ -419,7 +440,7 @@ class BankomatiPage extends Component
             'product_tip' => $this->searchProductTip,
             'naziv_sufix' => $this->searchNazivSufix,
             'mesto' => $this->searchMesto,
-
+            'naplata' => ($this->searchNaplata !== null && $this->searchNaplata !== '') ? $this->searchNaplata : null,
         ]; 
         
        $builder = BankomatiReadActions::BankomatiRead($searchParams);

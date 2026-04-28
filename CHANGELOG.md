@@ -359,3 +359,17 @@ V 1.1.10 (29.3.2026.) @Bnkomati_to_do
     - Dodaata nova komponenta "Istrorija lokacije" samo za lokacije tipa "Korisnik terminala" na stranici "Lokacije" za uloge Admin, Šef servisa, Serviser i Call center
     - Dodate "Kampanje" za ulogu Distributer. Kao i funkcionalnost da je kampanja obavezna prilikom premetanja terminala na lokaciju tipa "Korisnik terminala". Premeštanje terminala na lokaciju drugog tipa ili iz druge uloge setuje kampanju na null.
     - Rediyajnirana stranica Terminali za Menadzera licence i Admina
+
+V 1.1.14 ( 5.4.2026.) @Bnkomati_ff
+    - Ispravljen bug kod promene dodeljenog usera za ulogu Admin, sada vidi i programera
+    - Dodati komentari u Histroy proizvoda kada je akcija "Zatvoren tiket"
+    - Sklonjeno dugme "Zatvori"sa dna modala "Novi tiket" a dodat X u gornji desni ugao
+    - Dodata dashboard stranica za Bankomate
+    - Zamanjene ikonice za vrste lokacija za bankomate
+
+V 1.1.15 ( 22.4.2026.) @Bnkomati_ff
+    - Doadta akcija "Promeni vendora" za multiselected na stranici terminali za admina
+    - Bankomati - dodta promena vlasnika sn-a i terminal_id u History proizvoda
+
+V 1.1.16 ( 27.4.2026.) @Bnkomati_ff
+    - Ispravljeno vreme tiketa. Forma prikazuje lokalno vreme a u bazu se upisuje UTC
