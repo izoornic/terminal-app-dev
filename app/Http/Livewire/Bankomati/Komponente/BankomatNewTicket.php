@@ -22,8 +22,9 @@ class BankomatNewTicket extends Component
     use WithPagination;
 
     public $tiket_exists = false;
+    public ?int $tiket_exists_id = null;
 
-    public $bankomat_lokacija_id; 
+    public ?int $bankomat_lokacija_id = null;
     public $bakomatRegionId;
 
     public $vrsta_kvara;
@@ -47,7 +48,6 @@ class BankomatNewTicket extends Component
 
     public $role_region;
 
-    public $selectedBankomatTip;
     public $productTipId;
 
     public $datum_promene;
@@ -55,18 +55,20 @@ class BankomatNewTicket extends Component
     public $utcOffset = 0;
     public $datum_promene_error;
 
-    public function mount($bankomat_lokacija_id)
+    public function mount($bankomat_lokacija_id): void
     {
-        $this->role_region =auth()->user()->userBankmatPositionAndRegion();
+        $this->role_region = auth()->user()->userBankmatPositionAndRegion();
         $this->bankomat_lokacija_id = $bankomat_lokacija_id;
-        $this->tiket_exists = BankomatTiket::where('bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)->where('status', '!=', 'Zatvoren')->first();
-        //dd($this->tiket_exists);
-        /* if($this->tiket_exists){
-            
-        } */
-        $this->selectedBankomatTip = BankomatInformation::BankomatProizvodTip($this->bankomat_lokacija_id);
-        $this->productTipId = $this->selectedBankomatTip->bankomat_produkt_tip_id;
-        $this->bakomatRegionId = $this->selectedBankomatTip->bankomat_region_id;
+
+        $tiket = BankomatTiket::where('bankomat_lokacija_id', '=', $this->bankomat_lokacija_id)
+            ->where('status', '!=', 'Zatvoren')
+            ->first();
+        $this->tiket_exists = (bool) $tiket;
+        $this->tiket_exists_id = $tiket?->id;
+
+        $selectedBankomatTip = BankomatInformation::BankomatProizvodTip($this->bankomat_lokacija_id);
+        $this->productTipId = $selectedBankomatTip?->bankomat_produkt_tip_id;
+        $this->bakomatRegionId = $selectedBankomatTip?->bankomat_region_id;
 
         // 9 - Admin bankomata
         // 10 - Šef servisa bankomata
@@ -186,7 +188,7 @@ class BankomatNewTicket extends Component
         $mail_action = new BankomatTiketMailingActions($ticket->id);
         $mail_action->sendEmails("novi");
 
-        $this->emit('newTicketCreated', $ticket->id); //168); // $ticket->id);
+        $this->dispatch('newTicketCreated', $ticket->id); //168); // $ticket->id);
         
     }
 

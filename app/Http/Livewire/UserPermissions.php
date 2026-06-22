@@ -24,7 +24,7 @@ class UserPermissions extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -52,7 +52,7 @@ class UserPermissions extends Component
      * The data for the model mapped
      * in this component.
      *
-     * @return void
+     * @return array
      */
     public function modelData()
     {
@@ -80,7 +80,7 @@ class UserPermissions extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return object
      */
     public function read()
     {

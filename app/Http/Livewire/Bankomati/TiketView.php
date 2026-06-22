@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Bankomati;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 use App\Models\BankomatTiketKomantar;
 use App\Models\BankomatLocijaHirtory;
@@ -71,13 +72,7 @@ class TiketView extends Component
     public $old_naplata;
     
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['statusChanged'];
-
+    #[On('statusChanged')]
     public function statusChanged()
     {
         $this->modalStatusFormVisible = false;

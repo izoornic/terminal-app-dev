@@ -72,7 +72,7 @@
                             <p class="font-bold mb-2">Usluga se naplaćuje:</p>
                             <div class="flex">
                                 <label class="inline-flex items-center ml-4 cursor-pointer">
-                                    <input type="checkbox" wire:model="naplata" class="sr-only peer" />
+                                    <input type="checkbox" wire:model.live="naplata" class="sr-only peer" />
                                     <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
                                 </label>
 
@@ -126,7 +126,7 @@
                     <x-icon-history class="fill-current w-4 h-4 mr-0 mr-4 mt-1"/>
                     <span class="font-bold">Istorija proizvoda:</span>
                 </div>
-                <livewire:bankomati.komponente.bankomat-history :bankomat_lokacija_id="$bankomat_lokacija_id" :key="time()" />
+                <livewire:bankomati.komponente.bankomat-history :bankomat_lokacija_id="$bankomat_lokacija_id" :key="'history-'.$bankomat_lokacija_id" />
                 
             </div>
         </div>
@@ -136,7 +136,7 @@
 
     
     {{-- Zatvori tiket MODAL #################################################### --}}
-    <x-jet-dialog-modal wire:model="modalZatvoriTiketVisible">
+    <x-jet-dialog-modal wire:model.live="modalZatvoriTiketVisible">
         <x-slot name="title">
             <svg class="fill-current float-left w-6 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM446.78,370.78l-44,44L288,300,173.22,414.78l-44-44L244,256,129.22,141.22l44-44L288,212,402.78,97.22l44,44L332,256Z" transform="translate(0 -64)"/></svg>
             Zatvori tiket
@@ -146,7 +146,7 @@
             <p class="font-bold my-4">Da li ste sigurni da želite da zatvorite tiket #{{ $tikid }} ?</p>
             <hr/>
             <x-jet-label for="zatvori_komentar" value="Dodaj komentar:" />
-            <x-jet-textarea id="zatvori_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="zatvori_komentar" />
+            <x-jet-textarea id="zatvori_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="zatvori_komentar" />
             @error('zatvori_komentar') <span class="error">{{ $message }}</span> @enderror
         
 
@@ -154,13 +154,13 @@
                 <div>
                     <x-jet-label for="zatvori_datum_promene" value="Datum:" />
                     <div class="flex">
-                        <x-jet-input id="zatvori_datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="zatvori_datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($zatvori_datum_promene) }}</span>
+                        <x-jet-input id="zatvori_datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="zatvori_datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($zatvori_datum_promene) }}</span>
                     </div>
                     @error('zatvori_datum_promene') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="ml-4">
                     <x-jet-label for="zatvori_vreme_promene" value="Vreme:" />
-                    <x-jet-input id="zatvori_vreme_promene" type="time" class="mt-1 block" value="{{ $zatvori_vreme_promene }}" wire:model="zatvori_vreme_promene" />
+                    <x-jet-input id="zatvori_vreme_promene" type="time" class="mt-1 block" value="{{ $zatvori_vreme_promene }}" wire:model.live="zatvori_vreme_promene" />
                     @error('zatvori_vreme_promene') <span class="error">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -180,7 +180,7 @@
     </x-jet-dialog-modal>
 
     {{-- Promeni dodeljenog MODAL --}}
-    <x-jet-dialog-modal wire:model="modalDodeliTiketVisible">
+    <x-jet-dialog-modal wire:model.live="modalDodeliTiketVisible">
         <x-slot name="title">
         <svg class="float-left fill-current w-4 h-4 mr-0 mt-1 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg>
         Dodeli tiket korisniku
@@ -201,9 +201,9 @@
                             </tr>
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
-                                <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
-                                <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
+                                <td><x-jet-input wire:model.live="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
+                                <td><x-jet-input wire:model.live="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
+                                <td><x-jet-input wire:model.live="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200"> 
@@ -251,7 +251,7 @@
 
     
     {{-- Obrisi tiket MODAL --}}
-    <x-jet-dialog-modal wire:model="obrisiTiketModalVisible">
+    <x-jet-dialog-modal wire:model.live="obrisiTiketModalVisible">
         <x-slot name="title">
             <svg class="fill-current float-left w-6 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg> 
             Obriši tiket
@@ -275,7 +275,7 @@
     </x-jet-dialog-modal>
 
     {{-- STATUS MODAL ############################################################### --}}
-    <x-jet-dialog-modal wire:model="modalStatusFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalStatusFormVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -287,7 +287,7 @@
 
         <x-slot name="content">
            @if($modalStatusFormVisible)
-               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$bankomat_lokacija_id" :status="$bankomat_status_id" :key="time()" />
+               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$bankomat_lokacija_id" :status="$bankomat_status_id" :key="'status-'.$bankomat_lokacija_id" />
             @endif
         </x-slot>
 
@@ -299,7 +299,7 @@
     </x-jet-dialog-modal>
 
     {{-- PRIORITET MODAL ############################################################### --}}
-    <x-jet-dialog-modal wire:model="modalPrioritetFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalPrioritetFormVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">

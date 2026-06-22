@@ -77,7 +77,7 @@
     </div>
 
     {{-- CREATE / UPDATE --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
                 {{ __('Novi mesec') }}
         </x-slot>
@@ -86,7 +86,7 @@
             <div class="mt-4 flex">
                 <div>
                     <x-jet-label for="mesec" value="{{ __('Mesec zaduženja') }}" />
-                    <x-jet-input id="mesec" type="date" class="mt-1 block" value="{{ $mesec }}" wire:model="mesec" />
+                    <x-jet-input id="mesec" type="date" class="mt-1 block" value="{{ $mesec }}" wire:model.live="mesec" />
                     @error('mesec') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="font-bold mt-8 ml-4">{{ $mesecZaduzenjaDisplay }}</div>
@@ -116,7 +116,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             @if($modalConfirmDeleteVisible)
             {{ $mesecModel->mesec_naziv }} {{ App\Http\Helpers::yearNumber($mesecModel->mesec_datum) }}

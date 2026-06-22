@@ -10,6 +10,7 @@ use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -89,23 +90,19 @@ class LicencaTerminal extends Component
     //komentari
     public $modalKomentariVisible;
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['blacklistUpdate', 'newTerminal'];
-    
+    #[On('blacklistUpdate')]
     public function blacklistUpdate()
     {
          $this->modalFormVisible = false;
         $this->read();
     }
 
+    #[On('newTerminal')]
     public function newTerminal()
     {
         $this->noviTerminalShowModal();
     }
+
     /**
      * [Description for mount]
      *

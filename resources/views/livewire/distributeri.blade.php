@@ -39,13 +39,13 @@
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
                                 <td>
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td></td>
                                 <td></td>
@@ -122,7 +122,7 @@
     </div>
 
     {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
             @if ($isUpdate) {{ __('Izmeni podatke - ') }}{{ $d_naziv }}
             @else {{ __('Novi distributer') }} @endif
@@ -131,57 +131,57 @@
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="d_naziv" value="{{ __('Naziv') }}" />
-                <x-jet-input wire:model="d_naziv" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_naziv" id="" class="block mt-1 w-full" type="text" />
                 @error('d_naziv') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_adresa" value="{{ __('Adresa') }}" />
-                <x-jet-input wire:model="d_adresa" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_adresa" id="" class="block mt-1 w-full" type="text" />
                 @error('d_adresa') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_zip" value="{{ __('Poštanski broj') }}" />
-                <x-jet-input wire:model="d_zip" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_zip" id="" class="block mt-1 w-full" type="text" />
                 @error('d_zip') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_mesto" value="{{ __('Mesto') }}" />
-                <x-jet-input wire:model="d_mesto" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_mesto" id="" class="block mt-1 w-full" type="text" />
                 @error('d_mesto') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_email" value="{{ __('E-mail adresa') }}" />
-                <x-jet-input wire:model="d_email" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_email" id="" class="block mt-1 w-full" type="text" />
                 @error('d_email') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_pib" value="{{ __('PIB') }}" />
-                <x-jet-input wire:model="d_pib" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_pib" id="" class="block mt-1 w-full" type="text" />
                 @error('d_pib') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="d_mb" value="{{ __('Matični broj') }}" />
-                <x-jet-input wire:model="d_mb" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="d_mb" id="" class="block mt-1 w-full" type="text" />
                 @error('d_mb') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="broj_ugovora" value="{{ __('Broj ugovora') }}" />
-                <x-jet-input wire:model="broj_ugovora" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="broj_ugovora" id="" class="block mt-1 w-full" type="text" />
                 @error('broj_ugovora') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="datum_ugovora" value="Datum ugovora" />
-                <x-jet-input id="datum_ugovora" type="date" class="mt-1 block" value="{{ $datum_ugovora }}" wire:model.defer="datum_ugovora" />
+                <x-jet-input id="datum_ugovora" type="date" class="mt-1 block" value="{{ $datum_ugovora }}" wire:model="datum_ugovora" />
                 @error('datum_ugovora') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="datum_kraj_ugovora" value="Datum kraja ugovora" />
-                <x-jet-input id="datum_kraj_ugovora" type="date" class="mt-1 block" value="{{ $datum_kraj_ugovora }}" wire:model.defer="datum_kraj_ugovora" />
+                <x-jet-input id="datum_kraj_ugovora" type="date" class="mt-1 block" value="{{ $datum_kraj_ugovora }}" wire:model="datum_kraj_ugovora" />
                 @error('datum_kraj_ugovora') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="dani_prekoracenja_licence" value="{{ __('Broj dana za prekoračenje licence') }}" />
-                <x-jet-input wire:model="dani_prekoracenja_licence" type="date" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="dani_prekoracenja_licence" type="date" id="" class="block mt-1 w-full" type="text" />
                 @error('dani_prekoracenja_licence') <span class="error">{{ $message }}</span> @enderror
             </div>
             
@@ -206,7 +206,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Info Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
         <svg class="fill-red-500 w-5 h-5 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
            <span class="pl-6 py-2"> {{ __(' Info') }} </span>

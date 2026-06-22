@@ -15,7 +15,7 @@ class BankomatInfo extends Component
 
     public $multySelected = false;
     public $multySelectedArray = [];
-    public $multiSelectedInfo;
+    public $multiSelectedInfo = [];
 
     public function mount($bankomat_lokacija_id)
     {

@@ -37,19 +37,19 @@
             </p>
             <div class="mt-4">
                 <x-jet-label for="kontakt_name" value="Ime" />
-                <x-jet-input wire:model="kontakt_name" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="kontakt_name" id="" class="block mt-1 w-full" type="text" />
                 @error('kontakt_name') <span class="error">{{ $message }}</span> @enderror
             </div> 
             <div class="mt-4">
                 <x-jet-label for="kontakt_tel" value="Broj telefona" />
                 <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                    <x-jet-input wire:model="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.live="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
                     @error('kontakt_tel') <span class="error">{{ $message }}</span>@enderror
                 </div> 
             </div>
             <div class="mt-4">
                 <x-jet-label for="kontakt_email" value="e-mail" />
-                <x-jet-input wire:model="kontakt_email" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="kontakt_email" id="" class="block mt-1 w-full" type="text" />
                 @error('kontakt_email') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="flex justify-center items-center mt-4">

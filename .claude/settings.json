@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php --version)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Bankomati/BankomatTiopvi.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Komponente/SortButton.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Lokacijes.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Bankomati/BankomatiPage.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Bankomati/Tiketi.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Komponente/UserKategoriesNavigation.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/Users.php)",
+      "Bash(grep -n 'protected \\\\$listeners\\\\|public function \\\\|^use \\\\|^namespace \\\\|^class ' app/Http/Livewire/LicencaTerminal.php)"
+    ]
+  }
+}

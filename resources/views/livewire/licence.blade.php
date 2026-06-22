@@ -74,7 +74,7 @@
     </div>
 
     {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
             @if($is_update)
                 {{ __('Izmeni licencu') }}
@@ -86,17 +86,17 @@
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="naziv_licence" value="{{ __('Naziv licence') }}" />
-                <x-jet-input wire:model="naziv_licence" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="naziv_licence" id="" class="block mt-1 w-full" type="text" />
                 @error('naziv_licence') <span class="error">{{ $message }}</span> @enderror
             </div>  
             <div class="mt-4">
                 <x-jet-label for="opis_licence" value="{{ __('Opis licence') }}" />
-                <x-jet-input wire:model="opis_licence" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="opis_licence" id="" class="block mt-1 w-full" type="text" />
                 @error('opis_licence') <span class="error">{{ $message }}</span> @enderror
             </div>  
             <div class="mt-4">
                 <div class="">
-                   <!--  <input id="{{ $is_osnovna }}" type="checkbox" value="1" wire:model="is_osnovna" class="form-checkbox h-6 w-6 text-blue-500 my-2">
+                   <!--  <input id="{{ $is_osnovna }}" type="checkbox" value="1" wire:model.live="is_osnovna" class="form-checkbox h-6 w-6 text-blue-500 my-2">
                     <label class="ml-2" for="is_osnovna"> Osnovna licenca</label> -->
                 </div>
             </div>      
@@ -120,7 +120,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             @if($count_distributre_sa_licencom)
                 {{ __('Licenca info') }}

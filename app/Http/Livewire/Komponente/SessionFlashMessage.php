@@ -3,24 +3,20 @@
 namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class SessionFlashMessage extends Component
 {
     public $status;
     public $error;
 
-    /**
-     * Listeners for Livewire events.
-     *
-     * @var array
-     */
-    protected $listeners = ['flashMessage', 'fleshError'];
-
+    #[On('flashMessage')]
     public function flashMessage($message)
     {
          $this->status = $message;
     }
 
+    #[On('fleshError')]
     public function fleshError($message)
     {
         $this->error = $message;

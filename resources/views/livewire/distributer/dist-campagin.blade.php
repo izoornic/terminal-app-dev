@@ -66,7 +66,7 @@
     </div>
 
     {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
             @if($is_update)
                 {{ __('Izmeni kampanju') }}
@@ -78,12 +78,12 @@
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="campagin_name" value="{{ __('Naziv kampanje') }}" />
-                <x-jet-input wire:model="campagin_name" id="campagin_name" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="campagin_name" id="campagin_name" class="block mt-1 w-full" type="text" />
                 @error('campagin_name') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="campagin_description" value="{{ __('Opis kampanje') }}" />
-                <x-jet-input wire:model="campagin_description" id="campagin_description" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="campagin_description" id="campagin_description" class="block mt-1 w-full" type="text" />
                 @error('campagin_description') <span class="error">{{ $message }}</span> @enderror
             </div>
         </x-slot>
@@ -106,7 +106,7 @@
     </x-jet-dialog-modal>
 
     {{-- Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             {{ __('Obriši kampanju') }}
         </x-slot>

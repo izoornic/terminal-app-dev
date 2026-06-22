@@ -271,6 +271,7 @@ class Terminal extends Component
                     ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
                     ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+                    ->whereIn('users.pozicija_tipId', [1, 2, 3, 4, 5])
                     ->where('name', 'like', '%'.$this->searchUserName.'%')
                     ->where('l_naziv', 'like', '%'.$this->searchUserLokacija.'%')
                     ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')

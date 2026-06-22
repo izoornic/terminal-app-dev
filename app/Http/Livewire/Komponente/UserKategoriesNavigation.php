@@ -8,17 +8,15 @@ use App\Models\PozicijaKategoriy;
 class UserKategoriesNavigation extends Component
 {
     public $selectedKatId = null;
-    public function mount()
+    public function mount(): void
     {
         $this->selectedKatId = PozicijaKategoriy::orderBy('menu_order')->first()->id;
-        $this->emit('izaberiKategoriju', $this->selectedKatId);
-       //dd(PozicijaKategoriy::orderBy('menu_order')->get());
     }
 
-    protected $listeners = ['izaberiKategoriju' => 'postaviKategoriju'];
-    public function postaviKategoriju($katId)
+    public function selectKategorija(int $katId): void
     {
         $this->selectedKatId = $katId;
+        $this->dispatch('izaberiKategoriju', katId: $katId);
     }
 
     public function render()

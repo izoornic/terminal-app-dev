@@ -34,7 +34,7 @@
             <div class="mt-4">
             @if($tiket_status != "Zatvoren")
                 <x-jet-label for="novi_komentar" value="{{ __('Dodaj komentar:') }}" />
-                <x-jet-textarea id="novi_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="novi_komentar" />
+                <x-jet-textarea id="novi_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="novi_komentar" />
                 @error('novi_komentar') <span class="error">{{ $message }}</span> @enderror
                 <br />
                 <x-jet-secondary-button wire:click="posaljiKomentar" wire:loading.attr="disabled" class="mt-2">

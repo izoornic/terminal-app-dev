@@ -10,7 +10,7 @@
             <button class="flex bg-orange-50 text-sm text-gray-700 border rounded-md p-1.5 hover:bg-orange-700 hover:text-white ml-3" wire:click="clearFilter('{{$key}}')" title="Obriši filter">
                 {{ $value }}
                 <x-heroicon-c-x-circle class="w-4 h-4 ml-2 mt-0.5" />
-            <button>
+            </button>
         @endforeach
     </div>
     {{-- The data table --}}
@@ -38,7 +38,7 @@
                             <tr class="bg-orange-50">
                                 <td> <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /> </td>
                                 <td>
-                                    <select wire:model="searchProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -47,7 +47,7 @@
                                 </td>
                                 <td></td>
                                 <td>
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="Aktivan">Aktivan</option>
                                         <option value="Otvoren">Otvoren</option>
                                         <option value="Dodeljen">Dodeljen</option>
@@ -56,12 +56,12 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
+                                    <x-jet-input wire:model.live="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
                                 </td>
-                                <td><x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" /></td>
+                                <td><x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" /></td>
                                 <td colspan="2">
                                     @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
-                                        <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">Svi regioni</option>
                                                 @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                                                     <option value="{{ $key }}">{{ $value }}</option>
@@ -75,26 +75,26 @@
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td> 
-                                    <x-jet-input wire:model="searchTid" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži TID" />
+                                    <x-jet-input wire:model.live="searchTid" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži TID" />
                                 </td>
                                 <td></td>
                                 <td></td>
                                 <td>
                                     <span class="p-1 text-sm text-red-400">@if($searchDatumPocetak){{ App\Http\Helpers::datumFormatDanFullYear($searchDatumPocetak) }} @else Početni datum @endif</span>
-                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumPocetak }}" wire:model="searchDatumPocetak" />
+                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumPocetak }}" wire:model.live="searchDatumPocetak" />
                                 </td>
                                 <td>
                                     <span class="p-1 text-sm text-red-400">@if($searchDatumKraj){{ App\Http\Helpers::datumFormatDanFullYear($searchDatumKraj) }} @else Krajnji datum @endif</span>
-                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumKraj }}" wire:model="searchDatumKraj" />
+                                    <x-jet-input id="datum_promene" type="date" class="block bg-orange-50 block" value="{{ $searchDatumKraj }}" wire:model.live="searchDatumKraj" />
                                 </td>
                                 <td></td>
                                 <td>
-                                    <x-jet-input wire:model.debounce.500ms="searchComments" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži komentare" />
+                                    <x-jet-input wire:model.live.debounce.500ms="searchComments" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži komentare" />
                                 </td>
                                 <td class="text-center">
                                     <span class="p-1 text-sm text-red-400">Naplata</span>
                                     <label class="inline-flex items-center ml-4 cursor-pointer">
-                                        <input type="checkbox" wire:model="seadchNaplata" class="sr-only peer" />
+                                        <input type="checkbox" wire:model.live="seadchNaplata" class="sr-only peer" />
                                         <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
                                     </label>
                                 </td>
@@ -103,16 +103,15 @@
                             <!-- DATA  -->                   
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    <tr @if($item->is_time_expired && $item->status != 'Zatvoren') class="bg-red-50" 
-                                        @elseif($loop->even) class="bg-gray-50" 
+                                    <tr wire:key="tiket-{{ $item->id }}" @if($item->is_time_expired && $item->status != 'Zatvoren') class="bg-red-50"
+                                        @elseif($loop->even) class="bg-gray-50"
                                         @endif >
 
                                         <td class="px-2 py-1">{{ $item->id }} - {{ $item->is_time_expired }}</td> 
                                         <td class="px-1 py-2">
                                             {{ $item->bp_tip_naziv }}
                                              <br />
-                                            <span class="text-sm text-red-400">  @if($item->b_terminal_id){{ $item->b_terminal_id }}@endif</span> 
-                                        </td>
+                                            <span class="text-sm text-red-400">  @if($item->b_terminal_id){{ $item->b_terminal_id }}@endif</span>
                                         </td>
                                         <td class="px-1 py-2">{{ App\Http\Helpers::datumFormatDan($item->created_at) }}</td>
                                         <td class="px-1 py-2">{{ $item->status }}</br><span class="text-sm">{{ $item->name }}</span></td>
@@ -184,7 +183,7 @@
                             <tr class="bg-orange-50">
                                 <td> <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /> </td>
                                 <td>
-                                    <select wire:model="searchVanRegionaProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchVanRegionaProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -193,7 +192,7 @@
                                 </td>
                                 <td></td>
                                 <td>
-                                    <select wire:model="searchVanRegionaStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchVanRegionaStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="Aktivan">Aktivan</option>
                                         <option value="Otvoren">Otvoren</option>
                                         <option value="Dodeljen">Dodeljen</option>
@@ -202,9 +201,9 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchVanRegionaLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
+                                    <x-jet-input wire:model.live="searchVanRegionaLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
                                 </td>
-                                <td><x-jet-input wire:model="searchVanRegionaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" /></td>
+                                <td><x-jet-input wire:model.live="searchVanRegionaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" /></td>
                                 <td colspan="2">
                                 </td>
                                 <td></td>
@@ -213,7 +212,7 @@
                             <!-- DATA  -->                   
                             @if ($data_van_regiona->count())
                                 @foreach ($data_van_regiona as $item)
-                                    <tr @if($loop->even) class="bg-gray-50" @endif >
+                                    <tr wire:key="van-regiona-{{ $item->id }}" @if($loop->even) class="bg-gray-50" @endif >
                                         <td class="px-2 py-1">{{ $item->id }}</td> 
                                         <td class="px-1 py-2">{{ $item->bp_tip_naziv }}</td>
                                         <td class="px-1 py-2">{{ App\Http\Helpers::datumFormatDan($item->created_at) }}</td>
@@ -261,7 +260,7 @@
     @endif
 
     {{-- NOVI tiket MODAL #################################################### --}}
-    <x-jet-dialog-modal wire:model="newTicketShowModal">
+    <x-jet-dialog-modal wire:model.live="newTicketShowModal">
         <x-slot name="title" class="flex">
             <div class="flex justify-between">
                 <div class="flex">
@@ -277,7 +276,7 @@
         </x-slot>
 
         <x-slot name="content">
-           @if(!$bankomat_lokacija_id)                <livewire:bankomati.komponente.izbor-proizvoda :key="time()"/>
+           @if(!$bankomat_lokacija_id)                <livewire:bankomati.komponente.izbor-proizvoda :key="'izbor-'.(int)$newTicketShowModal"/>
            @else
                 <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$bankomat_lokacija_id" />
                 <livewire:bankomati.komponente.bankomat-new-ticket :bankomat_lokacija_id="$bankomat_lokacija_id" />

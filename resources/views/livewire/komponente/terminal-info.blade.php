@@ -10,7 +10,7 @@
                     <p>Terminal: <span class="font-bold">{{$item->sn}}</span> &nbsp;&nbsp;&nbsp; Staus: <span class="font-bold">{{ $item->ts_naziv }}</span></p>
                     <p class="text-sm mb-2 border-b-2 border-white">Lokacija: {{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}, {{$item->mesto}}</p>
                 @endforeach
-            @else
+            @elseif($selectedTerminal)
                 <div class="">
                     <div>
                         <p>Terminal: <span class="font-bold">{{$selectedTerminal->sn}}</span> &nbsp;&nbsp;&nbsp; Staus: <span class="font-bold">{{ $selectedTerminal->ts_naziv }}</span></p>

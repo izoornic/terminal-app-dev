@@ -21,6 +21,7 @@ class BankomatHistory extends Component
         $items = BankomatLocijaHirtory::select(
                 'bankomat_status_tips.status_naziv',
                 'bankomat_locija_hirtories.created_at',
+                'bankomat_locija_hirtories.updated_at',
                 'blokacijas.bl_naziv',
                 'blokacijas.bl_mesto',
                 'bankomat_regions.r_naziv',

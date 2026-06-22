@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Bankomati;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use App\Actions\Bankomati\BankomatiLokacijeReadActions;
 use Illuminate\Support\Facades\Config;
@@ -20,8 +21,6 @@ use App\Models\User;
 class Lokacije extends Component
 {
     use WithPagination;
-
-    protected $listeners = ['newLocation', 'newSubLocation', 'sortClick', 'novaLokacija'];
 
     //OREDER BY
     public $orderBy = 'blokacijas.id';
@@ -106,16 +105,19 @@ class Lokacije extends Component
     /*
     // Event lisener for new location
     */
+    #[On('newLocation')]
     public function newLocation()
     {
         $this->addNewLocation();
     }
 
+    #[On('newSubLocation')]
     public function newSubLocation()
     {
         $this->addNewSubLocation();
     }
 
+    #[On('novaLokacija')]
     public function novaLokacija($id, $key)
     {
        $this->modalNewSublocationVisible = false;
@@ -125,6 +127,7 @@ class Lokacije extends Component
        $this->dodajPodlokaciju();
     }
 
+    #[On('sortClick')]
     public function sortClick($field)
     {
         if ($this->orderBy === $field) {
@@ -132,9 +135,9 @@ class Lokacije extends Component
         } else {
             $this->orderBy = $field;
             $this->orderDirection = 'desc';
-            $this->emit('fieldChange', $field);
+            $this->dispatch('fieldChange', $field);
         }
-        $this->emit('sortChange', $this->orderDirection);
+        $this->dispatch('sortChange', $this->orderDirection);
     }
 
     public function rules()
@@ -265,7 +268,7 @@ class Lokacije extends Component
         $this->modalNewEditVisible = false;
         $this->resetInputFields();
         // Optionally, emit an event to notify other components of the change
-        $this->emit('locationSaved');
+        $this->dispatch('locationSaved');
     }
 
 /**

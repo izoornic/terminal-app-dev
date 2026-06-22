@@ -28,6 +28,7 @@ class RazduzenjePregled extends Component
     public $disrtibuter_mesec_row;
 
     public $modalConfirmDeleteVisible;
+    public $sum_razduzenja;
 
      /**
      * mount
@@ -49,7 +50,7 @@ class RazduzenjePregled extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return object
      */
     public function read()
     {

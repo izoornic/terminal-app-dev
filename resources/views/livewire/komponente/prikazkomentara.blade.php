@@ -29,7 +29,7 @@
     @if($canEdit)
         <div class="mt-4">
             <x-jet-label for="newKoment" value="{{ __('Dodaj komentar:') }}" />
-            <x-jet-textarea id="newKoment" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="newKoment" />
+            <x-jet-textarea id="newKoment" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="newKoment" />
             @error('newKoment') <span class="error">{{ $message }}</span> @enderror
             <x-jet-secondary-button wire:click="posaljiKomentar" wire:loading.attr="disabled" class="mt-2">
                 {{ __('Posalji komentar') }}

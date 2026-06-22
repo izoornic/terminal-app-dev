@@ -33,7 +33,7 @@ class OduzmiKolicinu extends Component
         $partStockService = new PartStockService();
         $partStockService->removeStock($this->partStock->part_type_id, $this->partStock->lokacija_id, $this->kolicina, auth()->user()->id);
        
-        $this->emit('modalActionSuccess', $this->partType->sifra, $this->partType->naziv);
+        $this->dispatch('modalActionSuccess', $this->partType->sifra, $this->partType->naziv);
     }
 
     public function render()

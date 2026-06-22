@@ -28,14 +28,14 @@
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchDistName" id="" class="block bg-orange-50 w-48" type="text" placeholder="Pretraži distributera" />
+                                    <x-jet-input wire:model.live="searchDistName" id="" class="block bg-orange-50 w-48" type="text" placeholder="Pretraži distributera" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-fit" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-fit" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td></td>
                                 <td colspan="2">
-                                    <select wire:model="searchZaduzen" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchZaduzen" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="0">---</option>
                                         <option value="1">Zadužen</option>
                                         <option value="2">Nije zadužen</option>
@@ -126,7 +126,7 @@
     </div>
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="deleteModalVisible">
+    <x-jet-dialog-modal wire:model.live="deleteModalVisible">
         <x-slot name="title">
             Obriši zaduženje
         </x-slot>

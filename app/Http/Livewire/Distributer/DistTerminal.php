@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Distributer;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 
 use App\Models\Lokacija;
@@ -81,7 +82,7 @@ class DistTerminal extends Component
 
     public $multiSelectedInfo;
 
-    protected $listeners = ['blacklistUpdate'];
+    #[On('blacklistUpdate')]
     public function blacklistUpdate()
     {
         $this->blacklistFormVisible = false;

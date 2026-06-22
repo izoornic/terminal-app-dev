@@ -61,7 +61,7 @@
     </div>
 
     {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
     <x-slot name="title">
             @if ($isUpdate) {{ __('Izmeni licencu') }}
             @else {{ __('Dodaj licencu') }} @endif
@@ -73,7 +73,7 @@
                 <div class="">Licenca: <span class="font-bold">{{ $l_naziv }}</span></div>
             @else
                 <x-jet-label for="licenca_tip_id" value="{{ __('Vrsta licence') }}" />
-                <select wire:model="licenca_tip_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <select wire:model.live="licenca_tip_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value=""> --- </option>
                     @foreach (App\Models\LicencaDistributerCena::OstaleLicenceZaDistributera($distId) as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
@@ -86,7 +86,7 @@
             <div class="mt-4 flex">
                 <div>
                     <x-jet-label for="licenca_zeta_cena" value="{{ __('Cena licence') }}" />
-                    <x-jet-input wire:model="licenca_zeta_cena" id="" class="block mt-1 w-80" type="text" />
+                    <x-jet-input wire:model.live="licenca_zeta_cena" id="" class="block mt-1 w-80" type="text" />
                     @error('licenca_zeta_cena') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="font-bold px-6 pt-8">EUR</div>
@@ -94,7 +94,7 @@
             <div class="mt-4 flex">
                 <div>
                     <x-jet-label for="licenca_dist_cena" value="{{ __('Preporučena cena za distributera') }}" />
-                    <x-jet-input wire:model="licenca_dist_cena" id="" class="block mt-1 w-80" type="text" />
+                    <x-jet-input wire:model.live="licenca_dist_cena" id="" class="block mt-1 w-80" type="text" />
                     @error('licenca_dist_cena') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="font-bold px-6 pt-8">EUR</div>
@@ -119,7 +119,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             {{ __('Brisanje licence') }}
         </x-slot>

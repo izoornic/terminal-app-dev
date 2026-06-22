@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Rdelovi\Komponente;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\PartStock;
 //use App\PartsInventory\Services\PartStockService;
 use App\PartsInventory\Services\TransferService;
@@ -16,10 +17,7 @@ class PremestiDeo extends Component
     public $lokacija;
     public $premestimoguce = true;
 
-    protected $listeners = [
-        'novaLokacija',
-    ];
-
+    #[On('novaLokacija')]
     public function novaLokacija($id)
     {
         $this->lokacija = $id;
@@ -47,7 +45,7 @@ class PremestiDeo extends Component
         $transferService->transferItem($this->partStock->part_type_id, $this->partStock->lokacija_id, $this->lokacija, $this->kolicina, auth()->user()->id, 'transfer');
         //$partStockService->addStock($this->partStock->part_type_id, $this->partStock->lokacija_id, $this->kolicina, auth()->user()->id);
        
-        $this->emit('modalActionSuccess', $this->partType->sifra, $this->partType->naziv);
+        $this->dispatch('modalActionSuccess', $this->partType->sifra, $this->partType->naziv);
     }
     
     public function render()

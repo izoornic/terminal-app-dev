@@ -6,7 +6,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pretraga</label>
                 <input type="text" 
-                    wire:model.debounce.300ms="searchNaziv" 
+                    wire:model.live.debounce.300ms="searchNaziv"
                     placeholder="Naziv"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             </div>
@@ -14,7 +14,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pretraga</label>
                 <input type="text" 
-                    wire:model.debounce.300ms="searchSifra" 
+                    wire:model.live.debounce.300ms="searchSifra"
                     placeholder="Šifra"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             </div>
@@ -22,7 +22,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Lokacija</label>
-                <select wire:model="locationId" 
+                <select wire:model.live="locationId" 
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Sve lokacije</option>
                     @foreach($locations as $location)
@@ -33,7 +33,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategorija</label>
-                <select wire:model="categoryId" 
+                <select wire:model.live="categoryId" 
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">Sve kategorije</option>
                     @foreach($categories as $category)
@@ -44,7 +44,7 @@
 
             <div class="flex items-end">
                 <label class="flex items-center">
-                    <input type="checkbox" wire:model="showLowStockOnly" 
+                    <input type="checkbox" wire:model.live="showLowStockOnly" 
                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <span class="ml-2 text-sm text-gray-700">Samo nisko stanje</span>
                 </label>
@@ -144,7 +144,7 @@
         {{ $stocks->links() }}
     </div>
    {{--  ######################################## ALL IN ONE MODAL #################################################### --}}
-    <x-jet-dialog-modal wire:model="modalVisible">
+    <x-jet-dialog-modal wire:model.live="modalVisible">
         <x-slot name="title">
             {{ $modal_title }}
         </x-slot>

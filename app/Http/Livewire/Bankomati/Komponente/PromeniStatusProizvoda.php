@@ -37,10 +37,11 @@ class PromeniStatusProizvoda extends Component
 
         //Provera datuma koji je korisnik uneo za promenu statusa
         if(!$this->validDatumPromene([1, 2, 4])) return;
-        
-        //dd($this->datum_promene);
-        DB::transaction(function()use($cuurent){
-            $cuurent->update(['bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
+
+        $datetime_promene = $this->datum_promene . ' ' . date('H:i:s');
+
+        DB::transaction(function() use ($cuurent, $datetime_promene) {
+            $cuurent->update(['bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $datetime_promene]);
 
             BankomatLocijaHirtory::create([
                 'bankomat_lokacija_id' => $this->modelId,
@@ -56,7 +57,7 @@ class PromeniStatusProizvoda extends Component
             
         });
 
-         $this->emit('statusChanged');
+         $this->dispatch('statusChanged');
     }
 
     private function validDatumPromene($history_a) 
@@ -71,7 +72,6 @@ class PromeniStatusProizvoda extends Component
             return false;
         }
 
-        $this->datum_promene .= ' ' . date('H:i:s');
         return true;
     }
 

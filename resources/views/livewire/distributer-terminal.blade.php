@@ -48,13 +48,13 @@
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td>
-                                    <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto, adresu, naziv" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto, adresu, naziv" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\LicencaDistributerCena::LicenceDistributera($distId) as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -63,13 +63,13 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchNenaplativ" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchNenaplativ" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         <option value="1">Da</option>
                                     </select>
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td></td>
                                 <td></td>
@@ -207,7 +207,7 @@
     </div>
 
     {{-- The Delete Modal #######################################################################--}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
                 {{ __('Brisanje licence') }}
         </x-slot>
@@ -231,7 +231,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Terminal Info Modal ##################################################### --}}
-    <x-jet-dialog-modal wire:model="modalTerminalInfoVisible">
+    <x-jet-dialog-modal wire:model.live="modalTerminalInfoVisible">
         <x-slot name="title">
             <svg class="float-left fill-red-500 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
                 Info
@@ -269,7 +269,7 @@
     </x-jet-dialog-modal>
 
          {{-- LAT LOG MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="latLogVisible">
+     <x-jet-dialog-modal wire:model.live="latLogVisible">
         <x-slot name="title">
         <svg class="float-left fill-sky-800 w-6 h-6 mx-auto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 299.4 432.7" style="enable-background:new 0 0 299.4 432.7;" xml:space="preserve"><g id="Layer_2"><g><path d="M149.7,0C67.2,0,0,67.2,0,149.7c0,45.1,27.5,81.1,59.4,122.7c26,34,55.6,72.6,76.4,124.2l14.6,36.1l13.4-36.5 c16.1-43.9,44.2-80.8,71.3-116.4c33.1-43.5,64.3-84.5,64.3-130.1C299.4,67.2,232.2,0,149.7,0z M211.2,261.6 c-21,27.6-44.2,58-61.8,92.7c-20.2-40-44.4-71.5-66.2-100.1C53.5,215.4,30,184.7,30,149.7C30,83.7,83.7,30,149.7,30 s119.7,53.7,119.7,119.7C269.4,185.1,242.4,220.6,211.2,261.6z"/><path d="M206.5,136.3h-41.8V94.5c0-8.3-6.7-15-15-15s-15,6.7-15,15v41.8H92.9c-8.3,0-15,6.7-15,15s6.7,15,15,15h41.8v41.8 c0,8.3,6.7,15,15,15s15-6.7,15-15v-41.8h41.8c8.3,0,15-6.7,15-15S214.8,136.3,206.5,136.3z"/></g></g></svg>
             {{ __('Koordinate') }}
@@ -294,7 +294,7 @@
                     <div class="flex">
                         <div class="flex-1">
                             <x-jet-label for="latLogValue" value="{{ __('Lat, Long') }}" />
-                            <x-jet-input wire:model="latLogValue" id="" class="block mt-1 w-full" type="text" />
+                            <x-jet-input wire:model.live="latLogValue" id="" class="block mt-1 w-full" type="text" />
                                 @error('lat_value') <span class="error">{{ $message }}</span> @enderror
                                 @error('long_value') <span class="error">{{ $message }}</span> @enderror
                         </div>
@@ -318,7 +318,7 @@
      </x-jet-dialog-modal>
 
     {{-- KOMENTARI MODAL --}}
-    <x-jet-dialog-modal wire:model="modalKomentariVisible">
+    <x-jet-dialog-modal wire:model.live="modalKomentariVisible">
         <x-slot name="title">
             KOMENTARI
         </x-slot>

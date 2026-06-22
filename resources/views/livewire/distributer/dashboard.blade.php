@@ -182,7 +182,7 @@
    </div>
 
    {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalLicencaFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalLicencaFormVisible">
     <x-slot name="title">
             Cena licence
         </x-slot>
@@ -197,7 +197,7 @@
             <div class="mt-4 flex">
                 <div>
                     <x-jet-label for="licenca_dist_cena" value="{{ __('Cena licence') }}" />
-                    <x-jet-input wire:model="licenca_dist_cena" id="" class="block mt-1 w-48" type="text" />
+                    <x-jet-input wire:model.live="licenca_dist_cena" id="" class="block mt-1 w-48" type="text" />
                     @error('licenca_dist_cena') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 <div class="font-bold px-6 pt-8">EUR</div>
@@ -217,7 +217,7 @@
     </x-jet-dialog-modal>
 
     {{-- EDIT DISTRIBUTER INFO Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalDistributerInfoFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalDistributerInfoFormVisible">
     <x-slot name="title">
            Izmeni podatke:
         </x-slot>
@@ -225,52 +225,52 @@
         <x-slot name="content">
         <div class="mt-4">
                 <x-jet-label for="distributer_naziv" value="{{ __('Naziv') }}" />
-                <x-jet-input wire:model="distributer_naziv" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_naziv" class="block mt-1 w-full" type="text" />
                 @error('distributer_naziv') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_adresa" value="{{ __('Adresa') }}" />
-                <x-jet-input wire:model="distributer_adresa" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_adresa" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_adresa') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_zip" value="{{ __('Poštanski broj') }}" />
-                <x-jet-input wire:model="distributer_zip" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_zip" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_zip') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_mesto" value="{{ __('Mesto') }}" />
-                <x-jet-input wire:model="distributer_mesto" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_mesto" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_mesto') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_email" value="{{ __('E-mail adresa') }}" />
-                <x-jet-input wire:model="distributer_email" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_email" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_email') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_pib" value="{{ __('PIB') }}" />
-                <x-jet-input wire:model="distributer_pib" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_pib" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_pib') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_mb" value="{{ __('Matični broj') }}" />
-                <x-jet-input wire:model="distributer_mb" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_mb" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_mb') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_tr" value="{{ __('Tekući račun') }}" />
-                <x-jet-input wire:model="distributer_tr" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_tr" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_tr') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_banka" value="{{ __('Banka') }}" />
-                <x-jet-input wire:model="distributer_banka" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_banka" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_banka') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="distributer_tel" value="{{ __('Telefon') }}" />
-                <x-jet-input wire:model="distributer_tel" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="distributer_tel" id="" class="block mt-1 w-full" type="text" />
                 @error('distributer_tel') <span class="error">{{ $message }}</span> @enderror
             </div>
         </x-slot>
@@ -287,13 +287,13 @@
     </x-jet-dialog-modal>
 
     {{-- Promeni DISTRIDUTERA test useru --}}
-    <x-jet-dialog-modal wire:model="promeniDitributeraModalVisible">
+    <x-jet-dialog-modal wire:model.live="promeniDitributeraModalVisible">
         <x-slot name="title">
         </x-slot>
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="testUserDistributer" value="{{ __('Radni status') }}" />
-                <select wire:model="testUserDistributer" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <select wire:model.live="testUserDistributer" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     @foreach (App\Models\LicencaDistributerTip::testUserDistributerList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach

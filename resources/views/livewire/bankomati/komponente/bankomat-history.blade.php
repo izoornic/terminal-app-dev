@@ -20,7 +20,7 @@
                     @endif
                 </span> 
                 <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - 
-                    <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->created_at) }}</span> - 
+                    <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span> - 
                     <span class="text-sky-900 text-sm font-medium py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-1">{{$item->akcija}}</span>
                 </h3>
                 @if($item->vrsta_akcije == 1)

@@ -7,14 +7,12 @@ use App\Models\LicencaDistributerTip;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Config;
 
 class DistCampagin extends Component
 {
     use WithPagination;
-
-    protected $listeners = ['newCampagin'];
 
     public $modalFormVisible;
     public $modalConfirmDeleteVisible;
@@ -33,6 +31,7 @@ class DistCampagin extends Component
         ];
     }
 
+    #[On('newCampagin')]
     public function newCampagin()
     {
         $this->createShowModal();

@@ -1,19 +1,22 @@
-<div>
+<div wire:key="ticket-conditional-wrapper">
     @if($tiket_exists)
-        <div class="bg-red-50 border-t-4 border-red-500 rounded-b text-red-600 px-4 py-3 shadow-md mb-6 mx-2 my-2" role="alert">
-            <p class="font-bold text-lg">Upozorenje!</p> 
-            <p class="text-lg">Za odabrani proizvod već postoji otvoren tiket!</p>
-            <div class="my-4 mx-4 flex" >
-                <a class="flex bg-red-500 text-white font-bold px-2 py-1 hover:bg-white hover:text-red-600 rounded" href="{{ route( 'bankomat-tiketview', ['id' => $tiket_exists->id] ) }}" title="{{ __('Pregled') }}" :active="request()->routeIs('bankomat-tiketview', ['id' => $tiket_exists->id] )">
-                    <x-heroicon-o-ticket class="w-4 h-4 mr-2 mt-0.5" />
-                    Tiket #{{ $tiket_exists->id }}
-                </a>
+        <div wire:key="ticket-exists-container">
+            <div class="bg-red-50 border-t-4 border-red-500 rounded-b text-red-600 px-4 py-3 shadow-md mb-6 mx-2 my-2" role="alert">
+                <p class="font-bold text-lg">Upozorenje!</p> 
+                <p class="text-lg">Za odabrani proizvod već postoji otvoren tiket!</p>
+                <div class="my-4 mx-4 flex" >
+                    <a class="flex bg-red-500 text-white font-bold px-2 py-1 hover:bg-white hover:text-red-600 rounded" href="{{ route( 'bankomat-tiketview', ['id' => $tiket_exists_id] ) }}" title="{{ __('Pregled') }}" :active="request()->routeIs('bankomat-tiketview', ['id' => $tiket_exists_id] )">
+                        <x-heroicon-o-ticket class="w-4 h-4 mr-2 mt-0.5" />
+                        Tiket #{{ $tiket_exists_id }}
+                    </a>
+                </div>
             </div>
         </div>
     @else
+        <div wire:key="ticket-tiket-container">
         <div class="mt-4">
             <x-jet-label for="vrsta_kvara" value="Vrsta kvara:" />   
-            <select wire:model="vrsta_kvara" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <select wire:model.live="vrsta_kvara" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">---</option>
                 @foreach (App\Models\BankomatTiketKvarTip::getAll($productTipId) as $key => $value)    
                     <option value="{{ $key }}">{{ $value }}</option>
@@ -24,7 +27,7 @@
         </div>
         <div class="mt-4">
             <x-jet-label for="opis_kvara" value="Opis kvara" />
-            <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opis_kvara" />
+            <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="opis_kvara" />
             @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
         </div> 
 
@@ -43,9 +46,9 @@
                         </tr>
                         <tr class="bg-orange-50">
                             <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                            <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
-                            <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
-                            <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
+                            <td><x-jet-input wire:model.live="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
+                            <td><x-jet-input wire:model.live="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
+                            <td><x-jet-input wire:model.live="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200"> 
@@ -110,13 +113,13 @@
             <div>
                 <x-jet-label for="datum_promene" value="Datum:" />
                 <div class="flex">
-                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
                 </div>
                 @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="ml-4">
                 <x-jet-label for="vreme_promene" value="Vreme:" />
-                <x-jet-input id="vreme_promene" type="time" class="mt-1 block" wire:model="vreme_promene"
+                <x-jet-input id="vreme_promene" type="time" class="mt-1 block" wire:model.live="vreme_promene"
                     x-data x-init="const n=new Date(); $wire.set('vreme_promene', String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')); $wire.set('utcOffset', n.getTimezoneOffset())" />
                 @error('vreme_promene') <span class="error">{{ $message }}</span> @enderror
             </div>
@@ -133,9 +136,8 @@
                     <x-icon-ticket-plus class="fill-current w-6 h-6 ml-2"/>
                     <span class="mx-2">Kreiraj tiket</span>
                 </button>
-            </div>
-            
+            </div>  
         @endif
-
+        </div>
     @endif
 </div>

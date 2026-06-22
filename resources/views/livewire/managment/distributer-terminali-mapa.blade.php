@@ -5,8 +5,10 @@
         <div class="text-red-600 float-left">{{ $dist_name }}</div>
         </div>
     </div>
-    <x-maps-google
-        :markers='$pins'  
-        :fitToBounds="true"
-    ></x-maps-google>
+    <div>
+        <x-maps-google
+            :markers='$pins'
+            :fitToBounds="true"
+        ></x-maps-google>
+    </div>
 </div>

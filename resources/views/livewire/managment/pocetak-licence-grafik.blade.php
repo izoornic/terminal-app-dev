@@ -9,7 +9,7 @@
                     <input type="checkbox" value="produzene" class="sr-only peer" onChange="changeBarVisability('produzene')" checked>
                     <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-400"></div>
                 </label>
-                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-yellow-400 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 0')">
+                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-yellow-400 hover:text-gray-600" wire:click="$dispatch('chartClicked', { data: 'januar - 2000 - 0' })">
                         <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                         Produžene licence {{ $broj_produzenih }}
                 </a>
@@ -18,7 +18,7 @@
                     <input type="checkbox" value="nove" class="sr-only peer" onChange="changeBarVisability('nove')" checked>
                     <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
                 </label>
-                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-emerald-600 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 1')">
+                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-emerald-600 hover:text-gray-600" wire:click="$dispatch('chartClicked', { data: 'januar - 2000 - 1' })">
                     <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                     Nove licence {{ $broj_novih }}
                 </a> 
@@ -27,7 +27,7 @@
                     <input type="checkbox" value="istekle" class="sr-only peer" onChange="changeBarVisability('istekle')" checked>
                     <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-800 dark:peer-checked:bg-red-800"></div>
                 </label>
-                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-red-800 hover:text-gray-600" wire:click="$emit('chartClicked', 'januar - 2000 - 2')">
+                <a class="font-semibold text-xl cursor-pointer flex ml-2 mr-6 pr-2 text-red-800 hover:text-gray-600" wire:click="$dispatch('chartClicked', { data: 'januar - 2000 - 2' })">
                     <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/></svg>
                     Istekle licence {{ $broj_istekilh }}
                 </a> 
@@ -127,7 +127,7 @@
                 const firstPoint = points[0];
                 const label = NaplataGrafik.data.labels[firstPoint.index];
                 const value = NaplataGrafik.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
-                Livewire.emit('chartClicked', label+'-'+firstPoint.datasetIndex);
+                Livewire.dispatch('chartClicked', { data: label+'-'+firstPoint.datasetIndex });
                 //console.log(label + ': ' + value + ' - ' + firstPoint.datasetIndex);
             }
         };

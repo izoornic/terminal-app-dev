@@ -13,6 +13,7 @@ use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -126,7 +127,7 @@ class Lokacijes extends Component
     //history modal
     public $modalHistoryVisible;
 
-    protected $listeners = ['sortClick'];
+    #[On('sortClick')]
     public function sortClick($field)
     {
         if ($this->orderBy === $field) {
@@ -134,9 +135,9 @@ class Lokacijes extends Component
         } else {
             $this->orderBy = $field;
             $this->orderDirection = 'desc';
-            $this->emit('fieldChange', $field);
+            $this->dispatch('fieldChange', $field);
         }
-        $this->emit('sortChange', $this->orderDirection);
+        $this->dispatch('sortChange', $this->orderDirection);
     }
 
     public function mount()

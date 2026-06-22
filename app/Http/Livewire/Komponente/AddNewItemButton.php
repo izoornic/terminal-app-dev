@@ -17,7 +17,7 @@ class AddNewItemButton extends Component
 
     public function btnClick()
     {
-        $this->emit($this->btn_event);
+        $this->dispatch($this->btn_event);
     }
 
     public function render()

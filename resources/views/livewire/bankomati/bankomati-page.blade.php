@@ -27,21 +27,21 @@
                             <tr class="bg-orange-50">
                                 <td> <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /> </td>
                                 <td>
-                                    <select wire:model="searchProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchProductTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td><x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
-                                <td><x-jet-input wire:model="searchModel" id="" class="block bg-orange-50 w-full" type="text" placeholder="Model" /></td>
+                                <td><x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
+                                <td><x-jet-input wire:model.live="searchModel" id="" class="block bg-orange-50 w-full" type="text" placeholder="Model" /></td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
+                                    <x-jet-input wire:model.live="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv lokacije" />
                                 </td>
                                 <td>
                                     @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
-                                        <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">---</option>
                                             @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -50,7 +50,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -58,7 +58,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchLocationTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchLocationTip" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BlokacijaTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -67,7 +67,7 @@
                                 </td>
                                 
                                 <td colspan="3">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                             </tr> 
                             {{-- SEARCH 2nd ROW --}}
@@ -75,18 +75,18 @@
                                 <td></td>
                                 <td></td>
                                 <td>
-                                    <x-jet-input wire:model="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="Terminal ID" />
+                                    <x-jet-input wire:model.live="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="Terminal ID" />
                                 </td>
                                 <td></td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchNazivSufix" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv sufix" />
+                                    <x-jet-input wire:model.live="searchNazivSufix" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv sufix" />
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td></td>
                                 <td colspan="2">
-                                    <select wire:model="searchNaplata" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchNaplata" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">Naplata</option>
                                         <option value="1">Da</option>
                                         <option value="0">Ne</option>
@@ -185,7 +185,7 @@
     </div>
 
     {{-- NOVI  BANKOMAT ############################################### --}}
-    <x-jet-dialog-modal wire:model="modalNewVisible">
+    <x-jet-dialog-modal wire:model.live="modalNewVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -201,7 +201,7 @@
                 @if(!$proizvod_model_tip)
                     <div class="mt-4">
                         <x-jet-label for="proizvod_model_tip" value="Tip proizvoda" />
-                        <select wire:model="proizvod_model_tip" id="" class="block appearance-none w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="proizvod_model_tip" id="" class="block appearance-none w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                             <option value="">---</option>
                             @foreach (App\Models\BankomatProductTip::getAll() as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -216,7 +216,7 @@
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="proizvod_model" value="Model novog proizvoda" />   
-                        <select wire:model="proizvod_model" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="proizvod_model" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                             <option value="">---</option>
                             @foreach (App\Models\BankomatTip::getAllFromCategory($proizvod_model_tip) as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -228,21 +228,21 @@
 
             <div class="mt-4">
                 <x-jet-label for="b_sn" value="Serijski broj" />
-                <x-jet-input wire:model.defer="b_sn" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model="b_sn" id="" class="block mt-1 w-full" type="text" />
                 @error('b_sn') <span class="error">{{ $message }}</span> @enderror
             </div>
 
             @if($proizvod_model_tip == 1)
                 <div class="mt-4">
                     <x-jet-label for="bankomat_tid" value="Terminal ID" />
-                    <x-jet-input wire:model.defer="bankomat_tid" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model="bankomat_tid" id="" class="block mt-1 w-full" type="text" />
                     @error('bankomat_tid') <span class="error">{{ $message }}</span> @enderror
                 </div>
             @endif
                 
                 <div class="mt-4">
                     <x-jet-label for="bankomat_status" value="Status proizvoda" />   
-                    <select wire:model.defer="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="">---</option>
                         @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -278,7 +278,7 @@
                 <div class="mt-4">
                     <x-jet-label for="datum_promene" value="Datum dodavanja proizvoda" />
                     <div class="flex">
-                        <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                        <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
                     </div>
                     @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
                     
@@ -301,7 +301,7 @@
     </x-jet-dialog-modal>
 
     {{-- EDIT MODAL ############################################################### --}}
-    <x-jet-dialog-modal wire:model="modalEditVisible">
+    <x-jet-dialog-modal wire:model.live="modalEditVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -314,13 +314,13 @@
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="b_sn" value="Serijski broj" />
-                <x-jet-input wire:model.defer="b_sn" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model="b_sn" id="" class="block mt-1 w-full" type="text" />
                 @error('b_sn') <span class="error">{{ $message }}</span> @enderror
             </div>
              @if($proizvod_model_tip == 1)
                 <div class="mt-4">
                     <x-jet-label for="bankomat_tid" value="Terminal ID" />
-                    <x-jet-input wire:model.defer="bankomat_tid" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model="bankomat_tid" id="" class="block mt-1 w-full" type="text" />
                     @error('bankomat_tid') <span class="error">{{ $message }}</span> @enderror
                 </div>
             @endif
@@ -335,7 +335,7 @@
                     @endif
                 </div>
                 @if($vlasnik_proizvoda)
-                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" :key="time()" />
+                    <livewire:bankomati.komponente.bankomat-lokacija-info :b_lokacija_id="$vlasnik_proizvoda" :key="'info-'.$vlasnik_proizvoda" />
                 @else
                     <livewire:bankomati.komponente.izbor-lokacije :key="$location_key" comp_index="vlasnik" />
                 @endif
@@ -357,7 +357,7 @@
 
 
     {{-- STATUS MODAL ############################################################### --}}
-    <x-jet-dialog-modal wire:model="modalStatusFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalStatusFormVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -369,7 +369,7 @@
 
         <x-slot name="content">
             @if($modalStatusFormVisible)
-               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$modelId" :status="$bankomat_status" :key="time()" />
+               <livewire:bankomati.komponente.promeni-status-proizvoda :bankomat_lokacija_id="$modelId" :status="$bankomat_status" :key="'status-'.$modelId" />
             @endif
         </x-slot>
 
@@ -381,7 +381,7 @@
     </x-jet-dialog-modal>
 
     {{-- PREMESTI MODAL ############################################################### --}}
-    <x-jet-dialog-modal wire:model="modalPremestiVisible">
+    <x-jet-dialog-modal wire:model.live="modalPremestiVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -406,7 +406,7 @@
 
                 <div class="mt-4">
                     <x-jet-label for="bankomat_status" value="Status bankomata" />   
-                    <select wire:model="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
@@ -418,7 +418,7 @@
             <div class="mt-4">
                 <x-jet-label for="datum_promene" value="Datum promene" />
                 <div class="flex">
-                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                    <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
                 </div>
                 @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
                 @if($datum_promene_error != '')
@@ -439,7 +439,7 @@
     </x-jet-dialog-modal>
 
     {{-- HISTORI Modal ################################################################################## --}}
-    <x-jet-dialog-modal wire:model="modalProizvodlHistoryVisible">
+    <x-jet-dialog-modal wire:model.live="modalProizvodlHistoryVisible">
         <x-slot name="title">
             <div class="flex">
             <x-icon-history class="fill-current w-6 h-6 mr-2"/>
@@ -466,7 +466,7 @@
     </x-jet-dialog-modal>
 
     {{-- TIKET Modal ################################################################################## --}}
-    <x-jet-dialog-modal wire:model="modalNewTicketVisible">
+    <x-jet-dialog-modal wire:model.live="modalNewTicketVisible">
         <x-slot name="title" class="flex">
             <div class="flex justify-between">
                 <div class="flex">
@@ -498,7 +498,7 @@
     </x-jet-dialog-modal>
 
     {{-- NAPLATA Modal ################################################################################## --}}
-    <x-jet-dialog-modal wire:model="modalNaplatVisible">
+    <x-jet-dialog-modal wire:model.live="modalNaplatVisible">
         <x-slot name="title">
             <div class="flex">
             <x-icon-ticket-plus class="fill-current w-6 h-6 mr-2"/>
@@ -515,7 +515,7 @@
                     <p class="font-bold mb-2">Naplata:</p>
                     <div class="flex">
                     <label class="inline-flex items-center ml-4 cursor-pointer">
-                        <input type="checkbox" wire:model="naplata" {{-- value="{{ $naplata }}" --}} class="sr-only peer" {{-- onChange="changeBarVisability('nove')"  checked --}}>
+                        <input type="checkbox" wire:model.live="naplata" {{-- value="{{ $naplata }}" --}} class="sr-only peer" {{-- onChange="changeBarVisability('nove')"  checked --}}>
                         <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600 dark:peer-checked:bg-teal-600"></div>
                     </label>
                         @if($naplata)
@@ -529,7 +529,7 @@
                 <div class="mt-4">
                     <x-jet-label for="datum_promene" value="Datum promene" />
                     <div class="flex">
-                        <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+                        <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
                     </div>
                     @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
                     @if($datum_promene_error != '')

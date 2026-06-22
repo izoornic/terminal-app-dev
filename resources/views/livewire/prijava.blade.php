@@ -61,7 +61,7 @@
             <div class="grid grid-cols-2 gap-6">
                 <div class="mt-4">
                     <x-jet-label for="serijskiBroj" value="{{ __('Serijski broj terminala:') }}" />
-                    <x-jet-input wire:model.defer="serialNum" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model="serialNum" id="" class="block mt-1 w-full" type="text" />
                     @error('serijskiBroj') <span class="error">{{ $message }}</span> @enderror
                 </div> 
                 <div class="pt-10"><x-jet-secondary-button wire:click="SearchTerminal"><svg class="fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M500.3 443.7l-119.7-119.7c27.22-40.41 40.65-90.9 33.46-144.7C401.8 87.79 326.8 13.32 235.2 1.723C99.01-15.51-15.51 99.01 1.724 235.2c11.6 91.64 86.08 166.7 177.6 178.9c53.8 7.189 104.3-6.236 144.7-33.46l119.7 119.7c15.62 15.62 40.95 15.62 56.57 0C515.9 484.7 515.9 459.3 500.3 443.7zM79.1 208c0-70.58 57.42-128 128-128s128 57.42 128 128c0 70.58-57.42 128-128 128S79.1 278.6 79.1 208z"/></svg>Pretrži</x-jet-button>
@@ -112,7 +112,7 @@
                 @if(!$smsSended && !$verifikacijaSubmited)
                 <div class="mt-4">
                         <x-jet-label for="opisKvaraList" value="{{ __('Izaberite kvar iz liste:') }}" />
-                        <select wire:model="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="0">---</option>    
                             @foreach (App\Models\TiketOpisKvaraTip::opisList($terminal->tid) as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -124,7 +124,7 @@
 
                     <div class="mt-4">
                         <x-jet-label for="opis_kvara" value="{{ __('Opis kvara:') }}" />
-                        <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opisKvataTxt" />
+                        <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="opisKvataTxt" />
                         @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
                     </div> 
 
@@ -134,7 +134,7 @@
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="prijavaIme" value="{{ __('Ime i prezime:') }}" />
-                        <x-jet-input wire:model="prijavaIme" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="prijavaIme" id="" class="block mt-1 w-full" type="text" />
                         @error('prijavaIme') <span class="error">{{ $message }}</span> @enderror
                     </div> 
                     <div class="mt-4">
@@ -164,7 +164,7 @@
                     <div class="mt-4">
                         <p class= "my-4">Na broj: <span class="font-bold">+381 {{ $telefon_display }} </span> je poslata SMS poruka sa verifikacinim kodom.</p>
                         <x-jet-label for="verifikacioniKodInput" value="{{ __('Unesite verifikacioni kod:') }}" />
-                        <x-jet-input wire:model.defer="verifikacioniKodInput" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model="verifikacioniKodInput" id="" class="block mt-1 w-full" type="text" />
                         @error('verifikacioniKodInput') <span class="error">{{ $message }}</span> @enderror
                     </div>
                     </div>

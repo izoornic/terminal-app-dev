@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class SortButton extends Component
 {
@@ -13,8 +14,6 @@ class SortButton extends Component
     public $btn_text;
     public $active;
 
-    protected $listeners = ['sortChange', 'fieldChange'];
-    
     public function mount()
     {
         $this->orderDirection = 'desc';
@@ -23,14 +22,16 @@ class SortButton extends Component
 
     public function sortClick()
     {
-        $this->emit('sortClick', $this->field);
+        $this->dispatch('sortClick', $this->field);
     }
 
+    #[On('sortChange')]
     public function sortChange($sort)
     {
         $this->orderDirection = $sort;
     }
 
+    #[On('fieldChange')]
     public function fieldChange($field)
     {
        $this->active =  ($this->field === $field) ? true : false;

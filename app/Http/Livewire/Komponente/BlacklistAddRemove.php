@@ -61,7 +61,7 @@ class BlacklistAddRemove extends Component
             $this->newKoment = '';
         }
         $this->canBlacklistErorr = '';
-        $this->emit('blacklistUpdate');
+        $this->dispatch('blacklistUpdate');
     }
 
     public function render()

@@ -57,13 +57,13 @@
                             <tr class="bg-orange-50">
                                 
                                 <td colspan = "2">
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td></td>
                                 <td></td>

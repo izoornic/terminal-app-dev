@@ -47,14 +47,14 @@
                             <tr class="bg-orange-50">
                                 <td> <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /> </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
                                     @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
-                                        <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                                 @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                                                     <option value="{{ $key }}">{{ $value }}</option>
@@ -119,7 +119,7 @@
                                 </td>
 
                                {{--  <td>
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\BlokacijaTip::getAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -128,7 +128,7 @@
                                 </td> --}}
                                 <td></td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>
                             </tr>
@@ -210,7 +210,7 @@
     </div>
 
     {{-- NOVA PODLOKACIJA - IZBOR GLAVNE LOKACIJE --}}
-    <x-jet-dialog-modal wire:model="modalNewSublocationVisible">
+    <x-jet-dialog-modal wire:model.live="modalNewSublocationVisible">
         <x-slot name="title">
             Nova podlokacija
         </x-slot>
@@ -230,7 +230,7 @@
     </x-jet-dialog-modal>
 
     {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
-    <x-jet-dialog-modal wire:model="modalNewEditVisible">
+    <x-jet-dialog-modal wire:model.live="modalNewEditVisible">
         <x-slot name="title">
             <div class="flex justify-between">
                 <div class="flex">
@@ -272,13 +272,13 @@
                     <span class="inline-flex items-center py-2 px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-m">
                         {{ $bl_naziv }}
                     </span>
-                    <input wire:model="bl_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                    <input wire:model.live="bl_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     @error('bl_naziv_sufix') <span class="error">{{ $message }}</span>@enderror
                 </div> 
             @else 
                 <div class="mt-4">
                     <x-jet-label for="bl_naziv" value="Naziv lokacije" />
-                    <x-jet-input wire:model="bl_naziv" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.live="bl_naziv" id="" class="block mt-1 w-full" type="text" />
                     @error('bl_naziv') <span class="error">{{ $message }}</span> @enderror
                 </div>
             @endif
@@ -288,7 +288,7 @@
                     @if($is_edit || $is_sublocation)
                         <p class="ml-4"><strong>{{ $blokacija_tip }}</strong></p>
                     @else
-                        <select wire:model="blokacija_tip_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="blokacija_tip_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                             <option value="">Izaberi vrstu lokacije</option>
                             @foreach (App\Models\BlokacijaTip::getAll() as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -299,12 +299,12 @@
             </div>  
             <div class="mt-4">
                 <x-jet-label for="bl_mesto" value="Mesto" />
-                <x-jet-input wire:model="bl_mesto" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="bl_mesto" id="" class="block mt-1 w-full" type="text" />
                 @error('bl_mesto') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="bl_adresa" value="Adresa" />
-                <x-jet-input wire:model="bl_adresa" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="bl_adresa" id="" class="block mt-1 w-full" type="text" />
                 @error('bl_adresa') <span class="error">{{ $message }}</span> @enderror
             </div>
             
@@ -313,35 +313,35 @@
                 @if($is_edit && $is_duplicate || $is_sublocation)
                     <p class="ml-4"><strong>{{ $pib }}</strong></p>
                 @else
-                    <x-jet-input wire:model="pib" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.live="pib" id="" class="block mt-1 w-full" type="text" />
                     @error('pib') <span class="error">{{ $message }}</span> @enderror
                 @endif
             </div>
         
             <div class="mt-4">
                 <x-jet-label for="mb" value="Matični broj" />
-                <x-jet-input wire:model="mb" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="mb" id="" class="block mt-1 w-full" type="text" />
                 @error('mb') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="email" value="e-mail" />
-                <x-jet-input wire:model="email" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="email" id="" class="block mt-1 w-full" type="text" />
                 @error('email') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="latitude" value="Latitude" />
-                <x-jet-input wire:model="latitude" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="latitude" id="" class="block mt-1 w-full" type="text" />
                 @error('latitude') <span class="error">{{ $message }}</span> @enderror
             </div>  
             <div class="mt-4">
                 <x-jet-label for="longitude" value="Longitude" />
-                <x-jet-input wire:model="longitude" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="longitude" id="" class="block mt-1 w-full" type="text" />
                 @error('longitude') <span class="error">{{ $message }}</span> @enderror
             </div>      
             <div class="mt-4">
                 <x-jet-label for="bankomat_region_id" value="Region" />
                 @if($role_region['role'] == 'admin' || $role_region['role'] == 'programer')
-                    <select wire:model="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="bankomat_region_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">Odaberi region</option>
                         @foreach (App\Models\BankomatRegion::getAll() as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -361,23 +361,23 @@
                     </p>
                     <div class="mt-4">
                         <x-jet-label for="kontakt_name" value="Ime" />
-                        <x-jet-input wire:model="kontakt_name" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="kontakt_name" id="" class="block mt-1 w-full" type="text" />
                         @error('kontakt_name') <span class="error">{{ $message }}</span> @enderror
                     </div> 
                     <div class="mt-4">
                         <x-jet-label for="kontakt_tel" value="Broj telefona" />
                         <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                            <x-jet-input wire:model="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
+                            <x-jet-input wire:model.live="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
 							{{-- <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
 								+381
 							</span>
-							<input wire:model="kontakt_tel" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" /> --}}
+							<input wire:model.live="kontakt_tel" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" /> --}}
 							@error('kontakt_tel') <span class="error">{{ $message }}</span>@enderror
 						</div> 
 					</div>
                     <div class="mt-4">
                         <x-jet-label for="kontakt_email" value="e-mail" />
-                        <x-jet-input wire:model="kontakt_email" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="kontakt_email" id="" class="block mt-1 w-full" type="text" />
                         @error('kontakt_email') <span class="error">{{ $message }}</span> @enderror
                     </div>
 				</div>
@@ -401,7 +401,7 @@
     </x-jet-dialog-modal>
 
     {{-- KONTAKT OSOBA MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="kontaktOsobaVisible">
+     <x-jet-dialog-modal wire:model.live="kontaktOsobaVisible">
         <x-slot name="title">
             <div class="flex">
             <x-heroicon-o-user-card class="text-gray-600 w-8 h-8 mt-1 mr-2" />
@@ -425,7 +425,7 @@
 
 
         {{-- The Delete or INFO Modal ############################################################# --}}
-    <x-jet-dialog-modal wire:model="modalLokacijaInfoVisible">
+    <x-jet-dialog-modal wire:model.live="modalLokacijaInfoVisible">
         <x-slot name="title">
             <div class="flex">
                 <x-heroicon-o-information-circle class="w-6 h-6 mx-1"/>
@@ -482,7 +482,7 @@
     </x-jet-dialog-modal>
 
      {{-- LAT LOG MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="latLogVisible">
+     <x-jet-dialog-modal wire:model.live="latLogVisible">
         <x-slot name="title">
             <div class="flex">
             <x-heroicon-o-pin-plus class="w-6 h-6 mr-2" />
@@ -497,7 +497,7 @@
                     <div class="flex">
                         <div class="flex-1">
                             <x-jet-label for="latLogValue" value="{{ __('Lat, Long') }}" />
-                            <x-jet-input wire:model="latLogValue" id="" class="block mt-1 w-full" type="text" />
+                            <x-jet-input wire:model.live="latLogValue" id="" class="block mt-1 w-full" type="text" />
                                 @error('latLogValue') <span class="error">{{ $message }}</span> @enderror
                                 @error('lat_value') <span class="error">{{ $message }}</span> @enderror
                                 @error('long_value') <span class="error">{{ $message }}</span> @enderror
