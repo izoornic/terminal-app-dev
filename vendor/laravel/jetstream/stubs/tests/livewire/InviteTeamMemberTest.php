@@ -19,15 +19,13 @@ class InviteTeamMemberTest extends TestCase
     {
         if (! Features::sendsTeamInvitations()) {
             $this->markTestSkipped('Team invitations not enabled.');
-
-            return;
         }
 
         Mail::fake();
 
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
-        $component = Livewire::test(TeamMemberManager::class, ['team' => $user->currentTeam])
+        Livewire::test(TeamMemberManager::class, ['team' => $user->currentTeam])
             ->set('addTeamMemberForm', [
                 'email' => 'test@example.com',
                 'role' => 'admin',
@@ -42,8 +40,6 @@ class InviteTeamMemberTest extends TestCase
     {
         if (! Features::sendsTeamInvitations()) {
             $this->markTestSkipped('Team invitations not enabled.');
-
-            return;
         }
 
         Mail::fake();

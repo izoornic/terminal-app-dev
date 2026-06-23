@@ -6,10 +6,13 @@ use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Inertia\Inertia;
+use Laravel\Fortify\Events\PasswordUpdatedViaController;
 use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
 use Laravel\Jetstream\Http\Livewire\CreateTeamForm;
@@ -50,7 +53,7 @@ class JetstreamServiceProvider extends ServiceProvider
         $this->configureRoutes();
         $this->configureCommands();
 
-        RedirectResponse::macro('banner', function ($message) {
+        RedirectResponse::macro('banner', function ($message): RedirectResponse {
             /** @var \Illuminate\Http\RedirectResponse $this */
             return $this->with('flash', [
                 'bannerStyle' => 'success',
@@ -58,7 +61,15 @@ class JetstreamServiceProvider extends ServiceProvider
             ]);
         });
 
-        RedirectResponse::macro('dangerBanner', function ($message) {
+        RedirectResponse::macro('warningBanner', function ($message): RedirectResponse {
+            /** @var \Illuminate\Http\RedirectResponse $this */
+            return $this->with('flash', [
+                'bannerStyle' => 'warning',
+                'banner' => $message,
+            ]);
+        });
+
+        RedirectResponse::macro('dangerBanner', function ($message): RedirectResponse {
             /** @var \Illuminate\Http\RedirectResponse $this */
             return $this->with('flash', [
                 'bannerStyle' => 'danger',
@@ -107,10 +118,10 @@ class JetstreamServiceProvider extends ServiceProvider
         ], 'jetstream-config');
 
         $this->publishes([
-            __DIR__.'/../database/migrations/2014_10_12_000000_create_users_table.php' => database_path('migrations/2014_10_12_000000_create_users_table.php'),
+            __DIR__.'/../database/migrations/0001_01_01_000000_create_users_table.php' => database_path('migrations/0001_01_01_000000_create_users_table.php'),
         ], 'jetstream-migrations');
 
-        $this->publishes([
+        $this->publishesMigrations([
             __DIR__.'/../database/migrations/2020_05_21_100000_create_teams_table.php' => database_path('migrations/2020_05_21_100000_create_teams_table.php'),
             __DIR__.'/../database/migrations/2020_05_21_200000_create_team_user_table.php' => database_path('migrations/2020_05_21_200000_create_team_user_table.php'),
             __DIR__.'/../database/migrations/2020_05_21_300000_create_team_invitations_table.php' => database_path('migrations/2020_05_21_300000_create_team_invitations_table.php'),
@@ -177,6 +188,12 @@ class JetstreamServiceProvider extends ServiceProvider
         if (class_exists(HandleInertiaRequests::class)) {
             $kernel->appendToMiddlewarePriority(HandleInertiaRequests::class);
         }
+
+        Event::listen(function (PasswordUpdatedViaController $event) {
+            if (request()->hasSession()) {
+                request()->session()->put(['password_hash_sanctum' => Auth::user()->getAuthPassword()]);
+            }
+        });
 
         Fortify::loginView(function () {
             return Inertia::render('Auth/Login', [

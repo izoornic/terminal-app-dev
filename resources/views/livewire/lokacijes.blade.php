@@ -671,7 +671,7 @@
                                     </tr>
                                     @endforeach
                                     </tbody>
-                                <table>
+                                </table>
                                 <div class="mt-5">
                                     {{ $this->lokacijeTipa($p_lokacija_tipId)->links() }}
                                 </div>
@@ -711,7 +711,8 @@
                                     </th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj kutije</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model</tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                </tr>
                             </thead>
                             <tr>
                                 <td></td>

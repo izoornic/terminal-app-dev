@@ -5,7 +5,7 @@
                     <div>Kontakt osoba:</div>
                     <div class="flex">
                         <div class="py-1">
-                            <x-heroicon-o-user-card class="w-8 h-8 mr-2" />
+                            <x-heroicon-o-identification class="w-8 h-8 mr-2" />
                         </div>
                         <div>
                             <p class="font-bold">{{ $item->ime }}</p>
@@ -32,7 +32,7 @@
         <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mt-6 mb-6">
             <hr />
             <p class="flex">
-                <x-heroicon-o-user-card class="mt-1 w-8 h-8" />
+                <x-heroicon-o-identification class="mt-1 w-8 h-8" />
                 Kontakt osoba:
             </p>
             <div class="mt-4">

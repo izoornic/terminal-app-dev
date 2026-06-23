@@ -1,10 +1,12 @@
 <div class="p-6">
     <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
+        @if($selectedKatId != 5)
         <x-jet-button wire:click="createShowModal" >
             <!--! CREATE NEW USER -->
             <x-heroicon-o-user-plus class="w-5 h-5 mr-0 ml-1"/>
-        <span class="ml-4">Novi korisnik</span>    
-    </x-jet-button> 
+            <span class="ml-4">Novi korisnik</span>    
+        </x-jet-button> 
+        @endif
     </div>
 
     {{-- The data table --}}

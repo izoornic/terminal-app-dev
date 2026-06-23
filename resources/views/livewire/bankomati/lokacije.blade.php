@@ -165,7 +165,7 @@
                                         <td class="px-2 pt-1">
                                             @if($item->ime)
                                                 <button class="mt-1 -mb-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white"  wire:click="showKontaktOsobaModal({{ $item->id }})" title="Kontakt">
-                                                    <x-heroicon-o-user-card class="w-8 h-8 -m-1 -mb-3" />
+                                                    <x-heroicon-o-identification class="w-8 h-8 -m-1 -mb-3" />
                                                 </button>
                                             @else
                                                 <button class="mt-1 -mb-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white"  wire:click="showKontaktOsobaModal({{ $item->id }})" title="Dodaj kontakt">
@@ -183,7 +183,7 @@
                                         </td>  
                                         <td>
                                             <button class="text-sky-800  border rounded-md border-sky-800 pt-2 mr-2 hover:bg-sky-800 hover:text-white" onclick="copyToCliboard('{{$item->bl_adresa}}', '{{$item->bl_mesto}}')" wire:click="showLatLogModal({{ $item->id }})" title="Dodaj koordinate" >
-                                                        <x-heroicon-o-pin-plus class="w-6 h-6 mx-2 mb-1 -mt-1" />
+                                                        <x-heroicon-o-map-pin class="w-6 h-6 mx-2 mb-1 -mt-1" />
                                             </button>
                                         </td>                                     
                                         <td>
@@ -356,7 +356,7 @@
                 <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mt-6 mb-6">
                     <hr />
                     <p class="flex">
-                        <x-heroicon-o-user-card class="mt-1 w-8 h-8" />
+                        <x-heroicon-o-identification class="mt-1 w-8 h-8" />
                         Kontakt osoba:
                     </p>
                     <div class="mt-4">
@@ -404,7 +404,7 @@
      <x-jet-dialog-modal wire:model.live="kontaktOsobaVisible">
         <x-slot name="title">
             <div class="flex">
-            <x-heroicon-o-user-card class="text-gray-600 w-8 h-8 mt-1 mr-2" />
+            <x-heroicon-o-identification class="text-gray-600 w-8 h-8 mt-1 mr-2" />
             Kontakt osoba
             </div>
         </x-slot>
@@ -485,7 +485,7 @@
      <x-jet-dialog-modal wire:model.live="latLogVisible">
         <x-slot name="title">
             <div class="flex">
-            <x-heroicon-o-pin-plus class="w-6 h-6 mr-2" />
+            <x-heroicon-o-map-pin class="w-6 h-6 mr-2" />
            Koordinate</div>
         </x-slot>
 
