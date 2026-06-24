@@ -12,6 +12,7 @@ use App\Models\PartStock;
 use App\PartsInventory\Services\ReservationService;
 use App\PartsInventory\Services\PartStockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ReservationServiceTest extends TestCase
 {
@@ -34,7 +35,7 @@ class ReservationServiceTest extends TestCase
         $this->partType = PartType::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_reservation()
     {
         $this->stockService->addStock(
@@ -63,7 +64,7 @@ class ReservationServiceTest extends TestCase
         $this->assertEquals(15, $stock->kolicina_dostupna);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_fulfill_reservation()
     {
         $this->stockService->addStock(
@@ -94,7 +95,7 @@ class ReservationServiceTest extends TestCase
         $this->assertEquals(0, $stock->kolicina_rezervisana);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cancel_reservation()
     {
         $this->stockService->addStock(

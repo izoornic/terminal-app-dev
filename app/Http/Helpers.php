@@ -49,12 +49,12 @@ class Helpers
 
     public static function addMonthsToDate($date, $no_of_mounths)
     {
-        return Carbon::parse($date)->addMonths($no_of_mounths)->toDateString();
+        return Carbon::parse($date)->addMonths((int) $no_of_mounths)->toDateString();
     }
 
     public static function addDaysToDate($date, $no_of_days)
     {
-        return Carbon::parse($date)->addDays($no_of_days)->toDateString();
+        return Carbon::parse($date)->addDays((int) $no_of_days)->toDateString();
     }
 
     public static function nameOfTheMounth($date)

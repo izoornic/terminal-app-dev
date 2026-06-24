@@ -13,6 +13,7 @@ use App\Models\TerminalTip;
 use App\PartsInventory\Services\TransferService;
 use App\PartsInventory\Services\PartStockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class TransferServiceTest extends TestCase
 {
@@ -39,7 +40,7 @@ class TransferServiceTest extends TestCase
         $this->partType = PartType::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_transfer()
     {
         // Dodaj stock na source lokaciju
@@ -69,7 +70,7 @@ class TransferServiceTest extends TestCase
         $this->assertCount(1, $transfer->items);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_execute_transfer()
     {
         // Priprema
@@ -126,7 +127,7 @@ class TransferServiceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_transfer_with_insufficient_stock()
     {
         $this->stockService->addStock(

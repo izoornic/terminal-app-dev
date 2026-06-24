@@ -1,8 +1,12 @@
-# Plan upgrejda: Laravel 10 → 11 + PHP 8.2 → 8.4
+# Plan upgrejda: Laravel 10 → 13 + PHP 8.2 → 8.4
 
 > Datum kreiranja: 2026-04-28
 > Polazna verzija: Laravel 10.x, PHP 8.2.30, Livewire 2.5
-> Ciljana verzija: Laravel 11.x, PHP 8.4.x, Livewire 3.x
+> Ciljana verzija: Laravel 13.x, PHP 8.4.x, Livewire 3.x
+>
+> **Redoslijed (od 2026-06-23):** L11 i PHP su razdvojeni jer L13 zahtijeva PHP ≥ 8.3.
+> Zato PHP 8.4 ide prije frameworka, pa onda inkrementalno L12 → L13:
+> FAZA 3 (PHP 8.4) → FAZA 4 (L12) → FAZA 5 (L13) → FAZA 6 (čišćenje).
 
 ---
 
@@ -11,7 +15,7 @@
 | Komponenta | Trenutno | Cilj |
 | --- | --- | --- |
 | PHP | 8.2.30 | 8.4.x |
-| Laravel | 10.x | 11.x |
+| Laravel | 10.x | 13.x |
 | Livewire | 2.5 | 3.x |
 | Jetstream | 2.6 | 4.x |
 | Sanctum | 3.2 | 4.x |
@@ -419,7 +423,92 @@ php artisan about
 
 ---
 
-## FAZA 4 — Post-upgrade čišćenje
+## FAZA 4 — Laravel 11 → 12
+
+> Preduslov: FAZA 3 završena — aplikacija stabilna na PHP 8.4.
+> Laravel 12 je namjerno minimalan release (uglavnom bump zavisnosti, malo breaking changes).
+> Ovdje je L12 **checkpoint**, ne krajnja destinacija — odmah slijedi L13 (FAZA 5).
+
+### 4.1 Provjera ekosistema prije bumpa
+
+Potvrditi da svi paketi imaju L12-kompatibilne verzije prije nego se dira framework:
+
+| Paket | Napomena |
+| --- | --- |
+| laravel/jetstream | provjeriti ^5 podršku za L12 |
+| livewire/livewire | provjeriti ^3 podršku za L12 |
+| laravel/sanctum | provjeriti ^4 podršku za L12 |
+| laravel/fortify | provjeriti |
+| spatie/laravel-permission | provjeriti ^6 |
+| maatwebsite/excel | provjeriti ^3 |
+| barryvdh/laravel-dompdf | provjeriti |
+| larswiegers/laravel-maps | ⚠️ neizvjesno — najvjerovatniji blocker (već označeno u FAZA 2) |
+
+```bash
+# Dry-run provjera konflikta
+composer require laravel/framework:^12.0 --dry-run 2>&1 | grep -i "conflict\|error"
+```
+
+### 4.2 Upgrejd
+
+```bash
+composer require laravel/framework:^12.0 -W
+php artisan optimize:clear
+```
+
+### 4.3 Ključne provjere (utvrditi tačno u zvaničnom 12.x upgrade guide-u)
+
+- [ ] Carbon 3 — provjeriti formatiranje/parsiranje datuma kroz app
+- [ ] `image` validacijsko pravilo — provjeriti SVG ponašanje (promijenjen default)
+- [ ] Proći cijeli zvanični upgrade guide za sitne breaking changes
+
+### 4.4 Verifikacija
+
+- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
+- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+- [ ] Ručno testirati: tiket, licence, bankomat, rezervacije/transfer, Excel, PDF, auth
+- [ ] Provjeriti `larswiegers/laravel-maps` (menadžment modul + Google mape)
+
+---
+
+## FAZA 5 — Laravel 12 → 13
+
+> Preduslov: FAZA 4 završena — aplikacija stabilna na L12 + PHP 8.4.
+> ⚠️ Laravel 13 zahtijeva **PHP ≥ 8.3** — zato PHP 8.4 (FAZA 3) ide prije frameworka.
+
+### 5.1 Provjera ekosistema prije bumpa
+
+- [ ] Jetstream — L13-kompatibilna verzija
+- [ ] Livewire 3 — L13 podrška
+- [ ] Sanctum / Fortify — L13 podrška
+- [ ] spatie/laravel-permission — L13 podrška
+- [ ] larswiegers/laravel-maps — ⚠️ provjeriti (isti rizik kao u FAZA 4)
+
+```bash
+composer require laravel/framework:^13.0 --dry-run 2>&1 | grep -i "conflict\|error"
+```
+
+### 5.2 Upgrejd
+
+```bash
+composer require laravel/framework:^13.0 -W
+php artisan optimize:clear
+```
+
+### 5.3 Breaking changes
+
+- [ ] Proći cijeli zvanični 13.x upgrade guide — specifične promjene utvrditi tamo (L13 je izvan ovog plana u trenutku pisanja)
+
+### 5.4 Verifikacija
+
+- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
+- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+- [ ] Ručno testirati sve module
+- [ ] Deploy na staging i finalni test
+
+---
+
+## FAZA 6 — Post-upgrade čišćenje
 
 - [ ] `php artisan optimize:clear`
 - [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
@@ -444,13 +533,18 @@ php artisan about
 | Faza 1 — Livewire 2→3 | **Visok** | 2–5 dana |
 | Faza 2 — Laravel 11 | Srednji | 1–2 dana |
 | Faza 3 — PHP 8.4 | Nizak | 2–4h |
-| Faza 4 — Čišćenje | Nizak | 2–4h |
+| Faza 4 — Laravel 12 | Nizak | 0.5–1 dan |
+| Faza 5 — Laravel 13 | Nizak–Srednji | 0.5–1 dan |
+| Faza 6 — Čišćenje | Nizak | 2–4h |
 
 ---
 
 ## Korisni linkovi
 
 - [Laravel 11 Upgrade Guide](https://laravel.com/docs/11.x/upgrade)
+- [Laravel 12 Upgrade Guide](https://laravel.com/docs/12.x/upgrade)
+- [Laravel 13 Upgrade Guide](https://laravel.com/docs/13.x/upgrade)
+- [Laravel Support Policy](https://laravel.com/docs/releases#support-policy)
 - [Livewire v3 Upgrade Guide](https://livewire.laravel.com/docs/upgrading)
 - [Jetstream v4 Changelog](https://github.com/laravel/jetstream/blob/main/CHANGELOG.md)
 - [PHP 8.4 Migration Guide](https://www.php.net/manual/en/migration84.php)
