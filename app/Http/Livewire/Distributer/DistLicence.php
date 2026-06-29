@@ -780,6 +780,7 @@ class DistLicence extends Component
         $licens->getCollection()->transform(function ($item) {
             /* $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
             $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0; */
+            $item->month_diff = Helpers::monthDifference($item->datum_kraj_licence);
             $this->allInPage[] = $item->lnid;
             return $item;
         });

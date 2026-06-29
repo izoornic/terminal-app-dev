@@ -133,7 +133,7 @@ class Helpers
         $eDate = Carbon::parse($krajLicence);
         $sDate = Carbon::now();
 
-        $diff = $sDate->diffInMonths($eDate);
+        $diff = (int) floor($sDate->diffInMonths($eDate));
         $dayPass = ($sDate->gt($eDate)) ? true : false;
         
         if($dayPass) return -1;

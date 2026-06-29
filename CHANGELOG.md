@@ -376,3 +376,6 @@ V 1.1.16 ( 27.4.2026.) @Bnkomati_ff
 
 V 2.0.0 ( 23.6.2026.) @upgrade/laravel11
     - Upgrade to Laravel 11
+
+V 2.0.0.2 ( 29.6.2026.) @upgrade/laravel11
+    - Upgrade to Laravel 11 ispravka bugova
