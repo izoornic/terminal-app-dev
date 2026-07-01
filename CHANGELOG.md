@@ -379,3 +379,7 @@ V 2.0.0 ( 23.6.2026.) @upgrade/laravel11
 
 V 2.0.0.2 ( 29.6.2026.) @upgrade/laravel11
     - Upgrade to Laravel 11 ispravka bugova
+
+V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
+    - Ispravljen bug Check All
+    - Ispravljen Bug Produzi licencu - Check polja, datum kraja licence bio auto setovan na mesec dana.

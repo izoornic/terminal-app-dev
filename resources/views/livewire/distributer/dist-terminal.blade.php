@@ -64,7 +64,7 @@
                         <thead>
                             {{-- DATA THEAD --}}
                             <tr>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500  tracking-wider"><input type="checkbox" value="1" wire:model.live="selectAll.1"  class="form-checkbox h-6 w-6 text-blue-500"></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500  tracking-wider"><input type="checkbox" wire:model.live="selectAll"  class="form-checkbox h-6 w-6 text-blue-500"></th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500  tracking-wider">
                                     Serijski broj <br />
                                     <span class=" text-red-400">Kutija</span>

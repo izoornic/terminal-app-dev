@@ -707,7 +707,7 @@
                             <thead>
                                 <tr>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                        <input type="checkbox" value="{{ $selectAllValue }}" wire:model.live="selectAll.{{ $this->modelId }}"  class="form-checkbox h-6 w-6 text-blue-500">
+                                        <input type="checkbox" wire:model.live="selectAll"  class="form-checkbox h-6 w-6 text-blue-500">
                                     </th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj kutije</th>
