@@ -18,6 +18,11 @@
                         </x-jet-nav-link>
                         @endif
                     @endforeach
+                    @if (Auth::id() === 1)
+                        <x-jet-nav-link href="{{ route('two-factor-recovery') }}" :active="request()->routeIs('two-factor-recovery')">
+                            2FA Recovery
+                        </x-jet-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -152,6 +157,11 @@
                     {{ $value }}
                 </x-jet-responsive-nav-link>
             @endforeach
+            @if (Auth::id() === 1)
+                <x-jet-responsive-nav-link href="{{ route('two-factor-recovery') }}" :active="request()->routeIs('two-factor-recovery')">
+                    2FA Recovery
+                </x-jet-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

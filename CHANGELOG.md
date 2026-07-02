@@ -383,3 +383,6 @@ V 2.0.0.2 ( 29.6.2026.) @upgrade/laravel11
 V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
     - Ispravljen bug Check All
     - Ispravljen Bug Produzi licencu - Check polja, datum kraja licence bio auto setovan na mesec dana.
+
+V 2.0.0.4 ( 2.7.2026.) @upgrade/laravel11
+    - Dodata 2FA recovery stranica za admina
