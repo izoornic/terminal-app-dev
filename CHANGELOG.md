@@ -386,3 +386,6 @@ V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
 
 V 2.0.0.4 ( 2.7.2026.) @upgrade/laravel11
     - Dodata 2FA recovery stranica za admina
+
+V 2.0.0.5 ( 5.7.2026.) @main
+    - Boost i clude.md update

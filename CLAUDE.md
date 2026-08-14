@@ -1,3 +1,95 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+ATM/Terminal and Spare Parts management system for a POS/ATM service business. The domain language is **Serbian** — models, routes, columns, comments, and UI strings are Serbian (e.g. `Tiket`, `Lokacija`, `Bankomat`, `Rdelovi` = spare parts, `PozicijaTip` = user role). Preserve this language when editing; do not "translate" identifiers.
+
+## Current Version State (read this first)
+
+This project is mid-way through a staged upgrade (L10 → L13, PHP 8.2 → 8.4; see [UPGRADE.md](UPGRADE.md)). The `upgrade/laravel11` phase has been merged to `main`. Installed stack:
+
+- **Laravel 11.54** (L11 structure: `bootstrap/app.php` + `bootstrap/providers.php`; there is **no** `app/Http/Kernel.php` or `RouteServiceProvider`). Middleware aliases, trusted proxies, and appended middleware are configured in [bootstrap/app.php](bootstrap/app.php).
+- **Livewire 3**, with one deliberate deviation from Boost's `livewire/v3` guidance below: `config/livewire.php` sets `class_namespace => 'App\Http\Livewire'`, so **all components live in the legacy `App\Http\Livewire` namespace**, not the LW3 default `app/Livewire` (which is empty). They otherwise use LW3 idioms (`$this->dispatch(...)`, `wire:model.live`). Add new components under `App\Http\Livewire` and match sibling syntax.
+- Jetstream 5 + Fortify + Sanctum 4, Spatie Permission 6, PHPUnit 11.
+
+The Laravel Boost block at the end of this file is auto-generated (`php artisan boost:update`) and now reflects this L11/LW3 stack.
+
+## Commands
+
+Assets use **Laravel Mix (webpack), not Vite** — ignore the Boost "Vite Error" note.
+
+```bash
+# Frontend build (Tailwind 3 + Alpine)
+npm run dev          # one-off dev build (alias: development)
+npm run watch        # rebuild on change
+npm run prod         # minified + versioned production build
+
+# Tests (PHPUnit 11)
+php artisan test                                   # full suite
+php artisan test tests/Feature/RolePermissionTest.php
+php artisan test --filter=testName                 # single test after a change
+php artisan test --testsuite=Unit                  # Unit or Feature suite
+
+# Create code the Laravel way (pass --no-interaction)
+php artisan make:livewire Bankomati/SomeComponent  # generates under App\Http\Livewire
+php artisan make:model / make:test / make:migration
+```
+
+### Local dev environment (WSL + Sail)
+
+Docker Compose (Sail) provides `laravel.test`, `mysql` (MySQL 8), and `mailpit`. `.env` uses `DB_HOST=mysql`, which resolves **only inside the Docker network**. To run `artisan`/`test` from the WSL host directly, set `DB_HOST=0.0.0.0` (the forwarded port), otherwise DB commands fail to connect. Inside Sail (`./vendor/bin/sail ...`) keep `DB_HOST=mysql`. Tests use a separate `testing` database (see [phpunit.xml](phpunit.xml)).
+
+## Architecture
+
+### Authorization: two parallel systems
+
+1. **Spatie Permission 6** — standard roles/permissions on `User`.
+2. **`PozicijaTip` (position) system** — the app's own coarse access layer, and the one that gates page routing:
+   - Protected routes sit in a group with middleware `['auth:sanctum', 'verified', 'accessrole']` in [routes/web.php](routes/web.php).
+   - `accessrole` → [EnsureUserRoleIsAllowedToAccess](app/Http/Middleware/EnsureUserRoleIsAllowedToAccess.php) checks `PozicijaPrikazStranica::isRoleHasRightToAccess($user->pozicija_tipId, currentRouteName())` and `abort(403)` otherwise. So **route access is data-driven** — a `pozicija_prikaz_stranicas` row must exist mapping a position to a route name, not just a route definition.
+   - Each position has its own dashboard view: `/dashboard` renders `PozicijaTip::getDashboardByPozicija($user->pozicija_tipId)` (the `dashboard_path` column). Different roles literally get different Blade dashboards.
+
+When adding a page, you must both define the named route inside the `accessrole` group **and** grant the relevant positions access, or users hit 403.
+
+### Layered logic: Actions + Services (not fat Livewire components)
+
+Business logic lives in plain classes, invoked from Livewire components / controllers. (An older `app/Ivan/` service namespace referenced in some notes has been refactored away — use these instead.)
+
+- **`app/Actions/<Domain>/`** — feature operations grouped by domain: `Bankomati/`, `Terminali/`, `Tiket/`, `Lokacije/`, `Rdelovi/`, `Licence/` (e.g. `CryptoSign`, `CenaLicence` for license signing/pricing), plus `Fortify/` and `Jetstream/` auth actions.
+- **`app/PartsInventory/Services/`** — spare-parts domain services: `InventoryService`, `PartStockService`, `ReservationService`, `TransferService`. These coordinate stock/movement/reservation/transfer models and are the place for inventory invariants (see the matching tests in `tests/Feature/PartsInventory/`).
+
+### Livewire-first UI
+
+~76 Livewire components under `App\Http\Livewire`, organized by module: `Bankomati/` (ATM), `Distributer/`, `Komponente/`, `Managment/`, `Rdelovi/` (spare parts), `Statistika/`. Pages are Blade + embedded Livewire; state lives server-side. Layout is `components.layouts.app`.
+
+### Domain model groups (83 models in `app/Models`)
+
+- **Terminals/ATMs:** `Terminal`, `TerminalLokacija`, `TerminalTip`, `TerminalVendor`; `Bankomat`, `BankomatTiket`, `BankomatProductTip`, `BankomatLokacija`.
+- **Licensing (multi-tier pricing):** `LicenceZaTerminal`, `LicencaNaplata`, `LicencaDistributerCena`, `LicencaMesec` — distributor-tiered pricing with charge/discharge (`zaduzenje`/`razduzenje`) tracking. Cryptographic license signing via `spatie/crypto` in `Actions/Licence`.
+- **Service tickets:** `Tiket`, `TiketHistory`, `TiketKomentar` — workflow with history + comments.
+- **Spare parts inventory:** `PartType`, `PartStock`, `PartMovement`, `PartTransfer`, `PartReservation`.
+- **Locations & distributors:** `Lokacija`, `LokacijaTip`, `Region`; distributor index/blacklist (`Blokacija`) tables link distributors ↔ locations.
+- **Users/roles:** `User`, `PozicijaTip`, `PozicijaPrikazStranica`.
+
+Many models carry `*History` siblings — mutations are expected to append history rows (via Observers in `app/Observers/`), not just update in place.
+
+### Other pieces
+
+- **PDF/Excel:** `barryvdh/laravel-dompdf` (predracun/invoice PDFs via controllers like `PredracunPdfControler`), `maatwebsite/excel` exports in `app/Exports/`.
+- **Helpers:** `app/Helpers/PaginationHelper.php` is autoloaded globally (composer `files`).
+- **Deployment:** cPanel via [.cpanel.yml](.cpanel.yml) — copies the tree to the deploy path and clears `bootstrap/cache/*`. There is no CI pipeline in-repo.
+
+## Project conventions & gotchas
+
+- Follow the Boost `=== php rules ===` (curly braces always, promoted constructor props, explicit return types, PHPDoc over inline comments) and `=== laravel/core rules ===` (Form Requests for validation, Eloquent over `DB::`, eager-load to avoid N+1) below — those remain accurate.
+- **Casts:** existing models use the `$casts` property (none use the L11 `casts()` method yet) — match siblings, even though Boost's `laravel/v11` rule suggests `casts()`.
+- Tests use factories; DB-touching tests run against the `testing` database. Don't remove existing tests.
+- The changelog ([CHANGELOG.md](CHANGELOG.md)) is Serbian and version-tagged (`V x.y.z`); the current line is 2.0.0.x.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -10,17 +102,16 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 - php - 8.2.30
 - laravel/fortify (FORTIFY) - v1
-- laravel/framework (LARAVEL) - v10
+- laravel/framework (LARAVEL) - v11
 - laravel/prompts (PROMPTS) - v0
-- laravel/sanctum (SANCTUM) - v3
-- livewire/livewire (LIVEWIRE) - v2
+- laravel/sanctum (SANCTUM) - v4
+- livewire/livewire (LIVEWIRE) - v3
 - laravel/mcp (MCP) - v0
 - laravel/sail (SAIL) - v1
-- phpunit/phpunit (PHPUNIT) - v9
-
+- phpunit/phpunit (PHPUNIT) - v11
 
 ## Conventions
-- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, naming.
+- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 
@@ -28,7 +119,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
 
 ## Application Structure & Architecture
-- Stick to existing directory structure - don't create new base folders without approval.
+- Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
 
 ## Frontend Bundling
@@ -40,17 +131,16 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
 
-
 === boost rules ===
 
 ## Laravel Boost
 - Laravel Boost is an MCP server that comes with powerful tools designed specifically for this application. Use them.
 
 ## Artisan
-- Use the `list-artisan-commands` tool when you need to call an Artisan command to double check the available parameters.
+- Use the `list-artisan-commands` tool when you need to call an Artisan command to double-check the available parameters.
 
 ## URLs
-- Whenever you share a project URL with the user you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain / IP, and port.
+- Whenever you share a project URL with the user, you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain/IP, and port.
 
 ## Tinker / Debugging
 - You should use the `tinker` tool when you need to execute PHP to debug code or query Eloquent models directly.
@@ -61,22 +151,21 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Only recent browser logs will be useful - ignore old logs.
 
 ## Searching Documentation (Critically Important)
-- Boost comes with a powerful `search-docs` tool you should use before any other approaches. This tool automatically passes a list of installed packages and their versions to the remote Boost API, so it returns only version-specific documentation specific for the user's circumstance. You should pass an array of packages to filter on if you know you need docs for particular packages.
-- The 'search-docs' tool is perfect for all Laravel related packages, including Laravel, Inertia, Livewire, Filament, Tailwind, Pest, Nova, Nightwatch, etc.
-- You must use this tool to search for Laravel-ecosystem documentation before falling back to other approaches.
+- Boost comes with a powerful `search-docs` tool you should use before any other approaches when dealing with Laravel or Laravel ecosystem packages. This tool automatically passes a list of installed packages and their versions to the remote Boost API, so it returns only version-specific documentation for the user's circumstance. You should pass an array of packages to filter on if you know you need docs for particular packages.
+- The `search-docs` tool is perfect for all Laravel-related packages, including Laravel, Inertia, Livewire, Filament, Tailwind, Pest, Nova, Nightwatch, etc.
+- You must use this tool to search for Laravel ecosystem documentation before falling back to other approaches.
 - Search the documentation before making code changes to ensure we are taking the correct approach.
-- Use multiple, broad, simple, topic based queries to start. For example: `['rate limiting', 'routing rate limiting', 'routing']`.
-- Do not add package names to queries - package information is already shared. For example, use `test resource table`, not `filament 4 test resource table`.
+- Use multiple, broad, simple, topic-based queries to start. For example: `['rate limiting', 'routing rate limiting', 'routing']`.
+- Do not add package names to queries; package information is already shared. For example, use `test resource table`, not `filament 4 test resource table`.
 
 ### Available Search Syntax
 - You can and should pass multiple queries at once. The most relevant results will be returned first.
 
-1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'
-2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit"
-3. Quoted Phrases (Exact Position) - query="infinite scroll" - Words must be adjacent and in that order
-4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit"
-5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms
-
+1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'.
+2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit".
+3. Quoted Phrases (Exact Position) - query="infinite scroll" - words must be adjacent and in that order.
+4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit".
+5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms.
 
 === php rules ===
 
@@ -87,7 +176,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ### Constructors
 - Use PHP 8 constructor property promotion in `__construct()`.
     - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
-- Do not allow empty `__construct()` methods with zero parameters.
+- Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ### Type Declarations
 - Always use explicit return type declarations for methods and functions.
@@ -101,7 +190,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 </code-snippet>
 
 ## Comments
-- Prefer PHPDoc blocks over comments. Never use comments within the code itself unless there is something _very_ complex going on.
+- Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very complex going on.
 
 ## PHPDoc Blocks
 - Add useful array shape type definitions for arrays when appropriate.
@@ -109,18 +198,24 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Enums
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
+=== tests rules ===
+
+## Test Enforcement
+
+- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === laravel/core rules ===
 
 ## Do Things the Laravel Way
 
 - Use `php artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using the `list-artisan-commands` tool.
-- If you're creating a generic PHP class, use `artisan make:class`.
+- If you're creating a generic PHP class, use `php artisan make:class`.
 - Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
 
 ### Database
 - Always use proper Eloquent relationship methods with return type hints. Prefer relationship methods over raw queries or manual joins.
-- Use Eloquent models and relationships before suggesting raw database queries
+- Use Eloquent models and relationships before suggesting raw database queries.
 - Avoid `DB::`; prefer `Model::query()`. Generate code that leverages Laravel's ORM capabilities rather than bypassing them.
 - Generate code that prevents N+1 query problems by using eager loading.
 - Use Laravel's query builder for very complex database operations.
@@ -150,33 +245,47 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ### Testing
 - When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `php artisan make:test [options] <name>` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ### Vite Error
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
+=== laravel/v11 rules ===
 
-=== laravel/v10 rules ===
+## Laravel 11
 
-## Laravel 10
+- Use the `search-docs` tool to get version-specific documentation.
+- Laravel 11 brought a new streamlined file structure which this project now uses.
 
-- Use the `search-docs` tool to get version specific documentation.
-- Middleware typically live in `app/Http/Middleware/` and service providers in `app/Providers/`.
-- There is no `bootstrap/app.php` application configuration in Laravel 10:
-    - Middleware registration is in `app/Http/Kernel.php`
-    - Exception handling is in `app/Exceptions/Handler.php`
-    - Console commands and schedule registration is in `app/Console/Kernel.php`
-    - Rate limits likely exist in `RouteServiceProvider` or `app/Http/Kernel.php`
-- When using Eloquent model casts, you must use `protected $casts = [];` and not the `casts()` method. The `casts()` method isn't available on models in Laravel 10.
+### Laravel 11 Structure
+- In Laravel 11, middleware are no longer registered in `app/Http/Kernel.php`.
+- Middleware are configured declaratively in `bootstrap/app.php` using `Application::configure()->withMiddleware()`.
+- `bootstrap/app.php` is the file to register middleware, exceptions, and routing files.
+- `bootstrap/providers.php` contains application specific service providers.
+- **No app\Console\Kernel.php** - use `bootstrap/app.php` or `routes/console.php` for console configuration.
+- **Commands auto-register** - files in `app/Console/Commands/` are automatically available and do not require manual registration.
 
+### Database
+- When modifying a column, the migration must include all of the attributes that were previously defined on the column. Otherwise, they will be dropped and lost.
+- Laravel 11 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
+
+### Models
+- Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
+
+### New Artisan Commands
+- List Artisan commands using Boost's MCP tool, if available. New commands available in Laravel 11:
+    - `php artisan make:enum`
+    - `php artisan make:class`
+    - `php artisan make:interface`
 
 === livewire/core rules ===
 
-## Livewire Core
-- Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire [Posts\\CreatePost]` artisan command to create new components
+## Livewire
+
+- Use the `search-docs` tool to find exact version-specific documentation for how to write Livewire and Livewire tests.
+- Use the `php artisan make:livewire [Posts\CreatePost]` Artisan command to create new components.
 - State should live on the server, with the UI reflecting it.
-- All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run authorization checks in Livewire actions.
+- All Livewire requests hit the Laravel backend; they're like regular HTTP requests. Always validate form data and run authorization checks in Livewire actions.
 
 ## Livewire Best Practices
 - Livewire components require a single root element.
@@ -193,15 +302,14 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - Prefer lifecycle hooks like `mount()`, `updatedFoo()` for initialization and reactive side effects:
 
-<code-snippet name="Lifecycle hook examples" lang="php">
+<code-snippet name="Lifecycle Hook Examples" lang="php">
     public function mount(User $user) { $this->user = $user; }
     public function updatedSearch() { $this->resetPage(); }
 </code-snippet>
 
-
 ## Testing Livewire
 
-<code-snippet name="Example Livewire component test" lang="php">
+<code-snippet name="Example Livewire Component Test" lang="php">
     Livewire::test(Counter::class)
         ->assertSet('count', 0)
         ->call('increment')
@@ -210,56 +318,60 @@ protected function isAccessible(User $user, ?string $path = null): bool
         ->assertStatus(200);
 </code-snippet>
 
+<code-snippet name="Testing Livewire Component Exists on Page" lang="php">
+    $this->get('/posts/create')
+    ->assertSeeLivewire(CreatePost::class);
+</code-snippet>
 
-    <code-snippet name="Testing a Livewire component exists within a page" lang="php">
-        $this->get('/posts/create')
-        ->assertSeeLivewire(CreatePost::class);
-    </code-snippet>
+=== livewire/v3 rules ===
 
+## Livewire 3
 
-=== livewire/v2 rules ===
+### Key Changes From Livewire 2
+- These things changed in Livewire 3, but may not have been updated in this application. Verify this application's setup to ensure you conform with application conventions.
+    - Use `wire:model.live` for real-time updates, `wire:model` is now deferred by default.
+    - Components now use the `App\Livewire` namespace (not `App\Http\Livewire`).
+    - Use `$this->dispatch()` to dispatch events (not `emit` or `dispatchBrowserEvent`).
+    - Use the `components.layouts.app` view as the typical layout path (not `layouts.app`).
 
-## Livewire 2
+### New Directives
+- `wire:show`, `wire:transition`, `wire:cloak`, `wire:offline`, `wire:target` are available for use. Use the documentation to find usage examples.
 
-- `wire:model` is live by default.
-- Components typically exist in the `App\Http\Livewire` namespace.
-- Use `emit()`, `emitTo()`, `emitSelf()`, and `dispatchBrowserEvent()` for events.
-- Alpine is included separately to Livewire.
-- You can listen for `livewire:load` to hook into Livewire initialization, and `Livewire.onPageExpired` for when the page expires:
+### Alpine
+- Alpine is now included with Livewire; don't manually include Alpine.js.
+- Plugins included with Alpine: persist, intersect, collapse, and focus.
 
-<code-snippet name="livewire:load example" lang="js">
-document.addEventListener('livewire:load', function () {
-    Livewire.onPageExpired(() => {
-        alert('Your session expired');
+### Lifecycle Hooks
+- You can listen for `livewire:init` to hook into Livewire initialization, and `fail.status === 419` for the page expiring:
+
+<code-snippet name="Livewire Init Hook Example" lang="js">
+document.addEventListener('livewire:init', function () {
+    Livewire.hook('request', ({ fail }) => {
+        if (fail && fail.status === 419) {
+            alert('Your session expired');
+        }
     });
 
-    Livewire.onError(status => console.error(status));
+    Livewire.hook('message.failed', (message, component) => {
+        console.error(message);
+    });
 });
 </code-snippet>
 
-
 === phpunit/core rules ===
 
-## PHPUnit Core
+## PHPUnit
 
-- This application uses PHPUnit for testing. All tests must be written as PHPUnit classes. Use `php artisan make:test --phpunit <name>` to create a new test.
+- This application uses PHPUnit for testing. All tests must be written as PHPUnit classes. Use `php artisan make:test --phpunit {name}` to create a new test.
 - If you see a test using "Pest", convert it to PHPUnit.
 - Every time a test has been updated, run that singular test.
 - When the tests relating to your feature are passing, ask the user if they would like to also run the entire test suite to make sure everything is still passing.
 - Tests should test all of the happy paths, failure paths, and weird paths.
-- You must not remove any tests or test files from the tests directory without approval. These are not temporary or helper files, these are core to the application.
+- You must not remove any tests or test files from the tests directory without approval. These are not temporary or helper files; these are core to the application.
 
 ### Running Tests
 - Run the minimal number of tests, using an appropriate filter, before finalizing.
-- To run all tests: `php artisan test`.
-- To run all tests in a file: `php artisan test tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `php artisan test --filter=testName` (recommended after making a change to a related file).
-
-
-=== tests rules ===
-
-## Test Enforcement
-
-- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
+- To run all tests: `php artisan test --compact`.
+- To run all tests in a file: `php artisan test --compact tests/Feature/ExampleTest.php`.
+- To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change to a related file).
 </laravel-boost-guidelines>
