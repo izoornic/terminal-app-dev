@@ -29,7 +29,7 @@ class TerminalCommentActions{
         }
         //TerminalComment::find($terminalLokacijaCommentId)->delete();
 
-        TerminalCommentActions::ComentNumberUpdate($terminalLokacijaCommentId);
+        TerminalCommentActions::ComentNumberUpdate( $komentar->terminal_lokacijaId);
     }
 
     public static function ComentNumberUpdate($terminalLokacijaId){

@@ -107,7 +107,7 @@ class IzborLokacije extends Component
 
     public function novaLokacija($id)
     {
-        $this->emit('novaLokacija', $id, $this->comp_index);
+        $this->dispatch('novaLokacija', $id, $this->comp_index);
     }
     public function render()
     {

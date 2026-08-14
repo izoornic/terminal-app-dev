@@ -57,7 +57,7 @@ class Prijava extends Component
     /**
      * rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {

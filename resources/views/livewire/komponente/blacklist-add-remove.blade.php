@@ -9,7 +9,7 @@
          <div>
             <div class="mt-4">
             <p> Dodaj komentar<span class="text-red-500">*</span></p>
-            <x-jet-textarea id="newKoment" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="newKoment" />
+            <x-jet-textarea id="newKoment" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="newKoment" />
             @error('newKoment') <span class="error">{{ $message }}</span> @enderror
             </div>
          </div>

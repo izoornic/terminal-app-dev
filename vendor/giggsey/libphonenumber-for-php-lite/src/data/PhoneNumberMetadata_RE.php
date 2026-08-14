@@ -34,13 +34,13 @@ class PhoneNumberMetadata_RE extends PhoneMetadata
             ->setNationalNumberPattern('709\d{6}|(?:26|[689]\d)\d{7}')
             ->setPossibleLength([9]);
         $this->mobile = (new PhoneNumberDesc())
-            ->setNationalNumberPattern('(?:69(?:2\d\d|3(?:[06][0-6]|1[013]|2[0-2]|3[0-39]|4\d|5[0-5]|7[0-37]|8[0-8]|9[0-479]))|7092[0-3])\d{4}')
+            ->setNationalNumberPattern('(?:69(?:2\d\d|3(?:[06][0-6]|1[0-3]|2[0-2]|3[0-39]|4\d|5[0-5]|7[0-37]|8[0-8]|9[0-479]))|7092[0-3])\d{4}')
             ->setExampleNumber('692123456');
         $this->premiumRate = (new PhoneNumberDesc())
             ->setNationalNumberPattern('89[1-37-9]\d{6}')
             ->setExampleNumber('891123456');
         $this->fixedLine = (new PhoneNumberDesc())
-            ->setNationalNumberPattern('26(?:2\d\d|3(?:0\d|1[0-6]))\d{4}')
+            ->setNationalNumberPattern('2631[0-6]\d{4}|26(?:2\d|30|88)\d{5}')
             ->setExampleNumber('262161234');
         $this->numberFormat = [
             (new NumberFormat())

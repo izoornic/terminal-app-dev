@@ -49,7 +49,7 @@
                                     document.getElementById("kontaktOsobe").style.display = "none";
                                 }' 
                     class="mt-1 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white">
-                    <x-heroicon-o-user-card class="w-8 h-8 -m-1 -mb-3" />
+                    <x-heroicon-o-identification class="w-8 h-8 -m-1 -mb-3" />
             </button> 
         
             <div id="kontaktOsobe" style="display: none">

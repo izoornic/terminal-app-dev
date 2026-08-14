@@ -30,7 +30,7 @@ class IzborProizvoda extends Component
 
     public function izabraniProizvod($id)
     {
-        $this->emit('izabraniProizvod', $id);
+        $this->dispatch('izabraniProizvod', $id);
     }
 
     public function readProizvode()

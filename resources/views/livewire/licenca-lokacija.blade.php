@@ -35,13 +35,13 @@
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
                                 <td>
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -49,7 +49,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -57,7 +57,7 @@
                                     </select>
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td colspan="2" class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>
                             </tr>
@@ -132,14 +132,14 @@
 
 
     {{-- Dodaj Blacklist Modal ####################################################################--}}
-    <x-jet-dialog-modal wire:model="modalBlacklistVisible">
+    <x-jet-dialog-modal wire:model.live="modalBlacklistVisible">
         <x-slot name="title">
             {{ __('Promeni blacklist status terminala') }}
         </x-slot>
 
         <x-slot name="content">
         @if($modalBlacklistVisible)
-            <livewire:komponente.terminal-info :terminal_lokacija_id="$modelId" />
+            <livewire:komponente.terminal-info :terminal_lokacija_id="$terLocId" />
             
             <div class="font-bold text-xl text-red-500 mb-6">
                 {{$canBlacklistErorr}}
@@ -167,7 +167,7 @@
 
 
     {{-- INFO Modal ##################################################################--}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             <svg class="float-left fill-red-500 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
                 Info
@@ -266,7 +266,7 @@
     </x-jet-dialog-modal>
 
      {{-- KONTAKT OSOBA MODAL --}}
-     <x-jet-dialog-modal wire:model="kontaktOsobaVisible">
+     <x-jet-dialog-modal wire:model.live="kontaktOsobaVisible">
         <x-slot name="title">
         <svg class="float-left fill-gray-500 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>
             {{ __('Kontakt osoba') }}
@@ -307,7 +307,7 @@
      </x-jet-dialog-modal>
 
      {{-- LAT LOG MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="latLogVisible">
+     <x-jet-dialog-modal wire:model.live="latLogVisible">
         <x-slot name="title">
         <svg class="float-left fill-sky-800 w-6 h-6 mx-auto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 299.4 432.7" style="enable-background:new 0 0 299.4 432.7;" xml:space="preserve"><g id="Layer_2"><g><path d="M149.7,0C67.2,0,0,67.2,0,149.7c0,45.1,27.5,81.1,59.4,122.7c26,34,55.6,72.6,76.4,124.2l14.6,36.1l13.4-36.5 c16.1-43.9,44.2-80.8,71.3-116.4c33.1-43.5,64.3-84.5,64.3-130.1C299.4,67.2,232.2,0,149.7,0z M211.2,261.6 c-21,27.6-44.2,58-61.8,92.7c-20.2-40-44.4-71.5-66.2-100.1C53.5,215.4,30,184.7,30,149.7C30,83.7,83.7,30,149.7,30 s119.7,53.7,119.7,119.7C269.4,185.1,242.4,220.6,211.2,261.6z"/><path d="M206.5,136.3h-41.8V94.5c0-8.3-6.7-15-15-15s-15,6.7-15,15v41.8H92.9c-8.3,0-15,6.7-15,15s6.7,15,15,15h41.8v41.8 c0,8.3,6.7,15,15,15s15-6.7,15-15v-41.8h41.8c8.3,0,15-6.7,15-15S214.8,136.3,206.5,136.3z"/></g></g></svg>
             {{ __('Koordinate') }}
@@ -332,7 +332,7 @@
                     <div class="flex">
                         <div class="flex-1">
                             <x-jet-label for="latLogValue" value="{{ __('Lat, Long') }}" />
-                            <x-jet-input wire:model="latLogValue" id="" class="block mt-1 w-full" type="text" />
+                            <x-jet-input wire:model.live="latLogValue" id="" class="block mt-1 w-full" type="text" />
                                 @error('lat_value') <span class="error">{{ $message }}</span> @enderror
                                 @error('long_value') <span class="error">{{ $message }}</span> @enderror
                         </div>

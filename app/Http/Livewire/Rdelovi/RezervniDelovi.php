@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Rdelovi;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 use App\Models\PartStock;
 use App\Models\PartType;
@@ -32,13 +33,7 @@ class RezervniDelovi extends Component
 
     public $stock_id;
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['newPart', 'modalActionSuccess'];
-
+    #[On('newPart')]
     public function newPart()
     {
         $this->part_id = '';
@@ -50,23 +45,24 @@ class RezervniDelovi extends Component
         }
     }
 
+    #[On('modalActionSuccess')]
     public function modalActionSuccess($sifra='', $naziv='')
     {
         switch ($this->modal_type) {
             case 'dodaj_novi_deo':
-                 $this->emit('flashMessage', 'Novi rezervni deo - '.$naziv.' - '.$sifra.' je uspešno dodat.');
+                 $this->dispatch('flashMessage', 'Novi rezervni deo - '.$naziv.' - '.$sifra.' je uspešno dodat.');
                 break;
             case 'dodaj_kolicinu':
-                $this->emit('flashMessage', 'Stanje za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
+                $this->dispatch('flashMessage', 'Stanje za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
                 break;
             case 'oduzmi_kolicinu':
-                $this->emit('flashMessage', 'Stanje za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
+                $this->dispatch('flashMessage', 'Stanje za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
                 break;
             case 'premesti_kolicinu':
-                $this->emit('flashMessage', 'Količina za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno premeštena.');
+                $this->dispatch('flashMessage', 'Količina za rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno premeštena.');
                 break;
             case 'azuriraj_rezervni_deo':
-                $this->emit('flashMessage', 'Rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
+                $this->dispatch('flashMessage', 'Rezervni deo  - '.$naziv.' - '.$sifra.' je uspešno azurirano.');
                 break;
         }
         $this->modalVisible = false;

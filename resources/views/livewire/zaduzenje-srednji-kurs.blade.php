@@ -35,7 +35,7 @@
                         <div class="my-6 flex w-fit">
                             <div>
                                 <x-jet-label for="srednji_kurs" value="{{ __('Srednji kurs EUR') }}" />
-                                <x-jet-input wire:model="srednji_kurs" id="" class="block mt-1 w-80" type="text" />
+                                <x-jet-input wire:model.live="srednji_kurs" id="" class="block mt-1 w-80" type="text" />
                                 @error('srednji_kurs') <span class="error">{{ $message }}</span> @enderror
                             </div>
                             <div class="font-bold px-6 pt-8">RSD</div>

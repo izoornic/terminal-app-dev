@@ -13,13 +13,13 @@
                                     <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" />
                                 </td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" />
                                 </td>
                                 <td class="p-1">
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTip" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">-- Tip lokacije --</option>
                                         @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -27,7 +27,7 @@
                                     </select>
                                 </td>
                                 <td class="p-1">
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchStatus" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">-- Status --</option>
                                         @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -40,10 +40,10 @@
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model="searchKutija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" />
+                                    <x-jet-input wire:model.live="searchKutija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" />
                                 </td>
                                 <td class="p-1">
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">-- Region --</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -51,7 +51,7 @@
                                     </select>
                                 </td>
                                 <td class="p-1">
-                                    <select wire:model="searchVendor" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchVendor" id="" class="block appearance-none bg-orange-50 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">-- Vendor --</option>
                                         @foreach (App\Models\TerminalVendor::allList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -59,10 +59,10 @@
                                     </select>
                                 </td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model="searchCampagin" id="" class="block bg-orange-50 w-full" type="text" placeholder="Kampanja" />
+                                    <x-jet-input wire:model.live="searchCampagin" id="" class="block bg-orange-50 w-full" type="text" placeholder="Kampanja" />
                                 </td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>    
                             </tr>  
                         </tbody>
@@ -72,7 +72,7 @@
                     <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
                         <thead>
                             <tr>
-                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500"><input type="checkbox" value="1" wire:model="selectAll.1"  class="form-checkbox h-6 w-6 text-blue-500"></th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500"><input type="checkbox" wire:model.live="selectAll"  class="form-checkbox h-6 w-6 text-blue-500"></th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">L</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Serijski broj <br /><span class=" text-red-400">Kutija</span></th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Lokacija <br /><span class=" text-red-400">Region</span></th>
@@ -85,13 +85,14 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Komentari</th>
                             </tr>
                         </thead>
-                            <!-- DATA  -->                   
+                        <tbody>
+                            <!-- DATA  -->
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    <tr @if($loop->even) class="bg-gray-50" @endif >
+                                    <tr wire:key="terminal-{{ $item->tlid }}" @if($loop->even) class="bg-gray-50" @endif >
                                         {{-- CHECK FIELD --}}
                                         <td class="px-1 py-1">
-                                            <input type="checkbox" value="{{ $item->tlid }}" wire:model="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500">
+                                            <input type="checkbox" value="{{ $item->tlid }}" wire:model.live="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500">
                                         </td>
 
                                         {{-- LICENCA --}}
@@ -232,7 +233,7 @@
     
 
     {{-- LICENCA MODAL ##########################################################################--}}
-    <x-jet-dialog-modal wire:model="licencaModalVisible">
+    <x-jet-dialog-modal wire:model.live="licencaModalVisible">
         <x-slot name="title">
             LICENCE
         </x-slot>
@@ -304,7 +305,7 @@
     </x-jet-dialog-modal>
 
     {{-- ERROR LICENCA ###################################################################### --}}
-    <x-jet-dialog-modal wire:model="modalErorLicencaVisible">
+    <x-jet-dialog-modal wire:model.live="modalErorLicencaVisible">
         <x-slot name="title">
             GREŠKA
         </x-slot>
@@ -335,7 +336,7 @@
 
 
     {{-- STATUS ##############################################################################  --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
             {{ __('Promeni status terminala') }}
         </x-slot>
@@ -351,7 +352,7 @@
             @endif
             <div class="mt-4 bg-gray-50 p-4 border-t-4 border-grey-800 rounded-b text-grey-900 shadow-md mb-6" role="alert">
             <div><span class="font-bold">Novi status terminala:</span></div>
-                <select wire:model.defer="modalStatus" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <select wire:model="modalStatus" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
@@ -377,7 +378,7 @@
 
 
     {{-- PREMESTI Modal ############################################################################--}}
-    <x-jet-dialog-modal wire:model="modalConfirmPremestiVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmPremestiVisible">
         <x-slot name="title">
             {{ __('Premesti terminal') }}
         </x-slot>
@@ -395,7 +396,7 @@
         @endif
         @if(!$plokacija)
             <x-jet-label for="tiplokacije" value="{{ __('Izaberi tip lokacije') }}" />
-            <select wire:model="plokacijaTip" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <select wire:model.live="plokacijaTip" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                 <option value="">---</option>
                 @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                     <option value="{{ $key }}">{{ $value }}</option>
@@ -415,10 +416,10 @@
                             </tr>
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                                <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                                <td><x-jet-input wire:model.live="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                                <td><x-jet-input wire:model.live="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                                 <td>
-                                     <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                     <select wire:model.live="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -450,7 +451,7 @@
                 @elseif($plokacijaTip != 0 && $plokacijaTip != 3)
                 {{-- MAGACIN ILI SEVIS --}}
                     <x-jet-label for="lokacija" value="{{ __('Izaberi lokaciju') }}" class="mt-4" />
-                    <select wire:model="plokacija" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="plokacija" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="">---</option>
                         @foreach (App\Models\Lokacija::lokacijeTipa($plokacijaTip) as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -475,7 +476,7 @@
 
             <div class="mt-4">
                 <x-jet-label for="pterminalStatus" value="{{ __('Novi status terminala') }}" />
-                    <select wire:model="modalStatusPremesti" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="modalStatusPremesti" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
@@ -485,7 +486,7 @@
             
             <div class="mb-6 mt-4">
                 <x-jet-label for="date_akcije" value="Datum promene:" />
-                <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_premestanja_terminala }}" wire:model.defer="datum_premestanja_terminala" />
+                <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_premestanja_terminala }}" wire:model="datum_premestanja_terminala" />
                 <x-jet-input-error for="date_akcije" class="mt-2" />
             </div>
 
@@ -505,7 +506,7 @@
 
     
     {{-- HISTORI Modal ################################################################################## --}}
-    <x-jet-dialog-modal wire:model="terminalHistoryVisible">
+    <x-jet-dialog-modal wire:model.live="terminalHistoryVisible">
         <x-slot name="title">
             {{ __('Vremenska linija terminala') }}
         </x-slot>
@@ -533,7 +534,7 @@
     </x-jet-dialog-modal>
 
     {{-- NOVI TIKET Modal ##################################################################################--}}
-    <x-jet-dialog-modal wire:model="newTiketVisible">
+    <x-jet-dialog-modal wire:model.live="newTiketVisible">
         <x-slot name="title">
             <svg class="fill-current w-6 h-6 mr-2 mt-1 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
             Novi Tiket
@@ -556,7 +557,7 @@
                 
                 <div class="mt-4">
                     <x-jet-label for="opisKvaraList" value="{{ __('Izaberi kvar iz liste') }}" />
-                    <select wire:model="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">---</option>    
                         @foreach (App\Models\TiketOpisKvaraTip::opisList() as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -566,7 +567,7 @@
                 </div>  
                 <div class="mt-4">
                     <x-jet-label for="opis_kvara" value="{{ __('Opis kvara') }}" />
-                    <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opisKvataTxt" />
+                    <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="opisKvataTxt" />
                     @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
                 </div> 
                 @if($userPozicija != 2)
@@ -585,9 +586,9 @@
                                 </tr>
                                 <tr class="bg-orange-50">
                                     <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                    <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
-                                    <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
-                                    <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200"> 
@@ -685,7 +686,7 @@
     </x-jet-dialog-modal>
 
     {{-- NOVA SERVISNA LICENCA ####################################################################--}}
-    <x-jet-dialog-modal wire:model="novaServisnaModalVisible">
+    <x-jet-dialog-modal wire:model.live="novaServisnaModalVisible">
         <x-slot name="title">
             {{ __('Dodaj servisne licence terminalu') }}
         </x-slot>
@@ -726,14 +727,14 @@
                             $licenca_dodatak = App\Models\LicencaDistributerCena::nazivServisneKojaGaziTrajnu($distId ,$nazivZaServisnu)
                         @endphp
                         <div class="my-4 border-y py-2 bg-gray-50">
-                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model.live="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
                                 <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
                                 @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
                                     
                                     <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
                                         @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
                                             <div class="px-1 rounded-md text-center">
-                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
+                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model.live="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
                                                 <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
                                             </div>
                                         @endforeach
@@ -744,14 +745,14 @@
                         @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId) as $licenca_dodatak)
                             
                             <div class="my-4 border-y py-2 bg-gray-50">
-                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                                <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model.live="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
                                 <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
                                 @if(in_array($licenca_dodatak->id, $licence_za_dodavanje))
                                     
                                     <div class="max-w-2xl grid grid-cols-5 gap-2 mt-4 mb-4 ml-10 border-t">
                                         @foreach(App\Models\LicencaParametar::parametriLicence($licenca_dodatak->licenca_tipId) as $parametar)
                                             <div class="px-1 rounded-md text-center">
-                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
+                                                <input id="{{$parametar->id}}" type="checkbox" value="{{$parametar->id}}" wire:model.live="parametri"  class="form-checkbox h-6 w-6 text-blue-500 my-2"><br />
                                                 <label class="break-words" for="{{$parametar->id}}">{{$parametar->param_opis}}</label>
                                             </div>
                                         @endforeach
@@ -779,7 +780,7 @@
     </x-jet-dialog-modal>
 
     {{-- PRODUZI PREKORACENJE ###############################################################################--}}
-    <x-jet-dialog-modal wire:model="pomeriPrekoracenjeModalVisible">
+    <x-jet-dialog-modal wire:model.live="pomeriPrekoracenjeModalVisible">
         <x-slot name="title">
             {{ __('Produzi trajanje privremene licence') }} - {{ $nazivZaServisnu }}
         </x-slot>
@@ -856,7 +857,7 @@
     </x-jet-dialog-modal>
 
         {{-- KOMENTARI MODAL ############################################################################--}}
-    <x-jet-dialog-modal wire:model="modalKomentariVisible">
+    <x-jet-dialog-modal wire:model.live="modalKomentariVisible">
         <x-slot name="title">
             KOMENTARI
         </x-slot>
@@ -879,7 +880,7 @@
     </x-jet-dialog-modal>
 
          {{-- EDIT TERMINAL INFO MODAL ###############################################################################--}}
-    <x-jet-dialog-modal wire:model="editTerminalInfoVisible">
+    <x-jet-dialog-modal wire:model.live="editTerminalInfoVisible">
         <x-slot name="title">
            TERMINAL INFO
         </x-slot>
@@ -890,10 +891,10 @@
                 <div class="mt-4">
                     <x-jet-label for="info_sn" value="{{ __('Serijski broj') }}" />
                     @if($terminalZaEditImaLicencu)
-                        <x-jet-input wire:model="info_sn" id="" class="block mt-1 w-full" type="text" disabled />
+                        <x-jet-input wire:model.live="info_sn" id="" class="block mt-1 w-full" type="text" disabled />
                         <p class="text-red-500 text-xs italic">Terminal ima dodeljenu licencu, serijski broj se ne može menjati!</p>    
                     @else
-                        <x-jet-input wire:model="info_sn" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="info_sn" id="" class="block mt-1 w-full" type="text" />
                         @error('info_sn') <span class="error">{{ $message }}</span> @enderror
                     @endif
                 </div>
@@ -901,7 +902,7 @@
 
                 <div class="mt-4">
                     <x-jet-label for="kutija" value="{{ __('Kutija') }}" />
-                    <x-jet-input wire:model="kutija" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.live="kutija" id="" class="block mt-1 w-full" type="text" />
                     @error('kutija') <span class="error">{{ $message }}</span> @enderror
                 </div>
                 
@@ -918,7 +919,7 @@
     </x-jet-dialog-modal>
 
         {{-- VENDOR MODAL ##############################################################################  --}}
-    <x-jet-dialog-modal wire:model="modalVendorVisible">
+    <x-jet-dialog-modal wire:model.live="modalVendorVisible">
         <x-slot name="title">
             {{ __('Promeni vendora') }}
         </x-slot>
@@ -934,7 +935,7 @@
             @endif
             <div class="mt-4 bg-gray-50 p-4 border-t-4 border-grey-800 rounded-b text-grey-900 shadow-md mb-6" role="alert">
             <div><span class="font-bold">Vendor:</span></div>
-                <select wire:model.defer="vendor_id" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <select wire:model="vendor_id" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="">---</option>
                     @foreach (App\Models\TerminalVendor::allList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>

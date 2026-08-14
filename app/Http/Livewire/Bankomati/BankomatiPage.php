@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Bankomati;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use App\Models\Bankomat;
 use App\Models\Blokacija;
@@ -89,13 +90,7 @@ class BankomatiPage extends Component
    /*  public $selectedTerminals = [1,2,3,8,9,10];
     public $multiSelected = true; */
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['newBankomat', 'newTicketCreated', 'novaLokacija', 'statusChanged'];
-
+    #[On('newBankomat')]
     public function newBankomat()
     {
         //SHOW MODAL
@@ -107,12 +102,14 @@ class BankomatiPage extends Component
         $this->modalNewVisible = true;
     }
 
+    #[On('newTicketCreated')]
     public function newTicketCreated($id)
     {
         $this->modalNewTicketVisible = false;
-        $this->emit('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
+        $this->dispatch('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
     }
 
+    #[On('novaLokacija')]
     public function novaLokacija($id, $key)
     {
         //dd($id, $key);
@@ -121,11 +118,12 @@ class BankomatiPage extends Component
         if($key == 'premesti') $this->nova_lokacija = $id; 
     }
     
+    #[On('statusChanged')]
     public function statusChanged()
     {
         $this->modalStatusFormVisible = false;
     }
-    
+
     public function mount()
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
@@ -169,29 +167,29 @@ class BankomatiPage extends Component
                 'vlasnik_proizvoda' => 'required|numeric|exists:blokacijas,id',
                 'datum_promene' => 'required|date',
             ]);
-        $this->datum_promene .= ' ' . Helpers::vremeKalendarNow();
-        
+        $datetime_promene = $this->datum_promene . ' ' . Helpers::vremeKalendarNow();
+
         // Save logic here, e.g., create or update the location in the database
-        DB::transaction(function(){
+        DB::transaction(function() use ($datetime_promene) {
             //Bankomat
             $cuurent = Bankomat::create($this->modelData());
             //BankomatLokacija
             $p_ban_loc = BankomatLokacija::create([
-                'bankomat_id' => $cuurent['id'], 
+                'bankomat_id' => $cuurent['id'],
                 'blokacija_id' => $this->bankomat_lokacija,
                 'bankomat_status_tip_id' => $this->bankomat_status,
                 'user_id' => auth()->user()->id,
-                'created_at' => $this->datum_promene,
-                'updated_at' => $this->datum_promene
+                'created_at' => $datetime_promene,
+                'updated_at' => $datetime_promene
             ]);
             BankomatLocijaHirtory::create([
                 'bankomat_lokacija_id' => $p_ban_loc['id'],
-                'bankomat_id' => $cuurent['id'], 
+                'bankomat_id' => $cuurent['id'],
                 'blokacija_id' => $this->bankomat_lokacija,
                 'bankomat_status_tip_id' => $this->bankomat_status,
                 'user_id' => auth()->user()->id,
-                'created_at' => $this->datum_promene,
-                'updated_at' => $this->datum_promene,
+                'created_at' => $datetime_promene,
+                'updated_at' => $datetime_promene,
                 'history_action_id' => 1
                 ]);
         });
@@ -306,7 +304,6 @@ class BankomatiPage extends Component
             return false;
         }
 
-        $this->datum_promene .= ' ' . date('H:i:s');
         return true;
     }
 
@@ -354,8 +351,10 @@ class BankomatiPage extends Component
         //Provera datuma koji je korisnik uneo za promenu statusa
         if(!$this->validDatumPromene([1, 3, 4])) return;
 
-        DB::transaction(function()use($cuurent, $history_akcija){
-            $cuurent->update(['blokacija_id' => $this->nova_lokacija, 'bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $this->datum_promene]);
+        $datetime_promene = $this->datum_promene . ' ' . date('H:i:s');
+
+        DB::transaction(function() use ($cuurent, $history_akcija, $datetime_promene) {
+            $cuurent->update(['blokacija_id' => $this->nova_lokacija, 'bankomat_status_tip_id' => $this->bankomat_status, 'updated_at' => $datetime_promene]);
 
             BankomatLocijaHirtory::create([
                 'bankomat_lokacija_id' => $this->modelId,
@@ -401,10 +400,11 @@ class BankomatiPage extends Component
        if($this->old_naplata != $this->naplata) {
             if(!$this->validDatumPromene([1, 5, 6])) return;
             $history_akcija = ($this->naplata) ? 5 : 6;
+            $datetime_promene = $this->datum_promene . ' ' . date('H:i:s');
 
-            DB::transaction(function()use($history_akcija){
+            DB::transaction(function() use ($history_akcija, $datetime_promene) {
                 $cuurent = BankomatLokacija::where('id', '=', $this->modelId)->first();
-                $cuurent->update(['naplata' => ($this->naplata ? 1 : 0), 'updated_at' => $this->datum_promene]);
+                $cuurent->update(['naplata' => ($this->naplata ? 1 : 0), 'updated_at' => $datetime_promene]);
 
                 BankomatLocijaHirtory::create([
                 'bankomat_lokacija_id' => $this->modelId,

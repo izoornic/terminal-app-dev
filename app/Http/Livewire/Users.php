@@ -17,6 +17,7 @@ use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use Illuminate\Validation\Rules\Password;
 
@@ -86,17 +87,18 @@ class Users extends Component
     //Kategorije korisnika
     public $selectedKatId;
     public $pozicijeKategorije;
+  
 
-    //listeners
-
-    protected $listeners = ['izaberiKategoriju' => 'postaviKategoriju', 'sortClick' => 'sortClick'];
+    #[On('izaberiKategoriju')]
     public function postaviKategoriju($katId)
     {
         $this->selectedKatId = $katId;
         $this->searchPozicija = null;
-        $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id');
+        $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id')->toArray();
+        $this->resetPage();
     }
 
+    #[On('sortClick')]
     public function sortClick($field)
     {
         if ($this->orderBy === $field) {
@@ -104,9 +106,9 @@ class Users extends Component
         } else {
             $this->orderBy = $field;
             $this->orderDirection = 'desc';
-            $this->emit('fieldChange', $field);
+            $this->dispatch('fieldChange', $field);
         }
-        $this->emit('sortChange', $this->orderDirection);
+        $this->dispatch('sortChange', $this->orderDirection);
     }
 
     public function mount(){
@@ -114,8 +116,7 @@ class Users extends Component
         $this->selectedKatId = PozicijaKategoriy::orderBy('menu_order')->first()->id;
         $this->orderDirection = 'desc';
         $this->orderBy = 'id';
-        $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id');
-        //dd($this->pozizicijeKategorije());
+        $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id')->toArray();
     }
 
     public function pozizicijeKategorije()
@@ -162,6 +163,7 @@ class Users extends Component
      */
     public function read()
     {
+        //dd($this->pozizicijeKategorije());
         $order = 'id';
         switch($this->orderBy){
             case 'uid':
@@ -171,79 +173,100 @@ class Users extends Component
                 $order = 'users.name';
             break;
             case 'lokacija':
-                $order = 'regions.r_naziv';
+                $order = 'r_naziv';
             break;
             case 'pozicija':
                 $order = 'users.pozicija_tipId';
             break;
             case 'status':
-                $order = 'korisnik_radni_statuses.radni_statusId';
+                $order = 'rstid';
             break;
         };
+
+        $pozicijeIds = $this->selectedKatId
+            ? PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id')->toArray()
+            : [];
+
+        $nazivSubquery = DB::raw('(SELECT naziv FROM pozicija_tips WHERE id = users.pozicija_tipId LIMIT 1) as naziv');
+
+        $latestRsSubquery = '(SELECT rs.id FROM korisnik_radni_statuses krs JOIN radni_status_tips rs ON krs.radni_statusId = rs.id WHERE krs.korisnikId = users.id ORDER BY krs.id DESC LIMIT 1)';
+        $latestRsNazivSubquery = '(SELECT rs.rs_naziv FROM korisnik_radni_statuses krs JOIN radni_status_tips rs ON krs.radni_statusId = rs.id WHERE krs.korisnikId = users.id ORDER BY krs.id DESC LIMIT 1)';
+        $latestRoSubquery = '(SELECT ro.id FROM korisnik_radni_odnos kro JOIN radni_odnos_tips ro ON kro.radni_odnosId = ro.id WHERE kro.korisnikId = users.id ORDER BY kro.id DESC LIMIT 1)';
+        $latestRoNazivSubquery = '(SELECT ro.ro_naziv FROM korisnik_radni_odnos kro JOIN radni_odnos_tips ro ON kro.radni_odnosId = ro.id WHERE kro.korisnikId = users.id ORDER BY kro.id DESC LIMIT 1)';
+
         if($this->selectedKatId == 4){
-             return User::select(
-                    'users.*', 
-                    'pozicija_tips.id as ptid', 
-                    'pozicija_tips.naziv as naziv',
-                    'radni_status_tips.id as rstid', 
-                    'radni_status_tips.rs_naziv as rs_naziv', 
-                    'blokacijas.bl_naziv as l_naziv', 
-                    'blokacijas.bl_mesto as mesto', 
-                    'bankomat_regions.r_naziv', 
-                    'radni_odnos_tips.id as rot_id', 
-                    'radni_odnos_tips.ro_naziv')
-                ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
-                ->leftJoin('korisnik_radni_statuses', 'users.id', '=', 'korisnik_radni_statuses.korisnikId')
-                ->leftJoin('radni_status_tips', 'korisnik_radni_statuses.radni_statusId', '=', 'radni_status_tips.id')
-                ->leftJoin('blokacijas', 'users.lokacijaId', '=', 'blokacijas.id')
-                ->leftJoin('bankomat_regions', 'blokacijas.bankomat_region_id', '=', 'bankomat_regions.id')
-                ->leftJoin('korisnik_radni_odnos', 'users.id', '=', 'korisnik_radni_odnos.korisnikId')
-                ->leftJoin('radni_odnos_tips', 'korisnik_radni_odnos.radni_odnosId', '=', 'radni_odnos_tips.id')
-                ->whereIn('users.pozicija_tipId', $this->pozicijeKategorije)
-                ->where('name', 'like', '%'.$this->searchName.'%')
-                ->when($this->searchLokacija, function($query) {
-                    return $query->where('blokacijas.bl_naziv', 'like', '%'.$this->searchLokacija.'%');
-                                /* ->orWhere('blokacijas.bl_mesto', 'like', '%'.$this->searchLokacija.'%')
-                                ->orWhere('bankomat_regions.r_naziv', 'like', '%'.$this->searchLokacija.'%'); */
+            $query = User::select(
+                    'users.*',
+                    $nazivSubquery,
+                    DB::raw('users.pozicija_tipId as ptid'),
+                    DB::raw("$latestRsSubquery as rstid"),
+                    DB::raw("$latestRsNazivSubquery as rs_naziv"),
+                    DB::raw('(SELECT bl_naziv FROM blokacijas WHERE id = users.lokacijaId LIMIT 1) as l_naziv'),
+                    DB::raw('(SELECT bl_mesto FROM blokacijas WHERE id = users.lokacijaId LIMIT 1) as mesto'),
+                    DB::raw('(SELECT br.r_naziv FROM blokacijas b JOIN bankomat_regions br ON b.bankomat_region_id = br.id WHERE b.id = users.lokacijaId LIMIT 1) as r_naziv'),
+                    DB::raw("$latestRoSubquery as rot_id"),
+                    DB::raw("$latestRoNazivSubquery as ro_naziv"))
+                ->whereIn('users.pozicija_tipId', $pozicijeIds)
+                ->when($this->searchName, function($query) {
+                    return $query->where('users.name', 'like', '%'.$this->searchName.'%');
                 })
-                ->where('radni_status_tips.id', ($this->searchRStatus > 0) ? '=' : '<>', $this->searchRStatus)
+                ->when($this->searchLokacija, function($query) {
+                    return $query->whereExists(function($sub) {
+                        $sub->select(DB::raw(1))->from('blokacijas')
+                            ->whereColumn('blokacijas.id', 'users.lokacijaId')
+                            ->where('blokacijas.bl_naziv', 'like', '%'.$this->searchLokacija.'%');
+                    });
+                })
+                ->when($this->searchRStatus > 0, function($query) {
+                    $statusId = $this->searchRStatus;
+                    return $query->whereExists(function($sub) use ($statusId) {
+                        $sub->select(DB::raw(1))->from('korisnik_radni_statuses')
+                            ->whereColumn('korisnik_radni_statuses.korisnikId', 'users.id')
+                            ->where('korisnik_radni_statuses.radni_statusId', $statusId);
+                    });
+                })
                 ->when($this->searchPozicija, function($query) {
                     return $query->where('users.pozicija_tipId', $this->searchPozicija);
                 })
-                ->orderBy($order, $this->orderDirection)
-                ->paginate(Config::get('global.paginate'));
+                ->orderBy($order, $this->orderDirection);
         }else{
-            
-            return User::select(
-                    'users.*', 
-                    'pozicija_tips.id as ptid', 
-                    'pozicija_tips.naziv as naziv',
-                    'radni_status_tips.id as rstid', 
-                    'radni_status_tips.rs_naziv as rs_naziv', 
-                    'lokacijas.l_naziv', 
-                    'lokacijas.mesto', 
-                    'regions.r_naziv', 
-                    'radni_odnos_tips.id as rot_id', 
-                    'radni_odnos_tips.ro_naziv')
-                ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
-                ->leftJoin('korisnik_radni_statuses', 'users.id', '=', 'korisnik_radni_statuses.korisnikId')
-                ->leftJoin('radni_status_tips', 'korisnik_radni_statuses.radni_statusId', '=', 'radni_status_tips.id')
-                ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
-                ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                ->leftJoin('korisnik_radni_odnos', 'users.id', '=', 'korisnik_radni_odnos.korisnikId')
-                ->leftJoin('radni_odnos_tips', 'korisnik_radni_odnos.radni_odnosId', '=', 'radni_odnos_tips.id')
-                ->whereIn('users.pozicija_tipId', $this->pozicijeKategorije)
+            $query = User::select(
+                    'users.*',
+                    $nazivSubquery,
+                    DB::raw('users.pozicija_tipId as ptid'),
+                    DB::raw("$latestRsSubquery as rstid"),
+                    DB::raw("$latestRsNazivSubquery as rs_naziv"),
+                    DB::raw('(SELECT l_naziv FROM lokacijas WHERE id = users.lokacijaId LIMIT 1) as l_naziv'),
+                    DB::raw('(SELECT mesto FROM lokacijas WHERE id = users.lokacijaId LIMIT 1) as mesto'),
+                    DB::raw('(SELECT r.r_naziv FROM lokacijas l JOIN regions r ON l.regionId = r.id WHERE l.id = users.lokacijaId LIMIT 1) as r_naziv'),
+                    DB::raw("$latestRoSubquery as rot_id"),
+                    DB::raw("$latestRoNazivSubquery as ro_naziv"))
+                ->whereIn('users.pozicija_tipId', $pozicijeIds)
                 ->when($this->searchPozicija, function($query) {
                     return $query->where('users.pozicija_tipId', $this->searchPozicija);
                 })
-                ->where('name', 'like', '%'.$this->searchName.'%')
-                ->when($this->searchLokacija, function($query) {
-                    return $query->where('lokacijas.l_naziv', 'like', '%'.$this->searchLokacija.'%');
+                ->when($this->searchName, function($query) {
+                    return $query->where('users.name', 'like', '%'.$this->searchName.'%');
                 })
-                ->where('radni_status_tips.id', ($this->searchRStatus > 0) ? '=' : '<>', $this->searchRStatus)
-                ->orderBy($order, $this->orderDirection)
-                ->paginate(Config::get('global.paginate'));
-            }
+                ->when($this->searchLokacija, function($query) {
+                    return $query->whereExists(function($sub) {
+                        $sub->select(DB::raw(1))->from('lokacijas')
+                            ->whereColumn('lokacijas.id', 'users.lokacijaId')
+                            ->where('lokacijas.l_naziv', 'like', '%'.$this->searchLokacija.'%');
+                    });
+                })
+                ->when($this->searchRStatus > 0, function($query) {
+                    $statusId = $this->searchRStatus;
+                    return $query->whereExists(function($sub) use ($statusId) {
+                        $sub->select(DB::raw(1))->from('korisnik_radni_statuses')
+                            ->whereColumn('korisnik_radni_statuses.korisnikId', 'users.id')
+                            ->where('korisnik_radni_statuses.radni_statusId', $statusId);
+                    });
+                })
+                ->orderBy($order, $this->orderDirection);
+        }
+
+        return $query->paginate(Config::get('global.paginate'));
     }
 
     /**
@@ -275,6 +298,10 @@ class Users extends Component
     {
         $this->resetValidation();
         $this->resetForm();
+        if(isset($this->pozizicijeKategorije()[8])){
+            $this->pozicijaId = 8;
+            $this->radniOdnosId = 3;
+        }
         $this->modalFormVisible = true;
         $this->newUser = true;
     }
@@ -332,7 +359,7 @@ class Users extends Component
         $this->vidi_komentare_na_terminalu = ($data->pozicija_tipId === 8) ? $data->vidi_komentare_na_terminalu : 0;
 
         $radniOdnos = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
-        $this->radniOdnosId = $radniOdnos->radni_odnosId;
+        $this->radniOdnosId = $radniOdnos->radni_odnosId ?? '';
         $this->oldRadniOdnosId = $this->radniOdnosId;
 
         if($this->pozicijaId == 8){
@@ -428,6 +455,12 @@ class Users extends Component
                 return;
             }
         }
+        
+        /* try {
+            $this->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            dd($e->errors());
+        } */
         $this->validate();
         DB::transaction(function(){
             $nUser = User::create($this->modelData());
@@ -462,10 +495,20 @@ class Users extends Component
             DB::transaction(function(){
                //prvo trenutna vrednost iz tabele
                $cuurent = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
-               //zatim upis u history tabelu
-               KorisnikRadniOdnosHistory::create(['korisnik_radni_odnosId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_odnosId' => $cuurent['radni_odnosId'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
-               //update trenutnog stanja
-               KorisnikRadniOdnos::where('korisnikId', $this->modelId)->update(['radni_odnosId' => $this->radniOdnosId]);
+               if($cuurent){
+                    //Ako je imao radni odnos pre edita
+                    //zatim upis u history tabelu
+                    KorisnikRadniOdnosHistory::create(['korisnik_radni_odnosId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_odnosId' => $cuurent['radni_odnosId'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
+                    //update trenutnog stanja
+                    KorisnikRadniOdnos::where('korisnikId', $this->modelId)->update(['radni_odnosId' => $this->radniOdnosId]);
+               }else{
+                    KorisnikRadniOdnos::create([
+                        'korisnikId' => $this->modelId,
+                        'radni_odnosId' => $this->radniOdnosId
+                    ]);
+               }
+              
+               
             });
         }
         $this->modalFormVisible = false;
@@ -531,7 +574,7 @@ class Users extends Component
 
     /*  public function updated($key, $value)
     {
-         $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id');
+         $this->pozicijeKategorije = PozicijaKategoriy::find($this->selectedKatId)->pozicije->pluck('id')->toArray();
     } */
 
        /* ----------------------------------- Radni Status Modal ------------------------------------------*/

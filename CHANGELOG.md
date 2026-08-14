@@ -373,3 +373,16 @@ V 1.1.15 ( 22.4.2026.) @Bnkomati_ff
 
 V 1.1.16 ( 27.4.2026.) @Bnkomati_ff
     - Ispravljeno vreme tiketa. Forma prikazuje lokalno vreme a u bazu se upisuje UTC
+
+V 2.0.0 ( 23.6.2026.) @upgrade/laravel11
+    - Upgrade to Laravel 11
+
+V 2.0.0.2 ( 29.6.2026.) @upgrade/laravel11
+    - Upgrade to Laravel 11 ispravka bugova
+
+V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
+    - Ispravljen bug Check All
+    - Ispravljen Bug Produzi licencu - Check polja, datum kraja licence bio auto setovan na mesec dana.
+
+V 2.0.0.4 ( 2.7.2026.) @upgrade/laravel11
+    - Dodata 2FA recovery stranica za admina

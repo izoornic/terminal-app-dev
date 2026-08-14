@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 use Auth;
 use App\Models\Tiket;
@@ -35,7 +36,7 @@ class Tiketview extends Component
 {
     public $validTiket;
     public $tikid;
-    public $tiket;
+    protected $tiket;
     public $kvarAkcijaId;
     public $userKreirao;
 
@@ -62,7 +63,8 @@ class Tiketview extends Component
     public $dodeljenUserInfo;
     public $selectedTerminalCommentsCount;
     public $selectedTerminalComments;
-    public $listeners = ['tiketRefresh' => 'render'];
+    #[On('tiketRefresh')]
+    public function refresh(): void { }
 
     //zatvori tiket MODAL
     public $modalZatvoriTiketVisible;
@@ -238,7 +240,6 @@ class Tiketview extends Component
      * @return void
      */
     public function dodeliTiketShowModal(){
-       
         $this->noviDodeljenUserId = false;
         $this->searchUserName = '';
         $this->searchUserLokacija = '';
@@ -258,6 +259,8 @@ class Tiketview extends Component
                     ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+                    ->where('users.id', '!=', $this->tiket->korisnik_dodeljenId)
+                    ->whereIn('users.pozicija_tipId', [1, 2, 3, 4, 5])
                     ->when($this->tiketAkcija[3] == "region", function ($rtval){
                         return $rtval->where('regions.id', '=', $this->userRegion);
                     })
@@ -354,7 +357,7 @@ class Tiketview extends Component
         
         $this->noviDodeljenUserId = false;
         $this->modalDodeliTiketVisible = false;
-        $this->emit('tiketRefresh');
+        $this->dispatch('tiketRefresh');
 
     }
 
@@ -425,7 +428,7 @@ class Tiketview extends Component
         $this->mailToUser->sendEmails('zatvoren', $comentari);
 
         $this->modalZatvoriTiketVisible = false;
-        $this->emit('tiketRefresh');
+        $this->dispatch('tiketRefresh');
     }
 
     public function obrisiTiketShowModal()
@@ -448,7 +451,7 @@ class Tiketview extends Component
 
         $this->validTiket = false;
         $this->obrisiTiketModalVisible = false;
-        $this->emit('tiketRefresh');
+        $this->dispatch('tiketRefresh');
     }
 
     public function addPartShowModal($tid)
@@ -507,7 +510,7 @@ class Tiketview extends Component
         $this->newKoment = 'Ugrađen je rezervni deo: ' . $this->selected_part['part_naziv'] . ' sifra: ' . $this->selected_part['part_sifra'];
         $this->posaljiKomentar();
         $this->modalAddPartVisible = false;
-        $this->emit('tiketRefresh');
+        $this->dispatch('tiketRefresh');
         
     }
 

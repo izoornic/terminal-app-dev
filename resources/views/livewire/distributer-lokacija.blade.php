@@ -63,7 +63,7 @@
 
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalDeleteLocVisible">
+    <x-jet-dialog-modal wire:model.live="modalDeleteLocVisible">
         <x-slot name="title">
             {{ __('Uklanjanje lokacije distributera') }}
         </x-slot>
@@ -99,7 +99,7 @@
     </x-jet-dialog-modal>
 
     {{--  MODAL DOAJ LOKACIJU --}}
-    <x-jet-dialog-modal wire:model="modalAddLocVisible">
+    <x-jet-dialog-modal wire:model.live="modalAddLocVisible">
         <x-slot name="title">
            {{ __('Dodaj lokaciju') }}
         </x-slot>
@@ -118,10 +118,10 @@
                     </tr>
                     <tr class="bg-orange-50">
                         <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                        <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                        <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                        <td><x-jet-input wire:model.live="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                        <td><x-jet-input wire:model.live="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                         <td>
-                                <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <select wire:model.live="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                     @foreach (App\Models\Region::regioni() as $key => $value)    
                                         <option value="{{ $key }}">{{ $value }}</option>
@@ -142,7 +142,7 @@
                 </tr>
                 @endforeach
                 </tbody>
-            <table>
+            </table>
             <div class="mt-5">
                 {{ $this->lokacijeTipa()->links() }}
             </div>

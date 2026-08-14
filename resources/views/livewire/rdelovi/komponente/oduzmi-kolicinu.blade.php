@@ -12,7 +12,7 @@
 
     <div class="mt-4 form-group">
         <label for="kolicina">Oduzmi od stanja: </label>
-        <input type="number" class="form-control" wire:model.defer="kolicina" id="kolicina" ><br />
+        <input type="number" class="form-control" wire:model="kolicina" id="kolicina" ><br />
         @error('kolicina') <span class="error">{{ $message }}</span> @enderror
         @if($oduzmimoguce == false)<span class="error">Izabrana količina je veća od trenutnog stanja</span> @endif
     </div>

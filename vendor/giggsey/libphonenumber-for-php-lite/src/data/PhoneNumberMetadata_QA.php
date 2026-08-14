@@ -37,14 +37,14 @@ class PhoneNumberMetadata_QA extends PhoneMetadata
             ->setPossibleLength([8]);
         $this->premiumRate = PhoneNumberDesc::empty();
         $this->fixedLine = (new PhoneNumberDesc())
-            ->setNationalNumberPattern('4(?:1111|2022)\d{3}|4(?:[04]\d\d|14[0-6]|999)\d{4}')
+            ->setNationalNumberPattern('4(?:(?:[014]\d\d|999)\d|2022)\d{3}')
             ->setExampleNumber('44123456')
             ->setPossibleLength([8]);
         $this->numberFormat = [
             (new NumberFormat())
                 ->setPattern('(\d{3})(\d{4})')
                 ->setFormat('$1 $2')
-                ->setLeadingDigitsPattern(['2[16]|8'])
+                ->setLeadingDigitsPattern(['2[136]|8'])
                 ->setNationalPrefixOptionalWhenFormatting(false),
             (new NumberFormat())
                 ->setPattern('(\d{4})(\d{4})')
@@ -60,7 +60,7 @@ class PhoneNumberMetadata_QA extends PhoneMetadata
         $this->personalNumber = PhoneNumberDesc::empty();
         $this->voip = PhoneNumberDesc::empty();
         $this->pager = (new PhoneNumberDesc())
-            ->setNationalNumberPattern('2[16]\d{5}')
+            ->setNationalNumberPattern('2[136]\d{5}')
             ->setExampleNumber('2123456')
             ->setPossibleLength([7]);
         $this->uan = PhoneNumberDesc::empty();

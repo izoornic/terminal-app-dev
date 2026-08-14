@@ -3,3 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/eposrs/servis-epos-app/
     - /bin/cp -a * $DEPLOYPATH
+    - /bin/rm -f $DEPLOYPATH/bootstrap/cache/packages.php $DEPLOYPATH/bootstrap/cache/services.php $DEPLOYPATH/bootstrap/cache/config.php $DEPLOYPATH/bootstrap/cache/compiled.php

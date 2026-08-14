@@ -5,7 +5,7 @@
                     <div>Kontakt osoba:</div>
                     <div class="flex">
                         <div class="py-1">
-                            <x-heroicon-o-user-card class="w-8 h-8 mr-2" />
+                            <x-heroicon-o-identification class="w-8 h-8 mr-2" />
                         </div>
                         <div>
                             <p class="font-bold">{{ $item->ime }}</p>
@@ -32,24 +32,24 @@
         <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mt-6 mb-6">
             <hr />
             <p class="flex">
-                <x-heroicon-o-user-card class="mt-1 w-8 h-8" />
+                <x-heroicon-o-identification class="mt-1 w-8 h-8" />
                 Kontakt osoba:
             </p>
             <div class="mt-4">
                 <x-jet-label for="kontakt_name" value="Ime" />
-                <x-jet-input wire:model="kontakt_name" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="kontakt_name" id="" class="block mt-1 w-full" type="text" />
                 @error('kontakt_name') <span class="error">{{ $message }}</span> @enderror
             </div> 
             <div class="mt-4">
                 <x-jet-label for="kontakt_tel" value="Broj telefona" />
                 <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                    <x-jet-input wire:model="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
+                    <x-jet-input wire:model.live="kontakt_tel" id="" class="block mt-1 w-full" type="text" />
                     @error('kontakt_tel') <span class="error">{{ $message }}</span>@enderror
                 </div> 
             </div>
             <div class="mt-4">
                 <x-jet-label for="kontakt_email" value="e-mail" />
-                <x-jet-input wire:model="kontakt_email" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="kontakt_email" id="" class="block mt-1 w-full" type="text" />
                 @error('kontakt_email') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="flex justify-center items-center mt-4">

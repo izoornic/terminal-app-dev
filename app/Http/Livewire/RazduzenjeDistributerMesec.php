@@ -47,6 +47,8 @@ class RazduzenjeDistributerMesec extends Component
     public $mesecRow;
     public $datumUplate;
 
+    public $zaduzenjeMesecDistributerRow;
+
 
      /**
      * mount
@@ -66,7 +68,7 @@ class RazduzenjeDistributerMesec extends Component
     /**
      * The validation rules
      *
-     * @return void
+     * @return array
      */
     public function rules()
     {
@@ -186,7 +188,7 @@ class RazduzenjeDistributerMesec extends Component
      /**
      * Prikaz kolekcije sa filterima
      *
-     * @return collection
+     * @return object
      * 
      */
     public function displayData()
@@ -233,7 +235,7 @@ class RazduzenjeDistributerMesec extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return object
      */
     public function read()
     {

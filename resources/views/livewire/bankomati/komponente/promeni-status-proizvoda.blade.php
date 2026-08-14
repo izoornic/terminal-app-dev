@@ -2,7 +2,7 @@
     <livewire:bankomati.komponente.bankomat-info :bankomat_lokacija_id="$modelId" />
     <div class="mt-4">
         <x-jet-label for="bankomat_status" value="Status bankomata" />   
-        <select wire:model="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        <select wire:model.live="bankomat_status" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             @foreach (App\Models\BankomatStatusTip::getAll() as $key => $value)    
                 <option value="{{ $key }}">{{ $value }}</option>
             @endforeach
@@ -12,7 +12,7 @@
     <div class="mt-4">
         <x-jet-label for="datum_promene" value="Datum promene" />
         <div class="flex">
-            <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
+            <x-jet-input id="datum_promene" type="date" class="mt-1 block" value="{{ $datum_promene }}" wire:model.live="datum_promene" /> <span class="p-2 mt-2">{{ App\Http\Helpers::datumFormatDanFullYear($datum_promene) }}</span>
         </div>
         @error('datum_promene') <span class="error">{{ $message }}</span> @enderror
         @if($datum_promene_error != '')

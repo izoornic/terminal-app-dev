@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Bankomati;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Config;
 use App\Actions\Bankomati\BankomatTiketReadActions;
 
@@ -50,35 +51,31 @@ class Tiketi extends Component
     public $newTicketShowModal = false;
     public $bankomat_lokacija_id;
     
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['newTicket', 'izabraniProizvod', 'newTicketCreated'];
-
+    #[On('newTicket')]
     public function newTicket()
     {
         $this->bankomat_lokacija_id = null;
         $this->newTicketShowModal = true;
     }
 
+    #[On('izabraniProizvod')]
     public function izabraniProizvod($id)
     {
         $this->bankomat_lokacija_id = $id;
         //dd($this->bankomat_lokacija_id);
     }
 
+    #[On('newTicketCreated')]
     public function newTicketCreated($id)
     {
         $this->newTicketShowModal = false;
-        $this->emit('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
+        $this->dispatch('flashMessage', 'Tiket #'.$id.' je uspešno dodat.');
     }
 
     public function mount()
     {
         $this->role_region =auth()->user()->userBankmatPositionAndRegion();
-        if($this->role_region['role'] != 'admin' || $this->role_region['role'] != 'programer') {
+        if($this->role_region['role'] != 'admin' && $this->role_region['role'] != 'programer') {
             $this->searchRegion = $this->role_region['region'];
             if($this->role_region['role'] == 'sef'){
                 //pokupi idjeve svih u servisu
@@ -132,6 +129,8 @@ class Tiketi extends Component
             session()->put('searchRegion', $this->searchRegion);
          }
 
+        $this->resetPage('tiketi');
+        $this->resetPage('userVanRegiona');
         $this->showFilterClearButtons();
     }
 

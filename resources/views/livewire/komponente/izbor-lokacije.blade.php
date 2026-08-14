@@ -29,11 +29,11 @@
                         {{-- search row --}}
                         <tr class="bg-orange-50">
                             <td></td>
-                            <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                            <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                            <td><x-jet-input wire:model.live="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                            <td><x-jet-input wire:model.live="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                             <td>
                                 @if( auth()->user()->hasRole('Admin') )
-                                    <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">---</option>
                                             @foreach (App\Models\Region::get() as $value)    
                                                 <option value="{{ $value->id }}">{{ $value->r_naziv }}</option>
@@ -46,7 +46,7 @@
                     </thead>
                     <tbody class="bg-yellow-50 divide-y divide-gray-200"> 
                     @foreach ($this->lokacijeTipa($vrsta_lokacije) as $value)
-                        <tr class="hover:bg-gray-100" wire:click="$emit('novaLokacija', {{ $value->id }})" >  
+                        <tr class="hover:bg-gray-100" wire:click="$dispatch('novaLokacija', { id: {{ $value->id }} })" >  
                                 <td></td>
                                 <td>
                                     @if($value->is_duplicate)<span class="text-red-500">*</span>@endif

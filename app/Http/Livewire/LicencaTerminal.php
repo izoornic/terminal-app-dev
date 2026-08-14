@@ -10,6 +10,7 @@ use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,7 @@ class LicencaTerminal extends Component
 
     //select all
     public $selectedTerminals = [];
-    public $selectAll;
+    public $selectAll = false;
     public $allInPage = [];
 
     //search
@@ -89,23 +90,19 @@ class LicencaTerminal extends Component
     //komentari
     public $modalKomentariVisible;
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['blacklistUpdate', 'newTerminal'];
-    
+    #[On('blacklistUpdate')]
     public function blacklistUpdate()
     {
          $this->modalFormVisible = false;
         $this->read();
     }
 
+    #[On('newTerminal')]
     public function newTerminal()
     {
         $this->noviTerminalShowModal();
     }
+
     /**
      * [Description for mount]
      *
@@ -159,7 +156,7 @@ class LicencaTerminal extends Component
         $terms->getCollection()->transform(function ($item) {
             $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
             $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0;
-            $this->allInPage[] = $item->tlid;
+            $this->allInPage[] = (string) $item->tlid;
             return $item;
         });
         
@@ -380,14 +377,14 @@ class LicencaTerminal extends Component
         
         session(['searchTipLokacije' =>  $this->searchTipLokacije]);
         $exp = Str::of($key)->explode(delimiter: '.');
-        if($exp[0] === 'selectAll' && is_numeric($value)){
+        if($exp[0] === 'selectAll' && $value){
            foreach($this->allInPage as $termid){
                if(!in_array($termid, $this->selectedTerminals)){
                 array_push($this->selectedTerminals, $termid);
-               }  
+               }
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
+            $this->selectedTerminals = array_values(array_diff($this->selectedTerminals, $this->allInPage));
         }
 
         /* if($this->modalConfirmPremestiVisible || $this->modalFormVisible){

@@ -33,9 +33,9 @@ class DistributeriPregled extends Component
         } else {
             $this->orderBy = $field;
             $this->orderDirection = 'desc';
-            $this->emit('fieldChange', $field);
+            $this->dispatch('fieldChange', $field);
         }
-        $this->emit('sortChange', $this->orderDirection);
+        $this->dispatch('sortChange', $this->orderDirection);
     }
     /**
      * The read function.

@@ -30,11 +30,11 @@
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
                                 <td colspan="2">
-                                <x-jet-input wire:model="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN Terminala" />
+                                <x-jet-input wire:model.live="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN Terminala" />
                                 </td>
                                 
                                 <td>
-                                    <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="1">Aktivan</option>
                                         <option value="2">Ovoren</option>
                                         <option value="3">Dodeljen</option>
@@ -43,11 +43,11 @@
                                     </select>   
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /> 
+                                    <x-jet-input wire:model.live="searchLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /> 
                                 </td>
                                 <td>
                                 @if($tiketAkcija[2]=="sve")
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -57,7 +57,7 @@
                                 </td>
                                 <td></td>
                                 <td>
-                                    <select wire:model="searchPrioritet" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchPrioritet" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                             @foreach (App\Models\TiketPrioritetTip::prioritetiList() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -75,7 +75,7 @@
                                 <td></td>
                                 <td></td>
                                 <td>
-                                    <select wire:model="searchVrstaKvara" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchVrstaKvara" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">-- Vrsta kvara --</option>
                                             @foreach (App\Models\TiketOpisKvaraTip::opisList() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -83,7 +83,7 @@
                                     </select> 
                                 </td>
                                 <td colspan="4">
-                                    <x-jet-input wire:model.defer="searchTxtOpisKvara" id="" class="block bg-orange-50 w-full" type="text" placeholder="Opis kvara" />
+                                    <x-jet-input wire:model="searchTxtOpisKvara" id="" class="block bg-orange-50 w-full" type="text" placeholder="Opis kvara" />
                                 </td>
                                 <td  class="text-center">
                                     <x-jet-secondary-button wire:click="searchOpisKvara">
@@ -144,7 +144,7 @@
     </div>
  
     {{-- Novi Tiket Form ################################################################################# --}}
-    <x-jet-dialog-modal wire:model="modalNewTiketVisible">
+    <x-jet-dialog-modal wire:model.live="modalNewTiketVisible">
         <x-slot name="title">
         <svg class="fill-current w-6 h-6 mr-2 mt-1 float-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
             {{ __('Novi Tiket') }}
@@ -163,9 +163,9 @@
                     </tr>
                     <tr class="bg-orange-50">
                         <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                        <td><x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
-                        <td><x-jet-input wire:model="searchTerminalLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                        <td><x-jet-input wire:model="searchTerminalMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                        <td><x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
+                        <td><x-jet-input wire:model.live="searchTerminalLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                        <td><x-jet-input wire:model.live="searchTerminalMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200"> 
@@ -214,7 +214,7 @@
                 
                 <div class="mt-4">
                     <x-jet-label for="opisKvaraList" value="{{ __('Izaberi kvar iz liste') }}" />
-                    <select wire:model="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <select wire:model.live="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="0">---</option>    
                         @foreach (App\Models\TiketOpisKvaraTip::opisList($newTerminalInfo->tid) as $key => $value)    
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -224,7 +224,7 @@
                 </div>  
                 <div class="mt-4">
                     <x-jet-label for="opis_kvara" value="{{ __('Opis kvara') }}" />
-                    <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opisKvataTxt" />
+                    <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="opisKvataTxt" />
                     @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
                 </div> 
                 @if($userPozicija != 2)
@@ -243,9 +243,9 @@
                                 </tr>
                                 <tr class="bg-orange-50">
                                     <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                    <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
-                                    <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
-                                    <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
+                                    <td><x-jet-input wire:model.live="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200"> 

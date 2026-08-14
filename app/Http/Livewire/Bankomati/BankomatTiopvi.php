@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Bankomati;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use App\Models\Bankomat;
 use App\Models\BankomatTip;
@@ -37,13 +38,7 @@ class BankomatTiopvi extends Component
     public $searchOpis;
     public $searchProductTip;
 
-    /**
-     * Listeners for Livewire events
-     *
-     * @var array
-     */
-    protected $listeners = ['newBankomatModel'];
-
+    #[On('newBankomatModel')]
     public function newBankomatModel()
     {
         $this->is_edit = false;

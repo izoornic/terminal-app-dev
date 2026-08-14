@@ -63,13 +63,13 @@
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
                                 <td></td>
                                 <td>
-                                    <x-jet-input wire:model="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
+                                    <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži ime" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="">---</option>
                                             @foreach (App\Models\Region::regioni() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -77,7 +77,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTip" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">---</option>
                                         @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -85,7 +85,7 @@
                                     </select>
                                 </td>
                                 <td colspan="2">
-                                    <x-jet-input wire:model="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
+                                    <x-jet-input wire:model.live="searchPib" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži PIB" />
                                 </td>
                                 <td colspan="2" class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>
                             </tr>
@@ -183,7 +183,7 @@
     </div>
     
     {{-- ERROR LICENCA #########################################--}}
-    <x-jet-dialog-modal wire:model="modalErorLicencaVisible">
+    <x-jet-dialog-modal wire:model.live="modalErorLicencaVisible">
         <x-slot name="title">
             GREŠKA
         </x-slot>
@@ -213,7 +213,7 @@
     </x-jet-dialog-modal>
 
     {{-- DODAJ VEZANU LOKACIJU MODAL #########################################--}}
-    <x-jet-dialog-modal wire:model="dodajLokacijuModalVisible">
+    <x-jet-dialog-modal wire:model.live="dodajLokacijuModalVisible">
         <x-slot name="title">
             <div class="flex">
             <svg class="fill-current w-6 h-6 mx-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"/></svg>
@@ -228,7 +228,7 @@
                     <span class="inline-flex items-center py-2 px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-m">
                         {{ $l_naziv }}
                     </span>
-                    <input wire:model="l_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                    <input wire:model.live="l_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     @error('l_naziv_sufix') <span class="error">{{ $message }}</span>@enderror
                 </div>
             </div>
@@ -238,12 +238,12 @@
             </div>  
             <div class="mt-4">
                 <x-jet-label for="mesto" value="{{ __('Mesto') }}" />
-                <x-jet-input wire:model.defer="mesto" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model="mesto" id="" class="block mt-1 w-full" type="text" />
                 @error('mesto') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
                 <x-jet-label for="adresa" value="{{ __('Adresa') }}" />
-                <x-jet-input wire:model.defer="adresa" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model="adresa" id="" class="block mt-1 w-full" type="text" />
                 @error('adresa') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
@@ -259,164 +259,9 @@
                 @if ($email_is_set)
                 <p class="pl-4 font-bold">{{$email}}</p>
                 @else
-                    <x-jet-input wire:model.defer="email" id="" class="block mt-1 w-full" type="text" />
-                    @error('email') <span class="error">{{ $message }}</span> @enderror
-                @endif
-            </div>
-            <div class="mt-4">
-                <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
-                <x-jet-input wire:model.defer="latitude" id="" class="block mt-1 w-full" type="text" />
-                @error('latitude') <span class="error">{{ $message }}</span> @enderror
-            </div>  
-            <div class="mt-4">
-                <x-jet-label for="longitude" value="{{ __('Longitude') }}" />
-                <x-jet-input wire:model.defer="longitude" id="" class="block mt-1 w-full" type="text" />
-                @error('longitude') <span class="error">{{ $message }}</span> @enderror
-            </div>      
-            <div class="mt-4">
-                <x-jet-label for="regionId" value="{{ __('Region') }}" />
-                <select wire:model.defer="regionId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                  <option value="">Odaberi region</option>
-                    @foreach (App\Models\Region::regioni() as $key => $value)    
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('regionId') <span class="error">{{ $message }}</span> @enderror
-            </div> 
-            {{-- Kontakt osoba --}}
-            @if($lokacija_tipId == 3)
-                <div class="mt-6">
-                    <hr />
-                    <p>
-                        <svg class="float-left fill-current w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>
-                        Kontakt osoba:
-                    </p>
-                    <div class="mt-4">
-                        <x-jet-label for="nameKo" value="{{ __('Ime') }}" />
-                        <x-jet-input wire:model.defer="nameKo" id="" class="block mt-1 w-full" type="text" />
-                        @error('nameKo') <span class="error">{{ $message }}</span> @enderror
-                    </div> 
-                    <div class="mt-4">
-                        <x-jet-label for="telKo" value="{{ __('Broj telefona') }}" />
-                        <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                    
-							<span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
-								+381
-							</span>
-							<input wire:model.defer="telKo" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
-							@error('telKo') <span class="error">{{ $message }}</span>@enderror
-						</div> 
-					</div>
-				</div>
-            @endif
-
-        </x-slot>
-        <x-slot name="footer">
-            <x-jet-secondary-button wire:click="$toggle('dodajLokacijuModalVisible')" wire:loading.attr="disabled">
-                {{ __('Close') }}
-            </x-jet-secondary-button>
-
-            <x-jet-button class="ml-2" wire:click="createPodlokaciju" wire:loading.attr="disabled">
-                    {{ __('Sačuvaj') }}
-                </x-jet-danger-button>
-        </x-slot>
-    </x-jet-dialog-modal>
-
-    {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
-        <x-slot name="title">
-            <div class="flex justify-between">
-                <div class="flex">
-                    <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M64 64C28.65 64 0 92.65 0 128V384C0 419.3 28.65 448 64 448H512C547.3 448 576 419.3 576 384V128C576 92.65 547.3 64 512 64H64zM96 128H480V384H96V128zM144 176C144 167.2 151.2 160 160 160H416C424.8 160 432 167.2 432 176V224C432 232.8 424.8 240 416 240H160C151.2 240 144 232.8 144 224V176zM96.01 272C96.01 263.2 103.2 256.1 112.1 256H464C472.8 256.1 480.1 263.2 480.1 272V320C480.1 328.8 472.8 336.1 464.1 336H112C103.2 336.1 .01e-5 .3288 .01e-5 .3204L96 .2724L96 .2724z"/></svg>
-                    @if ($isUpdate) {{ __('Izmeni podatke - ') }}{{ $l_naziv }}
-                    @else {{ __('Nova lokacija') }} @endif
-                </div>
-                <div>
-                    @if($isUpdate && $lokacija_tipId == 3 && !$is_duplicate)
-                        <x-jet-secondary-button wire:click="dodajPodlokaciju" wire:loading.attr="disabled">
-                           <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"/></svg>
-                            Dodaj lokaciju
-                        </x-jet-secondary-button>
-                    @endif
-                </div>
-
-            </div>
-        </x-slot>
-
-        <x-slot name="content">
-            @if($pib_count > 1 && !$is_duplicate)
-                <div class="bg-yellow-50 border border-yellow-500 text-yellow-700 px-4 py-3 rounded relative my-4 " role="alert">
-                    <p class="">Pažnja!<br />
-                    <span class="font-bold block sm:inline">
-                        Postoji više lokacija sa istim PIB-om. Ukoliko promenite Naziv ili PIB oni će biti promenjeni na svim lokacijama.
-                    </span>
-                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                        <svg class="text-yellow-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
-                    </span>
-                    </p>
-                </div>
-            @endif
-            @if ($isUpdate && $is_duplicate)
-                <x-jet-label for="l_naziv_sufix" value="{{ __('Sufix naziva') }}" />
-                <div class="mt-4 flex rounded-md shadow-sm mb-4">
-                    
-                    <span class="inline-flex items-center py-2 px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-m">
-                        {{ $l_naziv }}
-                    </span>
-                    <input wire:model="l_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
-                    @error('l_naziv_sufix') <span class="error">{{ $message }}</span>@enderror
-                </div> 
-            @else
-                <div class="mt-4">
-                    <x-jet-label for="l_naziv" value="{{ __('Naziv lokacije') }}" />
-                    <x-jet-input wire:model="l_naziv" id="" class="block mt-1 w-full" type="text" />
-                    @error('l_naziv') <span class="error">{{ $message }}</span> @enderror
-                </div>
-            @endif
-            <div class="mt-4">
-                <x-jet-label for="lokacija_tipId" value="{{ __('Vrsta lokacije') }}" />
-                <select wire:model="lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                    <option value="">Izaberi vrstu</option>
-                    @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('lokacija_tipId') <span class="error">{{ $message }}</span> @enderror
-            </div>  
-            <div class="mt-4">
-                <x-jet-label for="mesto" value="{{ __('Mesto') }}" />
-                <x-jet-input wire:model="mesto" id="" class="block mt-1 w-full" type="text" />
-                @error('mesto') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            <div class="mt-4">
-                <x-jet-label for="adresa" value="{{ __('Adresa') }}" />
-                <x-jet-input wire:model="adresa" id="" class="block mt-1 w-full" type="text" />
-                @error('adresa') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            
-            <div class="mt-4">
-                <x-jet-label for="pib" value="{{ __('PIB') }}" />
-                @if ($isUpdate && $is_duplicate)
-                    <p class="ml-4"><strong>{{ $pib }}</strong></p>
-                @else
-                    <x-jet-input wire:model="pib" id="" class="block mt-1 w-full" type="text" />
-                    @error('pib') <span class="error">{{ $message }}</span> @enderror
-                @endif
-            </div>
-        
-            <div class="mt-4">
-                <x-jet-label for="mb" value="{{ __('Matični broj') }}" />
-                <x-jet-input wire:model="mb" id="" class="block mt-1 w-full" type="text" />
-                @error('mb') <span class="error">{{ $message }}</span> @enderror
-            </div>
-            <div class="mt-4">
-                <x-jet-label for="email" value="{{ __('e-mail') }}" />
-                {{-- @if ($email_is_set)
-                <p class="pl-4 font-bold">{{$email}}</p>
-                @else --}}
                     <x-jet-input wire:model="email" id="" class="block mt-1 w-full" type="text" />
                     @error('email') <span class="error">{{ $message }}</span> @enderror
-                {{-- @endif --}}
+                @endif
             </div>
             <div class="mt-4">
                 <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
@@ -464,6 +309,161 @@
 					</div>
 				</div>
             @endif
+
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('dodajLokacijuModalVisible')" wire:loading.attr="disabled">
+                {{ __('Close') }}
+            </x-jet-secondary-button>
+
+            <x-jet-button class="ml-2" wire:click="createPodlokaciju" wire:loading.attr="disabled">
+                    {{ __('Sačuvaj') }}
+                </x-jet-danger-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
+        <x-slot name="title">
+            <div class="flex justify-between">
+                <div class="flex">
+                    <svg class="fill-current w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M64 64C28.65 64 0 92.65 0 128V384C0 419.3 28.65 448 64 448H512C547.3 448 576 419.3 576 384V128C576 92.65 547.3 64 512 64H64zM96 128H480V384H96V128zM144 176C144 167.2 151.2 160 160 160H416C424.8 160 432 167.2 432 176V224C432 232.8 424.8 240 416 240H160C151.2 240 144 232.8 144 224V176zM96.01 272C96.01 263.2 103.2 256.1 112.1 256H464C472.8 256.1 480.1 263.2 480.1 272V320C480.1 328.8 472.8 336.1 464.1 336H112C103.2 336.1 .01e-5 .3288 .01e-5 .3204L96 .2724L96 .2724z"/></svg>
+                    @if ($isUpdate) {{ __('Izmeni podatke - ') }}{{ $l_naziv }}
+                    @else {{ __('Nova lokacija') }} @endif
+                </div>
+                <div>
+                    @if($isUpdate && $lokacija_tipId == 3 && !$is_duplicate)
+                        <x-jet-secondary-button wire:click="dodajPodlokaciju" wire:loading.attr="disabled">
+                           <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"/></svg>
+                            Dodaj lokaciju
+                        </x-jet-secondary-button>
+                    @endif
+                </div>
+
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+            @if($pib_count > 1 && !$is_duplicate)
+                <div class="bg-yellow-50 border border-yellow-500 text-yellow-700 px-4 py-3 rounded relative my-4 " role="alert">
+                    <p class="">Pažnja!<br />
+                    <span class="font-bold block sm:inline">
+                        Postoji više lokacija sa istim PIB-om. Ukoliko promenite Naziv ili PIB oni će biti promenjeni na svim lokacijama.
+                    </span>
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg class="text-yellow-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
+                    </span>
+                    </p>
+                </div>
+            @endif
+            @if ($isUpdate && $is_duplicate)
+                <x-jet-label for="l_naziv_sufix" value="{{ __('Sufix naziva') }}" />
+                <div class="mt-4 flex rounded-md shadow-sm mb-4">
+                    
+                    <span class="inline-flex items-center py-2 px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-m">
+                        {{ $l_naziv }}
+                    </span>
+                    <input wire:model.live="l_naziv_sufix" class="form-input flex-1 block w-full pl-2 border border-l-0 border-gray-300 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                    @error('l_naziv_sufix') <span class="error">{{ $message }}</span>@enderror
+                </div> 
+            @else
+                <div class="mt-4">
+                    <x-jet-label for="l_naziv" value="{{ __('Naziv lokacije') }}" />
+                    <x-jet-input wire:model.live="l_naziv" id="" class="block mt-1 w-full" type="text" />
+                    @error('l_naziv') <span class="error">{{ $message }}</span> @enderror
+                </div>
+            @endif
+            <div class="mt-4">
+                <x-jet-label for="lokacija_tipId" value="{{ __('Vrsta lokacije') }}" />
+                <select wire:model.live="lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <option value="">Izaberi vrstu</option>
+                    @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('lokacija_tipId') <span class="error">{{ $message }}</span> @enderror
+            </div>  
+            <div class="mt-4">
+                <x-jet-label for="mesto" value="{{ __('Mesto') }}" />
+                <x-jet-input wire:model.live="mesto" id="" class="block mt-1 w-full" type="text" />
+                @error('mesto') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            <div class="mt-4">
+                <x-jet-label for="adresa" value="{{ __('Adresa') }}" />
+                <x-jet-input wire:model.live="adresa" id="" class="block mt-1 w-full" type="text" />
+                @error('adresa') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            
+            <div class="mt-4">
+                <x-jet-label for="pib" value="{{ __('PIB') }}" />
+                @if ($isUpdate && $is_duplicate)
+                    <p class="ml-4"><strong>{{ $pib }}</strong></p>
+                @else
+                    <x-jet-input wire:model.live="pib" id="" class="block mt-1 w-full" type="text" />
+                    @error('pib') <span class="error">{{ $message }}</span> @enderror
+                @endif
+            </div>
+        
+            <div class="mt-4">
+                <x-jet-label for="mb" value="{{ __('Matični broj') }}" />
+                <x-jet-input wire:model.live="mb" id="" class="block mt-1 w-full" type="text" />
+                @error('mb') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            <div class="mt-4">
+                <x-jet-label for="email" value="{{ __('e-mail') }}" />
+                {{-- @if ($email_is_set)
+                <p class="pl-4 font-bold">{{$email}}</p>
+                @else --}}
+                    <x-jet-input wire:model.live="email" id="" class="block mt-1 w-full" type="text" />
+                    @error('email') <span class="error">{{ $message }}</span> @enderror
+                {{-- @endif --}}
+            </div>
+            <div class="mt-4">
+                <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
+                <x-jet-input wire:model.live="latitude" id="" class="block mt-1 w-full" type="text" />
+                @error('latitude') <span class="error">{{ $message }}</span> @enderror
+            </div>  
+            <div class="mt-4">
+                <x-jet-label for="longitude" value="{{ __('Longitude') }}" />
+                <x-jet-input wire:model.live="longitude" id="" class="block mt-1 w-full" type="text" />
+                @error('longitude') <span class="error">{{ $message }}</span> @enderror
+            </div>      
+            <div class="mt-4">
+                <x-jet-label for="regionId" value="{{ __('Region') }}" />
+                <select wire:model.live="regionId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                  <option value="">Odaberi region</option>
+                    @foreach (App\Models\Region::regioni() as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('regionId') <span class="error">{{ $message }}</span> @enderror
+            </div> 
+            {{-- Kontakt osoba --}}
+            @if($lokacija_tipId == 3)
+                <div class="mt-6">
+                    <hr />
+                    <p>
+                        <svg class="float-left fill-current w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>
+                        Kontakt osoba:
+                    </p>
+                    <div class="mt-4">
+                        <x-jet-label for="nameKo" value="{{ __('Ime') }}" />
+                        <x-jet-input wire:model.live="nameKo" id="" class="block mt-1 w-full" type="text" />
+                        @error('nameKo') <span class="error">{{ $message }}</span> @enderror
+                    </div> 
+                    <div class="mt-4">
+                        <x-jet-label for="telKo" value="{{ __('Broj telefona') }}" />
+                        <div class="mt-4 flex rounded-md shadow-sm mb-4">
+                    
+							<span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
+								+381
+							</span>
+							<input wire:model.live="telKo" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+							@error('telKo') <span class="error">{{ $message }}</span>@enderror
+						</div> 
+					</div>
+				</div>
+            @endif
         </x-slot>
 
         <x-slot name="footer">
@@ -484,7 +484,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Delete or INFO Modal ############################################################# --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             @if($deletePosible)
                 <svg class="float-left fill-red-700 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) --><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg>
@@ -585,7 +585,7 @@
 
 
     {{-- ADD TERMINAL MODAL ########################################################### --}}
-    <x-jet-dialog-modal wire:model="modalAddTerminalVisible" id="adTer">
+    <x-jet-dialog-modal wire:model.live="modalAddTerminalVisible" id="adTer">
         <x-slot name="title">
           Dodaj / premesti terminal
         </x-slot>
@@ -608,13 +608,13 @@
             {{-- RADIO BUTTONS  --}}
             <div  class="flex justify-between mb-6">
                 <div class="form-check mx-4">
-                    <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="location">
+                    <input wire:model.live="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="location">
                     <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault1">
                         Premesti sa druge lokacije
                     </label>
                 </div>
                 <div class="form-check mx-4">
-                    <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault2"  value="addNew" >
+                    <input wire:model.live="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault2"  value="addNew" >
                     <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault2" value="new">
                         Dodaj novi terminal
                     </label>
@@ -625,7 +625,7 @@
                 {{-- DODAVANJE SA LOKACIJE --}}
                     @if(!$p_lokacijaId)
                         <div class="mb-6"> 
-                            <select wire:model="p_lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                            <select wire:model.live="p_lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                 <option value="">Izaberi vrstu lokacije</option>
                                 @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                     <option value="{{ $key }}">{{ $value }}</option>
@@ -647,10 +647,10 @@
                                         </tr>
                                         <tr class="bg-orange-50">
                                             <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                            <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                                            <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                                            <td><x-jet-input wire:model.live="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                                            <td><x-jet-input wire:model.live="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                                             <td>
-                                                <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                                <select wire:model.live="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                             <option value="">---</option>
                                                         @foreach (App\Models\Region::regioni() as $key => $value)    
                                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -671,14 +671,14 @@
                                     </tr>
                                     @endforeach
                                     </tbody>
-                                <table>
+                                </table>
                                 <div class="mt-5">
                                     {{ $this->lokacijeTipa($p_lokacija_tipId)->links() }}
                                 </div>
                             @else
                                 {{-- MAGACIN ILI SEVIS --}}
                                 <div class="mb-6">
-                                    <select wire:model="p_lokacijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="p_lokacijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="">Izaberi lokaciju</option>
                                         @foreach (App\Models\Lokacija::lokacijeTipa( $p_lokacija_tipId ) as $key => $value)    
                                             @if($key != $modelId) <option value="{{ $key }}">{{ $value }}</option> @endif
@@ -707,22 +707,23 @@
                             <thead>
                                 <tr>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                        <input type="checkbox" value="{{ $selectAllValue }}" wire:model="selectAll.{{ $this->modelId }}"  class="form-checkbox h-6 w-6 text-blue-500">
+                                        <input type="checkbox" wire:model.live="selectAll"  class="form-checkbox h-6 w-6 text-blue-500">
                                     </th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
                                     <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj kutije</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model</tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                </tr>
                             </thead>
                             <tr>
                                 <td></td>
-                                <td><x-jet-input wire:model="searchSN" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
-                                <td><x-jet-input wire:model="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" /></td>
+                                <td><x-jet-input wire:model.live="searchSN" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
+                                <td><x-jet-input wire:model.live="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" /></td>
                                 <td></td>
                             </tr>
                             <tbody>
                                 @foreach($this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK) as $item)
                                     <tr>
-                                        <td><input type="checkbox" value="{{ $item->id }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
+                                        <td><input type="checkbox" value="{{ $item->id }}" wire:model.live="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
                                         <td> {{ $item->sn }}</td>
                                         <td> {{ $item->broj_kutije }}</td>
                                         <td>{{ $item->model }}</td>
@@ -734,7 +735,7 @@
                             {{ $this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK)->links() }} 
                         </div>
                         <div class="mb-6">
-                            <select wire:model="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                            <select wire:model.live="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                 <option value="0">Status terminala</option>
                                 @foreach ( App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                                     <option value="{{ $key }}">{{ $value }}</option>
@@ -744,7 +745,7 @@
 
                         <div class="mb-6">
                             <x-jet-label for="date_akcije" value="Datum promene:" />
-                            <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_dodavanja_terminala }}" wire:model.defer="datum_dodavanja_terminala" />
+                            <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_dodavanja_terminala }}" wire:model="datum_dodavanja_terminala" />
                             <x-jet-input-error for="date_akcije" class="mt-2" />
                         </div>
 
@@ -770,17 +771,17 @@
                     </p>
                     <div class="mt-4">
                         <x-jet-label for="noviSN" value="{{ __('Serijski broj') }}" />
-                        <x-jet-input wire:model="noviSN" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="noviSN" id="" class="block mt-1 w-full" type="text" />
                         @error('noviSN') <span class="error">{{ $message }}</span> @enderror
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="noviKutijaNO" value="{{ __('Broj kutije') }}" />
-                        <x-jet-input wire:model="noviKutijaNO" id="" class="block mt-1 w-full" type="text" />
+                        <x-jet-input wire:model.live="noviKutijaNO" id="" class="block mt-1 w-full" type="text" />
                         @error('noviKutijaNO') <span class="error">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="my-6">
-                        <select wire:model="new_terminal_tip" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="new_terminal_tip" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                             <option value="0">Model terminala</option>
                             @foreach ( App\Models\TerminalTip::tipoviList() as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -789,7 +790,7 @@
                     </div>
 
                     <div class="my-6">
-                        <select wire:model="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <select wire:model.live="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                             <option value="0">Status terminala</option>
                             @foreach ( App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -799,7 +800,7 @@
 
                     <div class="mb-6">
                         <x-jet-label for="date_akcije" value="Datum promene:" />
-                        <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_dodavanja_terminala }}" wire:model.defer="datum_dodavanja_terminala" />
+                        <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_dodavanja_terminala }}" wire:model="datum_dodavanja_terminala" />
                         <x-jet-input-error for="date_akcije" class="mt-2" />
                     </div>
 
@@ -827,7 +828,7 @@
      </x-jet-dialog-modal>
 
      {{-- KONTAKT OSOBA MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="kontaktOsobaVisible">
+     <x-jet-dialog-modal wire:model.live="kontaktOsobaVisible">
         <x-slot name="title">
         <svg class="float-left fill-gray-500 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>
             {{ __('Kontakt osoba') }}
@@ -868,7 +869,7 @@
      </x-jet-dialog-modal>
 
      {{-- LAT LOG MODAL ##########################################################--}}
-     <x-jet-dialog-modal wire:model="latLogVisible">
+     <x-jet-dialog-modal wire:model.live="latLogVisible">
         <x-slot name="title">
         <svg class="float-left fill-sky-800 w-6 h-6 mx-auto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 299.4 432.7" style="enable-background:new 0 0 299.4 432.7;" xml:space="preserve"><g id="Layer_2"><g><path d="M149.7,0C67.2,0,0,67.2,0,149.7c0,45.1,27.5,81.1,59.4,122.7c26,34,55.6,72.6,76.4,124.2l14.6,36.1l13.4-36.5 c16.1-43.9,44.2-80.8,71.3-116.4c33.1-43.5,64.3-84.5,64.3-130.1C299.4,67.2,232.2,0,149.7,0z M211.2,261.6 c-21,27.6-44.2,58-61.8,92.7c-20.2-40-44.4-71.5-66.2-100.1C53.5,215.4,30,184.7,30,149.7C30,83.7,83.7,30,149.7,30 s119.7,53.7,119.7,119.7C269.4,185.1,242.4,220.6,211.2,261.6z"/><path d="M206.5,136.3h-41.8V94.5c0-8.3-6.7-15-15-15s-15,6.7-15,15v41.8H92.9c-8.3,0-15,6.7-15,15s6.7,15,15,15h41.8v41.8 c0,8.3,6.7,15,15,15s15-6.7,15-15v-41.8h41.8c8.3,0,15-6.7,15-15S214.8,136.3,206.5,136.3z"/></g></g></svg>
             {{ __('Koordinate') }}
@@ -893,7 +894,7 @@
                     <div class="flex">
                         <div class="flex-1">
                             <x-jet-label for="latLogValue" value="{{ __('Lat, Long') }}" />
-                            <x-jet-input wire:model="latLogValue" id="" class="block mt-1 w-full" type="text" />
+                            <x-jet-input wire:model.live="latLogValue" id="" class="block mt-1 w-full" type="text" />
                                 @error('latLogValue') <span class="error">{{ $message }}</span> @enderror
                                 @error('lat_value') <span class="error">{{ $message }}</span> @enderror
                                 @error('long_value') <span class="error">{{ $message }}</span> @enderror
@@ -918,7 +919,7 @@
      </x-jet-dialog-modal>
 
      {{-- HISTORI Modal ################################################################################## --}}
-    <x-jet-dialog-modal wire:model="modalHistoryVisible">
+    <x-jet-dialog-modal wire:model.live="modalHistoryVisible">
         <x-slot name="title">
             {{ __('Vremenska linija lokacije') }}
         </x-slot>

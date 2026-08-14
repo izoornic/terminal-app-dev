@@ -108,7 +108,7 @@ class DistLicence extends Component
     public $modalKomentariVisible;
 
     public $selectedTerminals = [];
-    public $selectAll;
+    public $selectAll = false;
     public $allInPage = [];
     public $produziCheckedMode = false;
     
@@ -255,6 +255,10 @@ class DistLicence extends Component
             $this->produzenje_unete_cene_error = 'Greška! Cena licence mora biti broj veći od 0!';
             return;
         }
+
+         $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
+        if($this->dani_trajanja < 1) return;
+
         $this->produzenje_unete_cene_error = '';
 
         if ($this->produziCheckedMode) {
@@ -269,8 +273,8 @@ class DistLicence extends Component
 
                 if (!$naplata) continue;
 
-                $datum_pocetka = $naplata->datum_kraj_licence;
-                $datum_kraja = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($datum_pocetka, 1));
+                //$datum_pocetka = $naplata->datum_kraj_licence;
+                //$datum_kraja = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($datum_pocetka, 1));
 
                 $parametri = LicencaParametarTerminal::where('terminal_lokacijaId', $naplata->terminal_lokacijaId)
                     ->where('distributerId', $naplata->distributerId)
@@ -281,8 +285,8 @@ class DistLicence extends Component
                     $naplata->id,
                     $naplata->terminal_lokacijaId,
                     $naplata->licenca_distributer_cenaId,
-                    $datum_pocetka,
-                    $datum_kraja,
+                    $this->datum_pocetka_licence,
+                    $this->datum_kraja_licence,
                     $this->produzenje_cena_licence,
                     $parametri,
                     $naplata->licenca_naziv
@@ -780,7 +784,8 @@ class DistLicence extends Component
         $licens->getCollection()->transform(function ($item) {
             /* $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
             $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0; */
-            $this->allInPage[] = $item->lnid;
+            $item->month_diff = Helpers::monthDifference($item->datum_kraj_licence);
+            $this->allInPage[] = (string) $item->lnid;
             return $item;
         });
 
@@ -798,15 +803,14 @@ class DistLicence extends Component
     public function updated($key, $value)
     {
         $exp = Str::of($key)->explode(delimiter: '.');
-        if($exp[0] === 'selectAll' && is_numeric($value)){
-            //dd($this->allInPage);
+        if($exp[0] === 'selectAll' && $value){
            foreach($this->allInPage as $termid){
                if(!in_array($termid, $this->selectedTerminals)){
                 array_push($this->selectedTerminals, $termid);
                }  
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
+            $this->selectedTerminals = array_values(array_diff($this->selectedTerminals, $this->allInPage));
         }
 
         //setuje kraj licnece na prvi dan u izabranom mesecu

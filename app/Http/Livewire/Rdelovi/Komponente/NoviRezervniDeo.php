@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Rdelovi\Komponente;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\PartsInventory\Services\PartStockService;
 use App\Models\PartType;
 
@@ -28,7 +29,7 @@ class NoviRezervniDeo extends Component
     protected $stockService;
     //private $partType;
 
-    protected $listeners = ['novaLokacija'];
+    #[On('novaLokacija')]
     public function novaLokacija($id)
     {
         $this->lokacija = $id;
@@ -115,7 +116,7 @@ class NoviRezervniDeo extends Component
             $stockService->addStock($partType->id, $this->lokacija, $this->kolicina, auth()->user()->id);
          }
        
-        $this->emit('modalActionSuccess', $this->sifra, $this->naziv);
+        $this->dispatch('modalActionSuccess', $this->sifra, $this->naziv);
     }
     
     public function render()

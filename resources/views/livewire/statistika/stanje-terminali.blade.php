@@ -22,7 +22,7 @@
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td>
-                                    <select wire:model="searchLokacijaTip" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchLokacijaTip" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="" class="text-gray-500"> Vrsta lokacije</option>
                                         @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -30,7 +30,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select wire:model="searchTerminalTip" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTerminalTip" id="" class="block appearance-none bg-orange-50 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                                 <option value="" class="text-gray-500"> Tip terminala</option>
                                             @foreach (App\Models\TerminalTip::tipoviList() as $key => $value)    
                                                 <option value="{{ $key }}">{{ $value }}</option>

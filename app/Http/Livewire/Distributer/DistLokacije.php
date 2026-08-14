@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Distributer;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 
 use App\Models\User;
@@ -78,8 +79,7 @@ class DistLokacije extends Component
     public $lokacija_row;
     public $nova_lokacija_postoji_u_bazi;
 
-    protected $listeners = ['novaLokacijaAdd'];
-
+    #[On('novaLokacijaAdd')]
     public function novaLokacijaAdd()
     {
         $this->searchPIBShowModal();

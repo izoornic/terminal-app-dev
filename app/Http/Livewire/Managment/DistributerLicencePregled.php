@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Managment;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\LicencaDistributerTip;
 
 class DistributerLicencePregled extends Component
@@ -14,14 +15,7 @@ class DistributerLicencePregled extends Component
     public $dataClicked;
     public $wkey = 1;
 
-    /**
-     * The listeners for the component.
-     * This allows the component to respond to events dispatched from the browser.
-     *
-     * @var array
-     */
-    protected $listeners = ['chartClicked' => 'getClickedData'];
-
+    #[On('chartClicked')]
     public function getClickedData($data)
     {
         $this->wkey ++;

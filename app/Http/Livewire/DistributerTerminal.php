@@ -191,7 +191,11 @@ class DistributerTerminal extends Component
         $builder = TerminaliReadActions::DistributerTerminaliRead($this->distId, $search);
 
         $perPage = Config::get('global.terminal_paginate');
-        return $builder->paginate($perPage, ['*'], 'terminali');   
+        return $builder->paginate($perPage, ['*'], 'terminali')
+            ->through(function ($item) {
+                $item->month_diff = Helpers::monthDifference($item->datum_kraj_licence);
+                return $item;
+            });
     }
 
     public function showLatLogModal($id)

@@ -133,7 +133,7 @@ class Tikets extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return object
      */
     public function read()
     {
@@ -258,7 +258,7 @@ class Tikets extends Component
     /**
      * searchTerminal
      *
-     * @return void
+     * @return object
      */
     public function searchTerminal() 
     {
@@ -286,7 +286,7 @@ class Tikets extends Component
     /**
      * Pronadji korisnika kome dodeljujes tiket
      *
-     * @return void
+     * @return object
      */
     public function searchUser()
     {
@@ -294,6 +294,7 @@ class Tikets extends Component
                     ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
                     ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+                    ->whereIn('users.pozicija_tipId', [1, 2, 3, 4, 5])
                     ->where('name', 'like', '%'.$this->searchUserName.'%')
                     ->where('l_naziv', 'like', '%'.$this->searchUserLokacija.'%')
                     ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')

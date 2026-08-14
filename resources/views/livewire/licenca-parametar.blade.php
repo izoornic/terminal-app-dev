@@ -61,7 +61,7 @@
     </div>
 
     {{-- Modal Form --}}
-    <x-jet-dialog-modal wire:model="modalFormVisible">
+    <x-jet-dialog-modal wire:model.live="modalFormVisible">
         <x-slot name="title">
             @if($is_update)
                 {{ __('Izmeni parametar') }}
@@ -73,7 +73,7 @@
         <x-slot name="content">
             <div class="mt-4">
                 <x-jet-label for="p_naziv" value="{{ __('Naziv parametra') }}" />
-                <x-jet-input wire:model="p_naziv" id="" class="block mt-1 w-full" type="text" />
+                <x-jet-input wire:model.live="p_naziv" id="" class="block mt-1 w-full" type="text" />
                 @error('p_naziv') <span class="error">{{ $message }}</span> @enderror
             </div>  
         </x-slot>
@@ -96,7 +96,7 @@
     </x-jet-dialog-modal>
 
     {{-- The Delete Modal --}}
-    <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
+    <x-jet-dialog-modal wire:model.live="modalConfirmDeleteVisible">
         <x-slot name="title">
             Obriši parametar: {{$p_naziv}}
         </x-slot>

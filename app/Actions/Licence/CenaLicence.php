@@ -5,8 +5,9 @@ namespace App\Actions\Licence;
 use App\Http\Helpers;
 use App\Models\KursEvra;
 use App\Models\LicencaDistributerCena;
+use Livewire\Wireable;
 
-class CenaLicence
+class CenaLicence implements Wireable
 {
     public $zeta_cena_eur;
     public $zeta_cena_din;
@@ -16,15 +17,40 @@ class CenaLicence
 
     public $cena_evra;
 
-    public function __construct($licenca_distributer_cenas_id, $datum_pocetak, $datum_kraj, $cena_evr_input=0)
+    public function __construct($licenca_distributer_cenas_id = null, $datum_pocetak = null, $datum_kraj = null, $cena_evr_input = 0)
     {
-        $this->izracunajCenuLicence($licenca_distributer_cenas_id, $datum_pocetak, $datum_kraj, $cena_evr_input);
+        if ($licenca_distributer_cenas_id !== null) {
+            $this->izracunajCenuLicence($licenca_distributer_cenas_id, $datum_pocetak, $datum_kraj, $cena_evr_input);
+        }
+    }
+
+    public function toLivewire(): array
+    {
+        return [
+            'zeta_cena_eur' => $this->zeta_cena_eur,
+            'zeta_cena_din' => $this->zeta_cena_din,
+            'dist_cena_eur' => $this->dist_cena_eur,
+            'dist_cena_din' => $this->dist_cena_din,
+            'cena_evra'     => $this->cena_evra,
+        ];
+    }
+
+    /** @param array{zeta_cena_eur: float, zeta_cena_din: float, dist_cena_eur: float, dist_cena_din: float, cena_evra: float} $value */
+    public static function fromLivewire($value): static
+    {
+        $instance = new static();
+        $instance->zeta_cena_eur = $value['zeta_cena_eur'];
+        $instance->zeta_cena_din = $value['zeta_cena_din'];
+        $instance->dist_cena_eur = $value['dist_cena_eur'];
+        $instance->dist_cena_din = $value['dist_cena_din'];
+        $instance->cena_evra     = $value['cena_evra'];
+        return $instance;
     }
 
     /**
      * [Description for izracunajCenuLicence]
      *
-     * @param mixed $licenca_tip_cena_id
+     * @param mixed $licenca_distributer_cenas_id
      * @param mixed $datum_pocetak
      * @param mixed $datum_kraj
      *
@@ -36,10 +62,10 @@ class CenaLicence
         $licenca_cena_row = LicencaDistributerCena::where('id', '=', $licenca_distributer_cenas_id)->first();
         //$kurs_evra_row = KursEvra::latest()->first();
         $cena_evra_calac = $cena_evr_input ?: KursEvra::latest()->first()->srednji_kurs;
-        $this->cena_evra = round(floatval($cena_evra_calac), 2);
+        $this->cena_evra = round( \floatval($cena_evra_calac), 2);
 
-        $zeta_cena = floatval($licenca_cena_row->licenca_zeta_cena);
-        $dist_cena = floatval($licenca_cena_row->licenca_dist_cena);
+        $zeta_cena = \floatval($licenca_cena_row->licenca_zeta_cena);
+        $dist_cena = \floatval($licenca_cena_row->licenca_dist_cena);
 
         $datum_pocetak_meseca = $datum_pocetak;
         $days_till_end = 0;

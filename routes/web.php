@@ -217,3 +217,13 @@ Route::group(['middleware' => [
         })->name('distributer-kampanja');
 
 });
+
+/*
+| Stranica za 2FA recovery kodove - tvrdo zaključana samo na admina sa id = 1.
+| Namjerno je izvan 'accessrole' grupe jer pristup ne zavisi od pozicije/uloge.
+*/
+Route::middleware(['auth:sanctum', 'verified'])->get('/two-factor-recovery', function(){
+    abort_unless((int) auth()->id() === 1, 403);
+
+    return view('admin.two-factor-recovery');
+})->name('two-factor-recovery');

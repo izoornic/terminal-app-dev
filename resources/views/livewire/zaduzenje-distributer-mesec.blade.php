@@ -24,13 +24,13 @@
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td>
-                                    <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-fit" type="text" placeholder="Pretraži mesto" />
+                                    <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-fit" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
-                                    <select wire:model="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-36 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                    <select wire:model.live="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-36 border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="0">---</option>
                                         @foreach (App\Models\LicencaDistributerCena::LicenceDistributera($did) as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
@@ -95,7 +95,7 @@
                                             <span class="font-bold">@money($item->cenaLicence) </span>RSD
                                         </td>
                                         <td class="px-2 py-2">
-                                            <input type="checkbox" value="{{ $item->lnid }}" wire:model="ne_zaduzuju_se"> 
+                                            <input type="checkbox" value="{{ $item->lnid }}" wire:model.live="ne_zaduzuju_se"> 
                                         </td>
                                     </tr>
                                     @php
@@ -142,7 +142,7 @@
     </div>
 
     {{-- The Zaduzenje Modal --}}
-    <x-jet-dialog-modal wire:model="zaduzenjeConfirmVisible">
+    <x-jet-dialog-modal wire:model.live="zaduzenjeConfirmVisible">
         <x-slot name="title">
             {{ __('Zaduži distributera') }}
         </x-slot>

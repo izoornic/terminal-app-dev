@@ -41,7 +41,7 @@ class RazduzenjeDistributeri extends Component
     /**
      * The read function.
      *
-     * @return void
+     * @return object
      */
     public function read()
     {

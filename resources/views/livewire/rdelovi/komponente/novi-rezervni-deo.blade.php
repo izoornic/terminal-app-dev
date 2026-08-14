@@ -4,7 +4,7 @@
         @if($is_edit)
             <span class="font-bold"></span> {{ $kategorija_naziv }} </span>
         @else
-            <select wire:model="kategorija" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <select wire:model.live="kategorija" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value="">---</option>
                 @foreach (App\Models\TerminalTip::tipoviList() as $key => $value)    
                     <option value="{{ $key }}">{{ $value }}</option>
@@ -15,27 +15,27 @@
     </div>
     <div class="mt-4">
         <x-jet-label for="sifra" value="Šifra:" />   
-        <x-jet-input wire:model="sifra" id="" class="block mt-1 w-full" type="text" />
+        <x-jet-input wire:model.live="sifra" id="" class="block mt-1 w-full" type="text" />
         @error('sifra') <span class="error">{{ $message }}</span> @enderror
     </div>
     <div class="mt-4">
         <x-jet-label for="naziv" value="Naziv:" />   
-        <x-jet-input wire:model="naziv" id="" class="block mt-1 w-full" type="text" />
+        <x-jet-input wire:model.live="naziv" id="" class="block mt-1 w-full" type="text" />
         @error('naziv') <span class="error">{{ $message }}</span> @enderror
     </div>
     <div class="mt-4">
         <x-jet-label for="opis" value="Opis:" />   
-        <x-jet-textarea wire:model="opis" id="" class="block mt-1 w-full" type="text" />
+        <x-jet-textarea wire:model.live="opis" id="" class="block mt-1 w-full" type="text" />
         @error('opis') <span class="error">{{ $message }}</span> @enderror
     </div>
     <div class="mt-4">
         <x-jet-label for="cena" value="Cena:" />   
-        <x-jet-input wire:model="cena" id="" class="block mt-1 w-full" type="number" />
+        <x-jet-input wire:model.live="cena" id="" class="block mt-1 w-full" type="number" />
         @error('cena') <span class="error">{{ $message }}</span> @enderror
     </div>
     <div class="mt-4">
         <x-jet-label for="jedinica_mere" value="Jedinica mere:" />   
-        <select wire:model="jedinica_mere" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        <select wire:model.live="jedinica_mere" id="" class="block appearance-none w-full bg-gray-100 border border-1 border-gray-300 rounded-md text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             @foreach ($jedinica_mere_list as $value)    
                 <option value="{{ $value }}">{{ $value }}</option>
             @endforeach
@@ -44,19 +44,19 @@
     </div>
     <div class="mt-4">
         <x-jet-label for="min_kolcina" value="Minimalna količina:" />
-        <x-jet-input wire:model="min_kolcina" id="" class="block mt-1 w-full" type="number" />
+        <x-jet-input wire:model.live="min_kolcina" id="" class="block mt-1 w-full" type="number" />
         @error('min_kolcina') <span class="error">{{ $message }}</span> @enderror
     </div>
     @if(!$is_edit)
         <div class="mt-4">
             <x-jet-label for="kolicina" value="Početna količina:" />   
-            <x-jet-input wire:model="kolicina" id="" class="block mt-1 w-full" type="number" />
+            <x-jet-input wire:model.live="kolicina" id="" class="block mt-1 w-full" type="number" />
             @error('kolicina') <span class="error">{{ $message }}</span> @enderror
         </div>
     @endif
     <div class="mt-4">
          <label class="flex items-center">
-            <input type="checkbox" wire:model="aktivan" 
+            <input type="checkbox" wire:model.live="aktivan" 
                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <span class="ml-2 text-sm text-gray-700">Aktivan</span>
         </label>

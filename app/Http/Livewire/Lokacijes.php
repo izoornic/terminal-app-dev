@@ -13,6 +13,7 @@ use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -80,9 +81,8 @@ class Lokacijes extends Component
     public $searchSN;
     public $searchBK;
     public $selsectedTerminals = [];
-    public $selectAll;
+    public $selectAll = false;
     public $allInPage = [];
-    public $selectAllValue = 1;
     public $t_status;
 
     public $errAddMsg = '';
@@ -126,7 +126,7 @@ class Lokacijes extends Component
     //history modal
     public $modalHistoryVisible;
 
-    protected $listeners = ['sortClick'];
+    #[On('sortClick')]
     public function sortClick($field)
     {
         if ($this->orderBy === $field) {
@@ -134,9 +134,9 @@ class Lokacijes extends Component
         } else {
             $this->orderBy = $field;
             $this->orderDirection = 'desc';
-            $this->emit('fieldChange', $field);
+            $this->dispatch('fieldChange', $field);
         }
-        $this->emit('sortChange', $this->orderDirection);
+        $this->dispatch('sortChange', $this->orderDirection);
     }
 
     public function mount()
@@ -555,6 +555,7 @@ class Lokacijes extends Component
         $this->t_status = 0;
         $this->addingType = 'location';
         $this->selsectedTerminals = [];
+        $this->selectAll = false;
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
         $this->p_lokacijaId = 0;
@@ -591,9 +592,8 @@ class Lokacijes extends Component
                                 ->where('terminals.broj_kutije', 'like', '%'.$bk.'%')
                                 ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminaliLokacija');
         foreach($terms as $terminal){
-            array_push($this->allInPage,  $terminal->id);
+            array_push($this->allInPage, (string) $terminal->id);
         }
-        //$this->selectAll[1] = false;
         return $terms;
     }
     
@@ -762,14 +762,14 @@ class Lokacijes extends Component
     {
         
         $exp = Str::of($key)->explode(delimiter: '.');
-        if($exp[0] === 'selectAll' && is_numeric($value)){
+        if($exp[0] === 'selectAll' && $value){
            foreach($this->allInPage as $termid){
                if(!in_array($termid, $this->selsectedTerminals)){
                 array_push($this->selsectedTerminals, $termid);
-               }  
+               }
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
+            $this->selsectedTerminals = array_values(array_diff($this->selsectedTerminals, $this->allInPage));
         }
 
         if($this->modalAddTerminalVisible || $this->kontaktOsobaVisible){

@@ -62,7 +62,7 @@ class Terminal extends Component
 
     //select all
     public $selectedTerminals = [];
-    public $selectAll;
+    public $selectAll = false;
     public $allInPage = [];
 
     //search
@@ -271,6 +271,7 @@ class Terminal extends Component
                     ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
                     ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+                    ->whereIn('users.pozicija_tipId', [1, 2, 3, 4, 5])
                     ->where('name', 'like', '%'.$this->searchUserName.'%')
                     ->where('l_naziv', 'like', '%'.$this->searchUserLokacija.'%')
                     ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')
@@ -847,7 +848,7 @@ class Terminal extends Component
         $terms->getCollection()->transform(function ($item) {
             $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
             $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0;
-            $this->allInPage[] = $item->tlid;
+            $this->allInPage[] = (string) $item->tlid;
             return $item;
         });
         
@@ -865,14 +866,14 @@ class Terminal extends Component
     public function updated($key, $value)
     {
         $exp = Str::of($key)->explode(delimiter: '.');
-        if($exp[0] === 'selectAll' && is_numeric($value)){
+        if($exp[0] === 'selectAll' && $value){
            foreach($this->allInPage as $termid){
                if(!in_array($termid, $this->selectedTerminals)){
                 array_push($this->selectedTerminals, $termid);
-               }  
+               }
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
-            $this->selectedTerminals = array_diff($this->selectedTerminals, $this->allInPage);
+            $this->selectedTerminals = array_values(array_diff($this->selectedTerminals, $this->allInPage));
         }
 
         if($this->editTerminalInfoVisible){
