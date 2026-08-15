@@ -512,11 +512,14 @@ Stanje utvrđeno u FAZI 4 (2026-08-15) — **dva paketa su konkretni blokeri za 
 - [x] Livewire 3.8.4 — već podržava `^13.0`
 - [x] spatie/laravel-permission 6.25.0 — već podržava `^13.0`
 - [x] maatwebsite/excel 3.1.70, barryvdh/laravel-dompdf 3.1.2, blade-icons 1.10.1 — podržavaju `^13.0`
-- [ ] Sanctum / Fortify — provjeriti neposredno prije bumpa
-- [ ] ⚠️ **`larswiegers/laravel-maps` v0.19** — `illuminate/support` ide samo do `^12.0`. Zadnji release
+- [x] Sanctum / Fortify — provjereno 2026-08-15: oba deklarišu `^11|^12|^13`, nisu bloker
+- [x] spatie/laravel-ignition — podržava `^13.0`
+- [ ] `laravel/tinker` 2.9 — ide samo do `^12.0`; nije bloker (constraint u `composer.json` je `^2.9`,
+      pa će composer sam povući noviju verziju), ali provjeriti da postoji release s L13 podrškom
+- [x] ⚠️ **`larswiegers/laravel-maps` v0.19** — `illuminate/support` ide samo do `^12.0`. Zadnji release
       2025-02-20. Opcije: sačekati novi release, forkovati/patchovati constraint, ili zamijeniti paket
       (koristi se samo za `<x-maps-google>` u dvije `managment` mape).
-- [ ] ⚠️ **`propaganistas/laravel-phone` 5.3.6** — `illuminate/support` ide samo do `^12.0`.
+- [x] ⚠️ **`propaganistas/laravel-phone` 5.3.6** — `illuminate/support` ide samo do `^12.0`.
       Provjeriti da li je izašla v6 s L13 podrškom.
 
 ```bash
