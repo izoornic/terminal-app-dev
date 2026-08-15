@@ -387,5 +387,10 @@ V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
 V 2.0.0.4 ( 2.7.2026.) @upgrade/laravel11
     - Dodata 2FA recovery stranica za admina
 
-V 2.0.0.5 ( 5.7.2026.) @main
+V 2.0.0.5 ( 15.8.2026.) @main
     - Boost i clude.md update
+    - Update php 8.4
+
+V 2.1.0 ( 15.8.2026.) @upgrade/php84
+    - Upgrade to Laravel 12 (12.66.0)
+    - Reseni security advisory-ji koji nisu imali patch u Laravel 11 (Signed URL path confusion, CRLF u email rule)
