@@ -400,3 +400,9 @@ V 2.2.0 ( 15.8.2026.) @upgrade/php84
     - PHPUnit 12, laravel/tinker 3, laravel/boost 2
     - Uklonjen propaganistas/laravel-phone (nije bio koriscen ni na jednom mestu)
     - laravel-maps 0.19 -> 0.21 zbog L13 podrske - PAZNJA: prelazi na Google AdvancedMarkerElement, proveriti mape
+
+V 2.2.1 ( 15.8.2026.) @upgrade/php84
+    - Ispravljen bug kod isteka roka bankomat tiketa (is_time_expired). MySQL je TIME kolonu time_frame
+      pretvarao u cifre HHMMSS umesto u sekunde, pa su se tiketi crvenili prekasno (Hitno 5h33min
+      umesto 2h, Visok 2 dana 18h umesto 1 dan, Srednji 5 dana 13h umesto 2 dana). Sada ide kroz TIME_TO_SEC()
+    - Dodat test tests/Feature/BankomatTiketExpiryTest.php
