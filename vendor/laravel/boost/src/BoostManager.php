@@ -5,47 +5,60 @@ declare(strict_types=1);
 namespace Laravel\Boost;
 
 use InvalidArgumentException;
-use Laravel\Boost\Install\CodeEnvironment\ClaudeCode;
-use Laravel\Boost\Install\CodeEnvironment\CodeEnvironment;
-use Laravel\Boost\Install\CodeEnvironment\Codex;
-use Laravel\Boost\Install\CodeEnvironment\Copilot;
-use Laravel\Boost\Install\CodeEnvironment\Cursor;
-use Laravel\Boost\Install\CodeEnvironment\Gemini;
-use Laravel\Boost\Install\CodeEnvironment\OpenCode;
-use Laravel\Boost\Install\CodeEnvironment\PhpStorm;
-use Laravel\Boost\Install\CodeEnvironment\VSCode;
+use Laravel\Boost\Install\Agents\Agent;
+use Laravel\Boost\Install\Agents\Amp;
+use Laravel\Boost\Install\Agents\Antigravity;
+use Laravel\Boost\Install\Agents\ClaudeCode;
+use Laravel\Boost\Install\Agents\Codex;
+use Laravel\Boost\Install\Agents\Copilot;
+use Laravel\Boost\Install\Agents\Cursor;
+use Laravel\Boost\Install\Agents\Factory;
+use Laravel\Boost\Install\Agents\GrokBuild;
+use Laravel\Boost\Install\Agents\Junie;
+use Laravel\Boost\Install\Agents\Kiro;
+use Laravel\Boost\Install\Agents\OpenCode;
+use Laravel\Boost\Install\Agents\Pi;
+use Laravel\Boost\Install\Agents\Zed;
 
 class BoostManager
 {
-    /** @var array<string, class-string<CodeEnvironment>> */
-    private array $codeEnvironments = [
-        'phpstorm' => PhpStorm::class,
-        'vscode' => VSCode::class,
-        'cursor' => Cursor::class,
-        'claudecode' => ClaudeCode::class,
+    /** @var array<string, class-string<Agent>> */
+    private array $agents = [
+        'amp' => Amp::class,
+        'antigravity' => Antigravity::class,
+        'claude_code' => ClaudeCode::class,
         'codex' => Codex::class,
         'copilot' => Copilot::class,
+        'cursor' => Cursor::class,
+        'factory' => Factory::class,
+        'grok_build' => GrokBuild::class,
+        'junie' => Junie::class,
+        'kiro' => Kiro::class,
         'opencode' => OpenCode::class,
-        'gemini' => Gemini::class,
+        'pi' => Pi::class,
+        'zed' => Zed::class,
     ];
 
     /**
-     * @param  class-string<CodeEnvironment>  $className
+     * @param  class-string<Agent>  $className
      */
-    public function registerCodeEnvironment(string $key, string $className): void
+    public function registerAgent(string $key, string $className): void
     {
-        if (array_key_exists($key, $this->codeEnvironments)) {
-            throw new InvalidArgumentException("Code environment '{$key}' is already registered");
+        if (array_key_exists($key, $this->agents)) {
+            throw new InvalidArgumentException("Agent '{$key}' is already registered");
         }
 
-        $this->codeEnvironments[$key] = $className;
+        $this->agents[$key] = $className;
     }
 
     /**
-     * @return array<string, class-string<CodeEnvironment>>
+     * @return array<string, class-string<Agent>>
      */
-    public function getCodeEnvironments(): array
+    public function getAgents(): array
     {
-        return $this->codeEnvironments;
+        $agents = $this->agents;
+        ksort($agents);
+
+        return $agents;
     }
 }

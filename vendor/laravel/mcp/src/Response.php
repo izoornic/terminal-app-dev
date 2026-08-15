@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace Laravel\Mcp;
 
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonException;
 use Laravel\Mcp\Enums\Role;
-use Laravel\Mcp\Exceptions\NotImplementedException;
+use Laravel\Mcp\Schema\Icon;
+use Laravel\Mcp\Server\Content\Audio;
 use Laravel\Mcp\Server\Content\Blob;
+use Laravel\Mcp\Server\Content\Image;
 use Laravel\Mcp\Server\Content\Notification;
+use Laravel\Mcp\Server\Content\ResourceLink;
 use Laravel\Mcp\Server\Content\Text;
 use Laravel\Mcp\Server\Contracts\Content;
+use Laravel\Mcp\Server\Resource;
+use League\Flysystem\UnableToReadFile;
 
 class Response
 {
@@ -41,6 +49,26 @@ class Response
         return new static(new Text($text));
     }
 
+    public static function html(string $path): static
+    {
+        $path = str_starts_with($path, '/') || preg_match('/^[a-zA-Z]:[\\\\\\/]/', $path) ? $path : resource_path($path);
+
+        if (! file_exists($path)) {
+            throw new InvalidArgumentException("File not found at path [{$path}].");
+        }
+
+        return static::text((string) file_get_contents($path));
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $mergeData
+     */
+    public static function view(string $view, array $data = [], array $mergeData = []): static
+    {
+        return static::text(view($view, $data, $mergeData)->render());
+    }
+
     /**
      * @internal
      *
@@ -58,8 +86,6 @@ class Response
 
     /**
      * @param  array<string, mixed>  $response
-     *
-     * @throws JsonException
      */
     public static function structured(array $response): ResponseFactory
     {
@@ -106,20 +132,86 @@ class Response
         return $this;
     }
 
-    /**
-     * @throws NotImplementedException
-     */
-    public static function audio(): Content
+    public static function audio(string $data, string $mimeType = 'audio/wav'): static
     {
-        throw NotImplementedException::forMethod(static::class, __METHOD__);
+        return new static(new Audio($data, $mimeType));
+    }
+
+    public static function image(string $data, string $mimeType = 'image/png'): static
+    {
+        return new static(new Image($data, $mimeType));
     }
 
     /**
-     * @throws NotImplementedException
+     * @param  string|class-string<Resource>|Resource|ResourceLink  $uri
+     * @param  array<string, mixed>  $annotations
+     * @param  list<Icon>  $icons
      */
-    public static function image(): Content
+    public static function resourceLink(
+        string|Resource|ResourceLink $uri,
+        ?string $name = null,
+        ?string $mimeType = null,
+        ?string $title = null,
+        ?string $description = null,
+        ?int $size = null,
+        array $annotations = [],
+        array $icons = [],
+    ): static {
+        if (is_string($uri) && is_subclass_of($uri, Resource::class)) {
+            $uri = Container::getInstance()->make($uri);
+        }
+
+        $link = match (true) {
+            $uri instanceof ResourceLink => $uri,
+            $uri instanceof Resource => (new ResourceLink(
+                uri: $uri->uri(),
+                name: $name ?? $uri->name(),
+                mimeType: $mimeType ?? $uri->mimeType(),
+                title: $title ?? $uri->title(),
+                description: $description ?? $uri->description(),
+                size: $size,
+                annotations: array_merge($uri->annotations(), $annotations),
+                icons: $icons === [] ? $uri->resolvedIcons() : $icons,
+            )),
+            default => new ResourceLink(
+                uri: $uri,
+                name: $name ?? throw new InvalidArgumentException('Resource link name is required when using a URI string.'),
+                mimeType: $mimeType,
+                title: $title,
+                description: $description,
+                size: $size,
+                annotations: $annotations,
+                icons: $icons,
+            ),
+        };
+
+        return new static($link);
+    }
+
+    public static function fromStorage(string $path, ?string $disk = null, ?string $mimeType = null): static
     {
-        throw NotImplementedException::forMethod(static::class, __METHOD__);
+        /** @var FilesystemAdapter $storage */
+        $storage = Storage::disk($disk);
+
+        try {
+            $data = $storage->get($path);
+        } catch (UnableToReadFile $unableToReadFile) {
+            throw new InvalidArgumentException("File not found at path [{$path}].", 0, $unableToReadFile);
+        }
+
+        if ($data === null) {
+            throw new InvalidArgumentException("File not found at path [{$path}].");
+        }
+
+        $mimeType ??= $storage->mimeType($path) ?: throw new InvalidArgumentException(
+            "Unable to determine MIME type for [{$path}].",
+        );
+
+        return match (true) {
+            str_starts_with($mimeType, 'image/') => static::image($data, $mimeType),
+            str_starts_with($mimeType, 'audio/') => static::audio($data, $mimeType),
+            default => throw new InvalidArgumentException("Unsupported MIME type [{$mimeType}] for [{$path}]."),
+        };
     }
 
     public function asAssistant(): static

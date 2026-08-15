@@ -10,25 +10,61 @@ class Config
 {
     protected const FILE = 'boost.json';
 
+    public function getGuidelines(): bool
+    {
+        return (bool) $this->get('guidelines', false);
+    }
+
+    public function setGuidelines(bool $enabled): void
+    {
+        $this->set('guidelines', $enabled);
+    }
+
     /**
      * @return array<int, string>
      */
-    public function getGuidelines(): array
+    public function getSkills(): array
     {
-        return $this->get('guidelines', []);
+        return $this->get('skills', []);
     }
 
     /**
-     * @param  array<int, string>  $guidelines
+     * @param  array<int, string>  $skills
      */
-    public function setGuidelines(array $guidelines): void
+    public function setSkills(array $skills): void
     {
-        $this->set('guidelines', $guidelines);
+        $this->set('skills', $skills);
     }
 
-    public function setEditors(array $editors): void
+    public function hasSkills(): bool
     {
-        $this->set('editors', $editors);
+        return $this->getSkills() !== [];
+    }
+
+    public function getMcp(): bool
+    {
+        return $this->get('mcp', false);
+    }
+
+    public function setMcp(bool $enabled): void
+    {
+        $this->set('mcp', $enabled);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getPackages(): array
+    {
+        return $this->get('packages', []);
+    }
+
+    /**
+     * @param  array<int, string>  $packages
+     */
+    public function setPackages(array $packages): void
+    {
+        $this->set('packages', $packages);
     }
 
     /**
@@ -47,19 +83,24 @@ class Config
         return $this->get('agents', []);
     }
 
-    public function getEditors(): array
+    public function setNightwatch(bool $installed): void
     {
-        return $this->get('editors', []);
+        $this->set('nightwatch', $installed);
     }
 
-    public function setHerdMcp(bool $installed): void
+    public function getNightwatch(): bool
     {
-        $this->set('herd_mcp', $installed);
+        return (bool) $this->get('nightwatch', $this->get('nightwatch_mcp', false));
     }
 
-    public function getHerdMcp(): bool
+    public function setCloud(bool $installed): void
     {
-        return $this->get('herd_mcp', false);
+        $this->set('cloud', $installed);
+    }
+
+    public function getCloud(): bool
+    {
+        return $this->get('cloud', false);
     }
 
     public function setSail(bool $useSail): void
@@ -70,6 +111,19 @@ class Config
     public function getSail(): bool
     {
         return $this->get('sail', false);
+    }
+
+    public function isValid(): bool
+    {
+        $path = base_path(self::FILE);
+
+        if (! file_exists($path)) {
+            return false;
+        }
+
+        json_decode(file_get_contents($path), true);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     public function flush(): void
@@ -90,7 +144,7 @@ class Config
 
     protected function set(string $key, mixed $value): void
     {
-        $config = array_filter($this->all());
+        $config = array_filter($this->all(), fn ($value): bool => $value !== null && $value !== []);
 
         data_set($config, $key, $value);
 

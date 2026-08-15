@@ -394,3 +394,9 @@ V 2.0.0.5 ( 15.8.2026.) @main
 V 2.1.0 ( 15.8.2026.) @upgrade/php84
     - Upgrade to Laravel 12 (12.66.0)
     - Reseni security advisory-ji koji nisu imali patch u Laravel 11 (Signed URL path confusion, CRLF u email rule)
+
+V 2.2.0 ( 15.8.2026.) @upgrade/php84
+    - Upgrade to Laravel 13 (13.25.0), Symfony 8.1
+    - PHPUnit 12, laravel/tinker 3, laravel/boost 2
+    - Uklonjen propaganistas/laravel-phone (nije bio koriscen ni na jednom mestu)
+    - laravel-maps 0.19 -> 0.21 zbog L13 podrske - PAZNJA: prelazi na Google AdvancedMarkerElement, proveriti mape

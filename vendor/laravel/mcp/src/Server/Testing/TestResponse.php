@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Laravel\Mcp\Server\Testing;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Mcp\Server\Primitive;
 use Laravel\Mcp\Server\Prompt;
 use Laravel\Mcp\Server\Resource;
 use Laravel\Mcp\Server\Tool;
-use Laravel\Mcp\Server\Transport\JsonRpcResponse;
+use Laravel\Mcp\Transport\JsonRpcResponse;
 use PHPUnit\Framework\Assert;
 use RuntimeException;
 
@@ -105,13 +107,27 @@ class TestResponse
     }
 
     /**
-     * @param  array<string, mixed>  $structuredContent
+     * @param  array<string, mixed>|Closure(AssertableJson): mixed  $structuredContent
      */
-    public function assertStructuredContent(array $structuredContent): static
+    public function assertStructuredContent(Closure|array $structuredContent): static
     {
+        $actual = $this->structuredContent();
+
+        if ($structuredContent instanceof Closure) {
+            Assert::assertNotNull($actual, 'The response does not contain any structured content.');
+
+            $assertableJson = AssertableJson::fromArray($actual);
+
+            $structuredContent($assertableJson);
+
+            $assertableJson->interacted();
+
+            return $this;
+        }
+
         Assert::assertSame(
-            $structuredContent,
-            $this->response->toArray()['result']['structuredContent'] ?? null,
+            $this->toJsonRepresentation($structuredContent),
+            $actual,
             'The expected structured content does not match the actual structured content.'
         );
 
@@ -133,7 +149,7 @@ class TestResponse
         foreach ($this->notifications as $notification) {
             $content = $notification->toArray();
 
-            if ($content['method'] === $method && (is_array($params) === false || $content['params'] === $params)) {
+            if ($content['method'] === $method && (is_array($params) === false || $this->toJsonRepresentation($content['params']) === $this->toJsonRepresentation($params))) {
                 Assert::assertTrue(true); // @phpstan-ignore-line
 
                 return $this;
@@ -183,7 +199,7 @@ class TestResponse
 
     public function assertHasNoErrors(): static
     {
-        Assert::assertEmpty($this->errors());
+        Assert::assertSame([], $this->errors(), 'The response has errors.');
 
         return $this;
     }
@@ -303,9 +319,11 @@ class TestResponse
         dd($this->response->toArray());
     }
 
-    public function dump(): void
+    public function dump(): static
     {
         dump($this->response->toArray());
+
+        return $this;
     }
 
     public function ddErrors(): void
@@ -321,11 +339,11 @@ class TestResponse
         return (match (true) {
             // @phpstan-ignore-next-line
             $this->primitive instanceof Tool => collect($this->response->toArray()['result']['content'] ?? [])
-                ->map(fn (array $message): string => $message['text'] ?? ''),
+                ->map(fn (array $message): string => $message['text'] ?? $message['data'] ?? ''),
             // @phpstan-ignore-next-line
             $this->primitive instanceof Prompt => collect($this->response->toArray()['result']['messages'] ?? [])
                 ->map(fn (array $message): array => $message['content'])
-                ->map(fn (array $content): string => $content['text'] ?? ''),
+                ->map(fn (array $content): string => $content['text'] ?? $content['data'] ?? ''),
             // @phpstan-ignore-next-line
             $this->primitive instanceof Resource => collect($this->response->toArray()['result']['contents'] ?? [])
                 ->map(fn (array $item): string => $item['text'] ?? $item['blob'] ?? ''),
@@ -359,5 +377,31 @@ class TestResponse
         $response = $this->response->toArray();
 
         return $response['result']['completion']['values'] ?? [];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function structuredContent(): ?array
+    {
+        $structuredContent = $this->response->toArray()['result']['structuredContent'] ?? null;
+
+        if (is_array($structuredContent) === false) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $decoded */
+        $decoded = $this->toJsonRepresentation($structuredContent);
+
+        return $decoded;
+    }
+
+    protected function toJsonRepresentation(mixed $value): mixed
+    {
+        return json_decode(
+            json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
+        );
     }
 }

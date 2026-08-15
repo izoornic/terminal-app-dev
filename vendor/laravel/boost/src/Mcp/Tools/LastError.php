@@ -7,6 +7,7 @@ namespace Laravel\Boost\Mcp\Tools;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Boost\Concerns\ReadsLogs;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -29,12 +30,12 @@ class LastError extends Tool
         if (! self::$listenerRegistered) {
             Log::listen(function (MessageLogged $event): void {
                 if ($event->level === 'error') {
-                    Cache::forever('boost:last_error', [
+                    rescue(fn () => Cache::forever('boost:last_error', [
                         'timestamp' => now()->toDateTimeString(),
                         'level' => $event->level,
                         'message' => $event->message,
                         'context' => [], // $event->context,
-                    ]);
+                    ]), report: false);
                 }
             });
 
@@ -54,9 +55,11 @@ class LastError extends Tool
     {
         // First, attempt to retrieve the cached last error captured during runtime.
         // This works even if the log driver isn't a file driver, so is the preferred approach
-        $cached = Cache::get('boost:last_error');
+        $cached = rescue(fn () => Cache::get('boost:last_error'), report: false);
+
         if ($cached) {
             $entry = "[{$cached['timestamp']}] {$cached['level']}: {$cached['message']}";
+
             if (! empty($cached['context'])) {
                 $entry .= ' '.json_encode($cached['context']);
             }
@@ -74,7 +77,7 @@ class LastError extends Tool
         $entry = $this->readLastErrorEntry($logFile);
 
         if ($entry !== null) {
-            return Response::text($entry);
+            return Response::text(Str::limit($entry, 500, '... more logs', true));
         }
 
         return Response::error('Unable to find an ERROR entry in the inspected portion of the log file.');

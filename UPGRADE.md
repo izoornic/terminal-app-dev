@@ -499,50 +499,113 @@ Prošao cijeli guide; ništa od breaking changes ne pogađa ovu aplikaciju:
 
 ---
 
-## FAZA 5 — Laravel 12 → 13
+## FAZA 5 — Laravel 12 → 13 ✅ KOMPLETIRANA (2026-08-15)
 
 > Preduslov: FAZA 4 završena — aplikacija stabilna na L12 + PHP 8.4.
 > ⚠️ Laravel 13 zahtijeva **PHP ≥ 8.3** — zato PHP 8.4 (FAZA 3) ide prije frameworka.
+>
+> **Rezultat:** `laravel/framework` **v12.66.0 → v13.25.0**, PHP 8.4.24, 43 testa zelena.
+> `composer audit` čist. Symfony stack prešao 7.4 → 8.1 (vidi 5.2).
 
-### 5.1 Provjera ekosistema prije bumpa
+### 5.1 Provjera ekosistema prije bumpa ✅
 
-Stanje utvrđeno u FAZI 4 (2026-08-15) — **dva paketa su konkretni blokeri za L13**:
+Oba blokera označena u FAZI 4 **riješena su upstream** u međuvremenu:
 
-- [x] Jetstream v5.5.3 — već podržava `^13.0`
-- [x] Livewire 3.8.4 — već podržava `^13.0`
-- [x] spatie/laravel-permission 6.25.0 — već podržava `^13.0`
-- [x] maatwebsite/excel 3.1.70, barryvdh/laravel-dompdf 3.1.2, blade-icons 1.10.1 — podržavaju `^13.0`
-- [x] Sanctum / Fortify — provjereno 2026-08-15: oba deklarišu `^11|^12|^13`, nisu bloker
-- [x] spatie/laravel-ignition — podržava `^13.0`
-- [ ] `laravel/tinker` 2.9 — ide samo do `^12.0`; nije bloker (constraint u `composer.json` je `^2.9`,
-      pa će composer sam povući noviju verziju), ali provjeriti da postoji release s L13 podrškom
-- [x] ⚠️ **`larswiegers/laravel-maps` v0.19** — `illuminate/support` ide samo do `^12.0`. Zadnji release
-      2025-02-20. Opcije: sačekati novi release, forkovati/patchovati constraint, ili zamijeniti paket
-      (koristi se samo za `<x-maps-google>` u dvije `managment` mape).
-- [x] ⚠️ **`propaganistas/laravel-phone` 5.3.6** — `illuminate/support` ide samo do `^12.0`.
-      Provjeriti da li je izašla v6 s L13 podrškom.
+| Paket | Bilo | Sad | Ishod |
+| --- | --- | --- | --- |
+| larswiegers/laravel-maps | v0.19 (do `^12.0`) | **v0.21** (2026-07-01, `^13.0`) | ✅ bump — ali nosi breaking change, vidi 5.5 |
+| propaganistas/laravel-phone | 5.3.6 (do `^12.0`) | 6.0.3 (`^13.0`) | ✅ **paket uklonjen** — vidi 5.2 |
+| laravel/tinker | ^2.9 (do `^12.0`) | **^3.0** (v3.0.2) | ✅ bump |
+| laravel/boost | ^1.1 (roster ide do `^12.0`) | **^2.5** (v2.5.3, roster v1.0.0) | ✅ bump — bio je stvarni bloker |
+| phpunit/phpunit | ^11 | **^12** (12.5.33) | ✅ bump, traži ga L13 guide |
+| nunomaduro/collision | ^8 | ^8 (v9 ne postoji) | ✅ ostaje |
+| Jetstream, Livewire, sanctum, fortify, spatie/permission, excel, dompdf, blade-icons, ignition, sail | — | — | ✅ već deklarisali `^13.0` |
 
-```bash
-composer require laravel/framework:^13.0 --dry-run 2>&1 | grep -i "conflict\|error"
-```
-
-### 5.2 Upgrejd
+### 5.2 Upgrejd ✅
 
 ```bash
-composer require laravel/framework:^13.0 -W
+composer remove propaganistas/laravel-phone          # neiskorišćen, vidi ispod
+composer require larswiegers/laravel-maps:^0.21 -W
+composer require --dev laravel/boost:^2.5 -W
+composer require laravel/framework:^13.0 laravel/tinker:^3.0 -W
+composer remove symfony/serializer symfony/property-access symfony/property-info symfony/type-info -W
+composer require --dev phpunit/phpunit:^12.0 -W
 php artisan optimize:clear
 ```
 
-### 5.3 Breaking changes
+**`propaganistas/laravel-phone` uklonjen** (odluka korisnika, 2026-08-15). Razlog: paket nije imao
+**nijednu aktivnu upotrebu** — sva 4 `phone:` validacijska pravila su zakomentarisana
+(`Prijava.php:66`, `Bankomati/Lokacije.php:248,286`, `Bankomati/Komponente/KontaktOsobe.php:37`),
+nema `config/phone.php`, nema importa. Uklonjen je i tranzitivni `giggsey/libphonenumber-for-php-lite`.
+⚠️ Ako se ta pravila ikad odkomentarišu bez vraćanja paketa, Laravel će baciti
+`BadMethodCallException: Method ... validatePhone does not exist`. Vraćanje:
+`composer require propaganistas/laravel-phone:^6.0`.
 
-- [ ] Proći cijeli zvanični 13.x upgrade guide — specifične promjene utvrditi tamo (L13 je izvan ovog plana u trenutku pisanja)
+**Symfony pinovi iz FAZE 3 skinuti.** L13 povlači Symfony 8.1 za console/http-foundation/http-kernel/
+mailer/mime/process/routing/uid/var-dumper/finder/error-handler. Pinovi na `^7.4` za
+`serializer|property-access|property-info|type-info` (dodati u FAZI 3 da se izbjegne miješani stack)
+sad su davali **obrnut efekat** — držali su ta 4 paketa na 7.4 dok je ostatak otišao na 8.1.
+Uklonjeni su iz `composer.json`; nema direktne upotrebe u `app/` (samo tranzitivno kroz
+`web-auth/webauthn-lib`, koji prihvata `^6.4|^7.0|^8.0`). Sad je Symfony konzistentno 8.1.
 
-### 5.4 Verifikacija
+### 5.3 Breaking changes iz zvaničnog 13.x upgrade guide-a ✅
 
-- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ručno testirati sve module
+- [x] **Request Forgery Protection** (high impact) — `VerifyCsrfToken` → `PreventRequestForgery`
+      + provjera `Sec-Fetch-Site` zaglavlja. **Ne pogađa nas**: custom `VerifyCsrfToken` klasa je
+      nestala još u FAZI 2 (L11), `bootstrap/app.php` je ne pominje, a u `app/Http/Middleware/`
+      su ostale samo `Authenticate`, `EnsureUserRoleIsAllowedToAccess`, `RedirectIfAuthenticated`, `TrustHosts`.
+- [x] **Cache `serializable_classes`** (medium impact) — novi default `false` u framework configu.
+      **Ne pogađa nas**: `config/cache.php` uopšte nema taj ključ, a `CacheManager::getSerializableClasses()`
+      radi `?? null`, pa store-ovi preskaču `allowed_classes` ograničenje → staro ponašanje ostaje.
+      App ne kešira PHP objekte (nema `Cache::put`/`remember` u `app/`), driver je `file`.
+      ℹ️ *Opciono za kasnije:* dodati `'serializable_classes' => false` u `config/cache.php` kao hardening.
+- [x] **Pagination Bootstrap view names** — nema referenci na `pagination::default` / `simple-default`.
+- [x] **Domain route registration precedence** — nema nijedne `->domain()` rute.
+- [x] **Manager `extend` callback binding** — nema `::extend(` u `app/`.
+- [x] **`QueueBusy` `$connection` → `$connectionName`**, **`JobAttempted` `$exceptionOccurred` → `$exception`** —
+      nema listenera za te evente (`QUEUE_CONNECTION=sync`).
+- [x] **`withScheduling` timing** — ne koristi se; scheduling je u `routes/console.php`
+      (`Schedule::command('eurorates:info')->dailyAt('08:05')` — provjereno da je preživio).
+- [x] **`Js::from` sad koristi `JSON_UNESCAPED_UNICODE`** — jedina upotreba je `@js($recoveryCodes)`
+      u `two-factor-recovery.blade.php`; recovery kodovi su ASCII, pa nema razlike.
+- [x] **`Str` factories reset između testova** — testovi ne koriste custom UUID/ULID/random factory.
+- [x] **Default password reset subject** — nema override-a stringa „Reset Password Notification".
+
+### 5.4 Verifikacija ✅
+
+- [x] `php artisan test` — **43 prošlo, 8 skipped, 1 risky** (131 asertacija). Identično L11 i L12 stanju.
+- [x] `config:cache` + `route:cache` + `view:cache` — sve tri prolaze.
+- [x] HTTP smoke (iz kontejnera): `/login` → 200, `/dashboard` → 302.
+- [x] **PDF (dompdf v3)** — validan izlaz, uklj. ćirilične/latinične dijakritike u sadržaju.
+- [x] **Excel** — `LicencaNaplataExport` generiše XLSX (~19 KB) nad stvarnim podacima.
+- [x] `<x-maps-google>` se renderuje bez greške na serveru (3.6 KB HTML za 2 markera).
+- [ ] **Ručno u browseru: obje managment mape** — vidi 5.5, ovo je jedini otvoreni rizik.
+- [ ] Ručno testirati: tiket, licence, bankomat, rezervacije/transfer, auth
 - [ ] Deploy na staging i finalni test
+
+### 5.5 ⚠️ OTVOREN RIZIK — Google mape poslije laravel-maps v0.21
+
+`laravel-maps` v0.21 je **breaking**: prešao je s `google.maps.Marker` na
+`google.maps.marker.AdvancedMarkerElement` (stari Marker je Google deprecirao 21.2.2024).
+
+**Problem:** Google zahtijeva **registrovan Cloud Map ID** za Advanced Markers. Paket prosljeđuje
+`mapId: '{{$mapId}}'`, gdje je `$mapId` samo `Str::random()` — isti string koji služi kao DOM `id`
+elementa. Potvrđeno renderom: `mapId: 'wgbhy2J2zbyd6F3b'`. To **nije** validan Cloud Map ID.
+
+**Šta testirati:** otvoriti obje mape u browseru i provjeriti prikazuju li se markeri —
+`livewire/managment/distributer-terminali-mapa.blade.php` i `distirbuteri-licence-mapa.blade.php`.
+U konzoli tražiti `InvalidMapIdError` ili poruku o Map ID-u.
+
+**Fix ako puknu** (bez forkovanja paketa): napraviti Map ID u Google Cloud Console
+(Google Maps Platform → Map Management), staviti ga u `.env`, pa ga proslijediti komponenti
+kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
+
+```blade
+<x-maps-google :markers="$pins" :fitToBounds="true" id="{{ config('services.google_maps.map_id') }}"></x-maps-google>
+```
+
+**Sporedno:** markeri s `icon` ključem se sad renderuju kao `<img>` fiksno 32×32 px unutar flex diva
+(prije je Google skalirao ikonu sam), pa ikone mogu izgledati drugačije. Obje mape koriste `icon`.
 
 ---
 

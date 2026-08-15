@@ -1,61 +1,16 @@
 <style>
     #{{$mapId}} {
-        height: 80%;
+        height: 100%;
     }
 </style>
 <style>
     #{{$mapId}} {
     @if(! isset($attributes['style']))
-        height: 80vh;
+        height: 100vh;
     @else
         {{ $attributes['style'] }}
     @endif
     }
-</style>
-<style>
-    .b_name {
-        color:rgb(0, 0, 0); 
-        font-weight: bold; 
-        font-size: 1.5em;
-        margin-bottom: 5px;
-    }
-    .details {
-        font-family: Arial, sans-serif;
-        font-size: 1.2em;
-        color: #808080;
-    }
-    .details .address {
-        font-size: 1em;
-        color: #555;
-        margin-bottom: 10px;
-    }
-    .details .sn {
-        font-size: 1em;
-        color: #555;
-        margin-bottom: 10px;
-    }
-    .details .kontakt_osoba {
-        margin-top: 10px;
-    }
-    .details .kontakt_osoba .name {
-        font-weight: bold;
-        color: #333;
-    }
-    .details .kontakt_osoba .tel {
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .details .statistika {
-        margin-top: 10px;
-        color: #438351ff;
-    }
-
-    .details .statistika:hover {
-        color: #143114ff;
-        text-decoration: underline;
-    }
-    
 </style>
 
 <div id="{{$mapId}}" @if(isset($attributes['class']))
@@ -63,7 +18,7 @@ class='{{ $attributes["class"] }}'
         @endif
 ></div>
 <script
-        src="https://maps.googleapis.com/maps/api/js?key={{config('maps.google_maps.access_token', null)}}&callback=initMap{{$mapId}}&libraries=&v=3"
+        src="https://maps.googleapis.com/maps/api/js?key={{config('maps.google_maps.access_token', null)}}&callback=initMap{{$mapId}}&libraries=marker&v=weekly"
         async
 ></script>
 
@@ -75,17 +30,20 @@ class='{{ $attributes["class"] }}'
             center: { lat: {{$centerPoint['lat'] ?? $centerPoint[0]}}, lng: {{$centerPoint['long'] ?? $centerPoint[1]}} },
             zoom: {{$zoomLevel}},
             mapTypeId: '{{$mapType}}',
-            zoomControl: true
+            mapId: '{{$mapId}}'
         });
 
     function addInfoWindow(marker, message) {
 
         var infoWindow = new google.maps.InfoWindow({
-            content: buildContent(message)
+            content: message
         });
 
-        google.maps.event.addListener(marker, 'click', function () {
-            infoWindow.open(map{{$mapId}}, marker);
+        marker.addEventListener('gmp-click', function () {
+            infoWindow.open({
+                anchor: marker,
+                map: map{{$mapId}}
+            });
         });
     }
 
@@ -94,74 +52,65 @@ class='{{ $attributes["class"] }}'
     @endif
 
     @foreach($markers as $marker)
-        var marker{{ $loop->iteration }} = new google.maps.Marker({
+        // Create marker content
+        @if(isset($marker['icon']) || isset($marker['label']))
+            var markerContent{{ $loop->iteration }} = document.createElement('div');
+            markerContent{{ $loop->iteration }}.style.display = 'flex';
+            markerContent{{ $loop->iteration }}.style.alignItems = 'center';
+            markerContent{{ $loop->iteration }}.style.gap = '8px';
+
+            @if(isset($marker['icon']))
+                var markerImage{{ $loop->iteration }} = document.createElement('img');
+                markerImage{{ $loop->iteration }}.src = "{{ $marker['icon'] }}";
+                markerImage{{ $loop->iteration }}.style.width = '32px';
+                markerImage{{ $loop->iteration }}.style.height = '32px';
+                markerContent{{ $loop->iteration }}.appendChild(markerImage{{ $loop->iteration }});
+            @endif
+
+            @if(isset($marker['label']))
+                var markerLabel{{ $loop->iteration }} = document.createElement('div');
+                markerLabel{{ $loop->iteration }}.textContent = {{ json_encode($marker['label']) }};
+                markerLabel{{ $loop->iteration }}.style.background = 'white';
+                markerLabel{{ $loop->iteration }}.style.padding = '4px 8px';
+                markerLabel{{ $loop->iteration }}.style.borderRadius = '4px';
+                markerLabel{{ $loop->iteration }}.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+                markerLabel{{ $loop->iteration }}.style.fontSize = '14px';
+                markerLabel{{ $loop->iteration }}.style.fontWeight = '500';
+                markerLabel{{ $loop->iteration }}.style.whiteSpace = 'nowrap';
+                markerContent{{ $loop->iteration }}.appendChild(markerLabel{{ $loop->iteration }});
+            @endif
+        @endif
+        console.log();
+        var marker{{ $loop->iteration }} = new google.maps.marker.AdvancedMarkerElement({
             position: {
                 lat: {{$marker['lat'] ?? $marker[0]}},
                 lng: {{$marker['long'] ?? $marker[1]}}
             },
             map: map{{$mapId}},
             @if(isset($marker['title']))
-            title: "{{ $marker['title'] }}",
+                title: "{{ $marker['title'] }}",
             @endif
-            icon: @if(isset($marker['icon']))"{{ $marker['icon']}}" @else null @endif
+            @if(isset($marker['icon']) || isset($marker['label']))
+                content: markerContent{{ $loop->iteration }},
+            @endif
+            gmpClickable: true
         });
 
-        @if(isset($marker['info']))
-            addInfoWindow(marker{{ $loop->iteration }}, @json($marker['info']));
-        @endif
+            @if(isset($marker['info']))
+                addInfoWindow(marker{{ $loop->iteration }}, @json($marker['info']));
+            @endif
 
-        @if($fitToBounds || $centerToBoundsCenter)
-        bounds.extend({lat: {{$marker['lat'] ?? $marker[0]}},lng: {{$marker['long'] ?? $marker[1]}}});
-        @endif
+            @if($fitToBounds || $centerToBoundsCenter)
+                bounds.extend({lat: {{$marker['lat'] ?? $marker[0]}},lng: {{$marker['long'] ?? $marker[1]}}});
+            @endif
 
-        @if($fitToBounds)
-        map{{$mapId}}.fitBounds(bounds);
-        @endif        
-        @endforeach
+            @if($fitToBounds)
+                map{{$mapId}}.fitBounds(bounds);
+            @endif
+    @endforeach
 
-        @if($centerToBoundsCenter)
+    @if($centerToBoundsCenter)
         map{{$mapId}}.setCenter(bounds.getCenter());
-        @endif
+    @endif
     }
-
-function buildContent(p_property) {
-   let property = JSON.parse(p_property);
-   let sn = property.terminal_sn ? property.terminal_sn : '';
-   let terminals = sn.split(',').map(term => term.trim()).filter(term => term !== '');
-   let statistikaLink = " ";
-    
-   if(property.dist_id) {
-        statistikaLink = `<a href="/managment-distributer-licence?id=${property.dist_id}" target="_blank">Statistika licenci</a>`;
-   } 
-    
-   if (terminals.length > 4) {
-        terminals = terminals.slice(0, 4); // Limit to 4 SNs
-        terminals.push('...'); // Indicate more SNs available
-    }
-   
-  const content = document.createElement("div");
-
-  content.innerHTML = `
-    <div class="b_name">
-        ${property.p_name}
-    </div>
-    <div class="details">
-        <div class="address">${property.address}</div>
-
-        <div class="sn">
-            ${terminals.length > 0 ? 'SN: ' + terminals.map(term => `<span class="sn">${term}</span>`).join(', ') : ''}
-        </div>
-
-        <div class="kontakt_osoba">
-            <div class="name">${property.ko_name}</div>
-            <div class="tel">${property.ko_tel}</div>
-        </div>
-
-        <div class="statistika">
-            ${statistikaLink}
-        </div>
-    </div>
-    `;
-  return content;
-}
 </script>

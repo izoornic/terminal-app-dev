@@ -6,6 +6,7 @@ namespace Laravel\Boost\Mcp;
 
 use Dotenv\Dotenv;
 use Illuminate\Support\Env;
+use Laravel\Boost\Support\CommandNormalizer;
 use Laravel\Mcp\Response;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
@@ -66,9 +67,9 @@ class ToolExecutor
 
     protected function getTimeout(array $arguments): int
     {
-        $timeout = (int) ($arguments['timeout'] ?? 180);
+        $timeout = (int) ($arguments['timeout'] ?? config('boost.mcp.tool_timeout') ?? 180);
 
-        return max(1, min(600, $timeout));
+        return max(1, $timeout);
     }
 
     /**
@@ -87,6 +88,7 @@ class ToolExecutor
 
             if (is_array($data['content']) && ! empty($data['content'])) {
                 $firstContent = $data['content'][0] ?? [];
+
                 if (is_array($firstContent)) {
                     $errorText = $firstContent['text'] ?? $errorText;
                 }
@@ -103,6 +105,7 @@ class ToolExecutor
                 $text = $firstContent['text'] ?? '';
 
                 $decoded = json_decode((string) $text, true);
+
                 if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                     return Response::json($decoded);
                 }
@@ -122,8 +125,12 @@ class ToolExecutor
      */
     protected function buildCommand(string $toolClass, array $arguments): array
     {
+        $phpBinary = config('boost.executable_paths.php') ?? PHP_BINARY;
+        $normalized = CommandNormalizer::normalize($phpBinary);
+
         return [
-            PHP_BINARY,
+            $normalized['command'],
+            ...$normalized['args'],
             base_path('artisan'),
             'boost:execute-tool',
             $toolClass,

@@ -16,6 +16,10 @@ class GuidelineConfig
 
     public bool $hasAnApi = false;
 
+    public bool $hasSkills = false;
+
+    public bool $hasMcp = false;
+
     /**
      * @var array<int, string>
      */
