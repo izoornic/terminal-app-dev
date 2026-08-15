@@ -423,51 +423,79 @@ php artisan about
 
 ---
 
-## FAZA 4 — Laravel 11 → 12
+## FAZA 4 — Laravel 11 → 12 ✅ KOMPLETIRANA (2026-08-15)
 
 > Preduslov: FAZA 3 završena — aplikacija stabilna na PHP 8.4.
 > Laravel 12 je namjerno minimalan release (uglavnom bump zavisnosti, malo breaking changes).
 > Ovdje je L12 **checkpoint**, ne krajnja destinacija — odmah slijedi L13 (FAZA 5).
+>
+> **Rezultat:** `laravel/framework` `11.x-dev` → **`v12.66.0`** (stabilan tag; ranije je bio prikovan
+> na dev granu). Uklonjen `illuminate/json-schema`. Nijedan drugi paket nije trebalo dirati.
+> **`composer audit` sada čist** — tri L11 CVE-a (Signed URL path confusion, CRLF u email rule)
+> nestala su s prelaskom na 12.x.
 
-### 4.1 Provjera ekosistema prije bumpa
+### 4.1 Provjera ekosistema prije bumpa ✅
 
-Potvrditi da svi paketi imaju L12-kompatibilne verzije prije nego se dira framework:
+Svi paketi već deklarišu L12 podršku — **nema blokera**, uključujući i `laravel-maps` koji je bio označen kao rizik:
 
-| Paket | Napomena |
-| --- | --- |
-| laravel/jetstream | provjeriti ^5 podršku za L12 |
-| livewire/livewire | provjeriti ^3 podršku za L12 |
-| laravel/sanctum | provjeriti ^4 podršku za L12 |
-| laravel/fortify | provjeriti |
-| spatie/laravel-permission | provjeriti ^6 |
-| maatwebsite/excel | provjeriti ^3 |
-| barryvdh/laravel-dompdf | provjeriti |
-| larswiegers/laravel-maps | ⚠️ neizvjesno — najvjerovatniji blocker (već označeno u FAZA 2) |
+| Paket | Instalirano | Podržava | Status |
+| --- | --- | --- | --- |
+| laravel/jetstream | v5.5.3 | ^11\|^12\|^13 | ✅ |
+| livewire/livewire | v3.8.4 | ^10\|^11\|^12\|^13 | ✅ |
+| laravel/sanctum | v4 | ✅ | ✅ |
+| laravel/fortify | v1 | ✅ | ✅ |
+| spatie/laravel-permission | 6.25.0 | ^11\|^12\|^13 | ✅ |
+| maatwebsite/excel | 3.1.70 | ^11\|^12\|^13 | ✅ |
+| barryvdh/laravel-dompdf | v3.1.2 | ^11\|^12\|^13 | ✅ |
+| blade-ui-kit/blade-icons | 1.10.1 | ^11\|^12\|^13 | ✅ |
+| **larswiegers/laravel-maps** | v0.19 | ^11\|**^12** (nema ^13) | ✅ za L12, **⚠️ bloker za L13** |
+| **propaganistas/laravel-phone** | 5.3.6 | ^11\|**^12** (nema ^13) | ✅ za L12, **⚠️ bloker za L13** |
 
 ```bash
 # Dry-run provjera konflikta
-composer require laravel/framework:^12.0 --dry-run 2>&1 | grep -i "conflict\|error"
+composer require laravel/framework:^12.0 -W --dry-run
 ```
 
-### 4.2 Upgrejd
+### 4.2 Upgrejd ✅
 
 ```bash
 composer require laravel/framework:^12.0 -W
 php artisan optimize:clear
 ```
 
-### 4.3 Ključne provjere (utvrditi tačno u zvaničnom 12.x upgrade guide-u)
+### 4.3 Ključne provjere iz zvaničnog 12.x upgrade guide-a ✅
 
-- [ ] Carbon 3 — provjeriti formatiranje/parsiranje datuma kroz app
-- [ ] `image` validacijsko pravilo — provjeriti SVG ponašanje (promijenjen default)
-- [ ] Proći cijeli zvanični upgrade guide za sitne breaking changes
+Prošao cijeli guide; ništa od breaking changes ne pogađa ovu aplikaciju:
 
-### 4.4 Verifikacija
+- [x] **Carbon 3** — već je bio instaliran (3.13.2) prije ovog bumpa, `composer.lock` ga nije dirao →
+      semantika `diffIn*` (float, predznačeno) nije promijenjena u ovoj fazi. Formatiranje/parsiranje
+      provjereno kroz `App\Http\Helpers` (`datumKalendarNow`, `addMonthsToDate`) — radi.
+- [x] **`image` validacijsko pravilo (SVG)** — aplikacija **ne koristi** `image` pravilo nigdje u `app/`.
+- [x] **Models i UUIDv7** (medium impact) — nema `HasUuids`/`HasUlids` ni u jednom modelu.
+- [x] **Multi-schema DB inspecting** — nema poziva `Schema::getTables/getViews/getTypes/getTableListing`.
+- [x] **Local disk root → `storage/app/private`** — `config/filesystems.php` **eksplicitno** definiše
+      `local` disk s `root => storage_path('app')`, pa promjena defaulta ne utiče.
+- [x] **Route precedence (duplikati imena)** — 77 imenovanih ruta, nula duplikata
+      (jedini duplirani `name('dashboard')` u `routes/web.php:43` je zakomentarisan).
+- [x] **`mergeIfMissing()` s dot-notacijom** — nema upotrebe u kodu.
+- [x] **Blueprint/Grammar konstruktori** — nema `new Blueprint`, `setConnection()` ni `withTablePrefix()`.
+- [x] **Container: default vrijednosti class-property zavisnosti** — nema pogođenih konstruktora.
 
-- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ručno testirati: tiket, licence, bankomat, rezervacije/transfer, Excel, PDF, auth
-- [ ] Provjeriti `larswiegers/laravel-maps` (menadžment modul + Google mape)
+### 4.4 Verifikacija ✅
+
+- [x] `php artisan test` — **43 prošlo, 8 skipped, 1 risky** (131 asertacija, 16s). Identično stanju
+      prije bumpa; skipped/risky su Jetstream testovi za isključene feature (API tokeni, registracija,
+      email verifikacija) + `BrowserSessionsTest` bez asertacija — sve pre-postojeće.
+- [x] `php artisan config:cache && php artisan route:cache && php artisan view:cache` — sve tri prolaze
+      (`view:cache` kompajlira sve Blade šablone, što pokriva i `<x-maps-google>` komponentu).
+- [x] HTTP smoke (iz kontejnera): `/login` → 200 s Livewire assetima, `/dashboard` → 302 na login.
+- [x] **PDF (dompdf v3)** — `app('dompdf.wrapper')` generiše validan `%PDF-` izlaz.
+- [x] **Excel** — `LicencaNaplataExport` generiše XLSX (~19 KB) nad stvarnim podacima.
+- [ ] Ručno testirati u browseru: tiket, licence, bankomat, rezervacije/transfer, auth
+- [ ] Ručno provjeriti `larswiegers/laravel-maps` mape (menadžment modul — Google Maps se renderuje u browseru)
+
+> ℹ️ Napomena o lokalnom okruženju: na WSL hostu port 80 drži lokalni Apache, pa `curl localhost/...`
+> ne pogađa Sail. Smoke testove pokretati **iz kontejnera**: `docker compose exec laravel.test curl ...`
 
 ---
 
@@ -478,11 +506,18 @@ php artisan optimize:clear
 
 ### 5.1 Provjera ekosistema prije bumpa
 
-- [ ] Jetstream — L13-kompatibilna verzija
-- [ ] Livewire 3 — L13 podrška
-- [ ] Sanctum / Fortify — L13 podrška
-- [ ] spatie/laravel-permission — L13 podrška
-- [ ] larswiegers/laravel-maps — ⚠️ provjeriti (isti rizik kao u FAZA 4)
+Stanje utvrđeno u FAZI 4 (2026-08-15) — **dva paketa su konkretni blokeri za L13**:
+
+- [x] Jetstream v5.5.3 — već podržava `^13.0`
+- [x] Livewire 3.8.4 — već podržava `^13.0`
+- [x] spatie/laravel-permission 6.25.0 — već podržava `^13.0`
+- [x] maatwebsite/excel 3.1.70, barryvdh/laravel-dompdf 3.1.2, blade-icons 1.10.1 — podržavaju `^13.0`
+- [ ] Sanctum / Fortify — provjeriti neposredno prije bumpa
+- [ ] ⚠️ **`larswiegers/laravel-maps` v0.19** — `illuminate/support` ide samo do `^12.0`. Zadnji release
+      2025-02-20. Opcije: sačekati novi release, forkovati/patchovati constraint, ili zamijeniti paket
+      (koristi se samo za `<x-maps-google>` u dvije `managment` mape).
+- [ ] ⚠️ **`propaganistas/laravel-phone` 5.3.6** — `illuminate/support` ide samo do `^12.0`.
+      Provjeriti da li je izašla v6 s L13 podrškom.
 
 ```bash
 composer require laravel/framework:^13.0 --dry-run 2>&1 | grep -i "conflict\|error"
