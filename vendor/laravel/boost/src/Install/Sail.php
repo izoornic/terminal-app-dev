@@ -8,7 +8,7 @@ use const DIRECTORY_SEPARATOR;
 
 class Sail
 {
-    public const BINARY_PATH = 'vendor'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'sail';
+    public const DEFAULT_BINARY_PATH = 'vendor'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'sail';
 
     public static function artisanCommand(): string
     {
@@ -32,25 +32,51 @@ class Sail
 
     public static function command(string $command): string
     {
-        return self::BINARY_PATH.' '.$command;
+        return self::binaryPath().' '.$command;
+    }
+
+    public static function binaryPath(): string
+    {
+        return config('boost.executable_paths.sail') ?? self::DEFAULT_BINARY_PATH;
     }
 
     public function isInstalled(): bool
     {
-        return file_exists(base_path(self::BINARY_PATH)) &&
-            (file_exists(base_path('docker-compose.yml')) || file_exists(base_path('compose.yaml')));
+        $binaryPath = self::binaryPath();
+
+        $binaryExists = file_exists($binaryPath) || file_exists(base_path($binaryPath));
+
+        return $binaryExists && (
+            file_exists(base_path('compose.yml'))
+            || file_exists(base_path('compose.yaml'))
+            || file_exists(base_path('docker-compose.yml'))
+            || file_exists(base_path('docker-compose.yaml'))
+        );
     }
 
     public function isActive(): bool
     {
+        if ($this->isRunningInDevcontainer()) {
+            return false;
+        }
+
         return get_current_user() === 'sail' || getenv('LARAVEL_SAIL') === '1';
     }
 
+    public function isRunningInDevcontainer(): bool
+    {
+        return getenv('REMOTE_CONTAINERS') === 'true';
+    }
+
     /**
-     * @return array<int, string>
+     * @return array{key: string, command: string, args: array<int, string>}
      */
     public function buildMcpCommand(string $serverName): array
     {
-        return [$serverName, self::BINARY_PATH, 'artisan', 'boost:mcp'];
+        return [
+            'key' => $serverName,
+            'command' => self::binaryPath(),
+            'args' => ['artisan', 'boost:mcp'],
+        ];
     }
 }

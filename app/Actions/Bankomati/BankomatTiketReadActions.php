@@ -58,7 +58,7 @@ class BankomatTiketReadActions
             'users.name',
             'bankomat_tiket_kvar_tips.btkt_naziv',
         )
-        ->addSelect(DB::raw('CASE WHEN NOW() > DATE_ADD(bankomat_tikets.created_at, INTERVAL bankomat_tiket_prioritet_tips.time_frame SECOND) THEN 1 ELSE 0 END AS is_time_expired'))
+        ->addSelect(DB::raw('CASE WHEN NOW() > DATE_ADD(bankomat_tikets.created_at, INTERVAL TIME_TO_SEC(bankomat_tiket_prioritet_tips.time_frame) SECOND) THEN 1 ELSE 0 END AS is_time_expired'))
         ->join('bankomat_lokacijas', 'bankomat_tikets.bankomat_lokacija_id', '=', 'bankomat_lokacijas.id')
         ->join('bankomats', 'bankomats.id', '=', 'bankomat_lokacijas.bankomat_id')
         ->leftJoin('users', 'users.id', '=', 'bankomat_tikets.user_dodeljen_id')

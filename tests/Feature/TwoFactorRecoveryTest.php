@@ -15,7 +15,7 @@ class TwoFactorRecoveryTest extends TestCase
 
     public function test_admin_user_id_1_can_regenerate_recovery_codes(): void
     {
-        $admin = User::factory()->create(); // prvi kreirani korisnik -> id = 1
+        $admin = User::factory()->create(['id' => 1]); // fiksiran id=1: MySQL auto-increment se ne resetuje rollback-om između testova
         $this->assertSame(1, $admin->id);
         $this->actingAs($admin);
 

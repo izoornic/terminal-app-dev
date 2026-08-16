@@ -6,18 +6,20 @@ namespace Laravel\Boost\Mcp\Resources;
 
 use Laravel\Boost\Mcp\ToolExecutor;
 use Laravel\Boost\Mcp\Tools\ApplicationInfo as ApplicationInfoTool;
-use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Resource;
 
 class ApplicationInfo extends Resource
 {
-    public function __construct(protected ToolExecutor $toolExecutor) {}
+    public function __construct(protected ToolExecutor $toolExecutor)
+    {
+        //
+    }
 
     /**
      * The resource's description.
      */
-    protected string $description = 'Comprehensive application information including PHP version, Laravel version, database engine, all installed packages with their versions, and all Eloquent models in the application.';
+    protected string $description = 'Comprehensive application information including PHP version, Laravel version, database engine, and all installed packages with their versions in the application.';
 
     /**
      * The resource's URI.
@@ -37,7 +39,7 @@ class ApplicationInfo extends Resource
         $response = $this->toolExecutor->execute(ApplicationInfoTool::class);
 
         if ($response->isError()) {
-            return $response; // Return the error response directly
+            return $response;
         }
 
         $data = json_decode((string) $response->content(), true);

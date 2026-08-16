@@ -107,7 +107,7 @@
                                         @elseif($loop->even) class="bg-gray-50"
                                         @endif >
 
-                                        <td class="px-2 py-1">{{ $item->id }} - {{ $item->is_time_expired }}</td> 
+                                        <td class="px-2 py-1">{{ $item->id }}</td> 
                                         <td class="px-1 py-2">
                                             {{ $item->bp_tip_naziv }}
                                              <br />

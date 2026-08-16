@@ -26,7 +26,6 @@ class LicenceController extends Controller
      /**
      * Display the specified resource.
      *
-     * @return \Illuminate\Http\Response
      */
     public function index()
     {
@@ -83,13 +82,13 @@ class LicenceController extends Controller
                     'datum_prekoracenja'    => $item->datum_prekoracenja,
                     'signature'             => $item->signature,
                     'tip'                   => self::LICENCA_POREKLO[$item->licenca_poreklo],
-                    'datum_trajne'          => ($item->licenca_poreklo == 3) ? self::getGatumKrajLicence($item->terminal_lokacijaId, $item->distributerId, $item->licenca_distributer_cenaId) : '',
+                    'datum_trajne'          => ($item->licenca_poreklo == 3) ? self::getDatumKrajLicence($item->terminal_lokacijaId, $item->distributerId, $item->licenca_distributer_cenaId) : '',
                     'parametars'            =>[]
                 ];
                 
                 //$item->parametars = [];
                 //da li licenca uopste ima parametre_
-                if(LicencaParametar::where('id', '=', $item->ltid)->first()) {
+                if(LicencaParametar::where('licenca_tipId', '=', $item->ltid)->exists()) {
                     //da li licenca koju trazimo ima parametre
                     $each_data['parametars'] = LicencaParametarTerminal::where('licenca_parametar_terminals.terminal_lokacijaId', '=', $item->terminal_lokacijaId)
                         ->where('licenca_parametar_terminals.distributerId', '=', $item->distributerId)
@@ -98,6 +97,7 @@ class LicenceController extends Controller
                         ->pluck('licenca_parametars.param_opis')
                         ->all();
                 }  
+                
                 //hardcoded parametars za Servisne licence
                 if($item->licenca_poreklo == 2){
                     array_push($each_data['parametars'] , 'temp');
@@ -114,7 +114,7 @@ class LicenceController extends Controller
         return response()->json($retval);
     }
 
-    private function getGatumKrajLicence($terminal_lokacijaId, $distributerId, $licenca_distributer_cenaId){
+    private function getDatumKrajLicence($terminal_lokacijaId, $distributerId, $licenca_distributer_cenaId){
         $datum_kraj = LicencaNaplata::select('datum_kraj_licence')
                 ->where([
                     'terminal_lokacijaId' => $terminal_lokacijaId, 

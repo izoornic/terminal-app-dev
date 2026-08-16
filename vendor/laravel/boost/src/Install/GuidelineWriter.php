@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Laravel\Boost\Install;
 
-use Laravel\Boost\Contracts\Agent;
+use Laravel\Boost\Contracts\SupportsGuidelines;
 use RuntimeException;
 
 class GuidelineWriter
@@ -17,7 +17,10 @@ class GuidelineWriter
 
     public const NOOP = 3;
 
-    public function __construct(protected Agent $agent) {}
+    public function __construct(protected SupportsGuidelines $agent)
+    {
+        //
+    }
 
     /**
      * @return GuidelineWriter::NEW|GuidelineWriter::REPLACED|GuidelineWriter::FAILED|GuidelineWriter::NOOP
@@ -28,14 +31,18 @@ class GuidelineWriter
             return self::NOOP;
         }
 
+        $guidelines = $this->agent->transformGuidelines($guidelines);
+
         $filePath = $this->agent->guidelinesPath();
 
         $directory = dirname($filePath);
+
         if (! is_dir($directory) && ! @mkdir($directory, 0755, true)) {
             throw new RuntimeException("Failed to create directory: {$directory}");
         }
 
         $handle = @fopen($filePath, 'c+');
+
         if (! $handle) {
             throw new RuntimeException("Failed to open file: {$filePath}");
         }
@@ -47,18 +54,19 @@ class GuidelineWriter
 
             // Check if guidelines already exist
             $pattern = '/<laravel-boost-guidelines>.*?<\/laravel-boost-guidelines>/s';
-            $replacement = "<laravel-boost-guidelines>\n".$guidelines."\n</laravel-boost-guidelines>";
+            $replacement = "<laravel-boost-guidelines>\n".$guidelines."\n\n</laravel-boost-guidelines>";
             $replaced = false;
 
             if (preg_match($pattern, $content)) {
                 // Replace ALL existing boost guidelines blocks in-place
                 // If the user added guidelines after ours then let's
                 // make sure we keep the flow.
-                $newContent = preg_replace($pattern, $replacement, $content, 1);
+                $newContent = preg_replace_callback($pattern, fn (array $m): string => $replacement, $content, 1);
                 $replaced = true;
             } else {
                 // No existing Boost guidelines found, append to end of existing file
                 $frontMatter = '';
+
                 if ($this->agent->frontmatter() && ! str_contains($content, "\n---\n")) {
                     $frontMatter = "---\nalwaysApply: true\n---\n";
                 }

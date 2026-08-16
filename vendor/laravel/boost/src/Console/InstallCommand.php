@@ -6,256 +6,212 @@ namespace Laravel\Boost\Console;
 
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Laravel\Boost\Contracts\Agent;
-use Laravel\Boost\Contracts\McpClient;
-use Laravel\Boost\Install\Cli\DisplayHelper;
-use Laravel\Boost\Install\CodeEnvironment\CodeEnvironment;
-use Laravel\Boost\Install\CodeEnvironmentsDetector;
+use Laravel\Boost\Concerns\DisplayHelper;
+use Laravel\Boost\Contracts\SupportsGuidelines;
+use Laravel\Boost\Contracts\SupportsMcp;
+use Laravel\Boost\Contracts\SupportsSkills;
+use Laravel\Boost\Install\Agents\Agent;
+use Laravel\Boost\Install\AgentsDetector;
+use Laravel\Boost\Install\Cloud;
 use Laravel\Boost\Install\GuidelineComposer;
 use Laravel\Boost\Install\GuidelineConfig;
 use Laravel\Boost\Install\GuidelineWriter;
-use Laravel\Boost\Install\Herd;
+use Laravel\Boost\Install\McpWriter;
+use Laravel\Boost\Install\Nightwatch;
+use Laravel\Boost\Install\RuleComposer;
 use Laravel\Boost\Install\Sail;
+use Laravel\Boost\Install\Skill;
+use Laravel\Boost\Install\SkillComposer;
+use Laravel\Boost\Install\SkillWriter;
+use Laravel\Boost\Install\ThirdPartyPackage;
+use Laravel\Boost\Rules\RuleRepository;
+use Laravel\Boost\Skills\Remote\GitHubRepository;
+use Laravel\Boost\Skills\Remote\GitHubSkillProvider;
+use Laravel\Boost\Skills\Remote\RemoteSkill;
 use Laravel\Boost\Support\Config;
-use Laravel\Prompts\Concerns\Colors;
+use Laravel\Boost\Support\RenderFailures;
 use Laravel\Prompts\Terminal;
-use Symfony\Component\Finder\Finder;
+use RuntimeException;
 use Symfony\Component\Process\Process;
+use Throwable;
 
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\intro;
+use function Laravel\Prompts\grid;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\note;
 
 class InstallCommand extends Command
 {
-    use Colors;
+    use DisplayHelper;
 
-    protected $signature = 'boost:install {--ignore-guidelines : Skip installing AI guidelines} {--ignore-mcp : Skip installing MCP server configuration}';
-
-    private CodeEnvironmentsDetector $codeEnvironmentsDetector;
-
-    private Herd $herd;
-
-    private Sail $sail;
-
-    private Terminal $terminal;
+    protected $signature = 'boost:install
+        {--guidelines : Install AI guidelines}
+        {--skills : Install agent skills}
+        {--mcp : Install MCP server configuration}';
 
     /** @var Collection<int, Agent> */
-    private Collection $selectedTargetAgents;
-
-    /** @var Collection<int, McpClient> */
-    private Collection $selectedTargetMcpClient;
+    private Collection $selectedAgents;
 
     /** @var Collection<int, string> */
     private Collection $selectedBoostFeatures;
 
     /** @var Collection<int, string> */
-    private Collection $selectedAiGuidelines;
+    private Collection $selectedThirdPartyPackages;
 
     private string $projectName;
 
     /** @var array<non-empty-string> */
-    private array $systemInstalledCodeEnvironments = [];
+    private array $systemInstalledAgents = [];
 
-    private array $projectInstalledCodeEnvironments = [];
+    /** @var array<non-empty-string> */
+    private array $projectInstalledAgents = [];
 
     private bool $enforceTests = true;
 
+    /** @var array<int, string> */
+    private array $installedSkillNames = [];
+
     const MIN_TEST_COUNT = 6;
 
-    private string $greenTick;
-
-    private string $redCross;
-
-    private bool $installGuidelines;
-
-    private bool $installMcpConfig;
-
-    public function __construct(protected Config $config)
-    {
+    public function __construct(
+        private readonly AgentsDetector $agentsDetector,
+        private readonly Cloud $cloud,
+        private readonly Config $config,
+        private readonly Nightwatch $nightwatch,
+        private readonly Sail $sail,
+        private readonly Terminal $terminal
+    ) {
         parent::__construct();
     }
 
-    public function handle(
-        CodeEnvironmentsDetector $codeEnvironmentsDetector,
-        Herd $herd,
-        Sail $sail,
-        Terminal $terminal,
-    ): int {
-        $this->installGuidelines = ! $this->option('ignore-guidelines');
-        $this->installMcpConfig = ! $this->option('ignore-mcp');
+    public function handle(): int
+    {
+        $this->terminal->initDimensions();
+        $this->projectName = config('app.name');
 
-        if (! $this->installGuidelines && ! $this->installMcpConfig) {
-            $this->error('You cannot ignore both guidelines and MCP config. Please select at least one option to proceed.');
-
-            return self::FAILURE;
-        }
-
-        $this->bootstrap($codeEnvironmentsDetector, $herd, $sail, $terminal);
-        $this->displayBoostHeader();
+        $this->displayBoostHeader('Install', $this->projectName);
         $this->discoverEnvironment();
         $this->collectInstallationPreferences();
         $this->performInstallation();
+
+        $this->reportRenderFailures();
+
+        $this->noteInferConventions();
+
         $this->outro();
 
         return self::SUCCESS;
     }
 
-    protected function bootstrap(CodeEnvironmentsDetector $codeEnvironmentsDetector, Herd $herd, Sail $sail, Terminal $terminal): void
-    {
-        $this->codeEnvironmentsDetector = $codeEnvironmentsDetector;
-        $this->herd = $herd;
-        $this->sail = $sail;
-        $this->terminal = $terminal;
-
-        $this->terminal->initDimensions();
-
-        $this->greenTick = $this->green('✓');
-        $this->redCross = $this->red('✗');
-
-        $this->selectedTargetAgents = collect();
-        $this->selectedTargetMcpClient = collect();
-
-        $this->projectName = config('app.name');
-    }
-
-    protected function displayBoostHeader(): void
-    {
-        note($this->boostLogo());
-        intro('✦ Laravel Boost :: Install :: We Must Ship ✦');
-        note("Let's give {$this->bgYellow($this->black($this->bold($this->projectName)))} a Boost");
-    }
-
-    protected function boostLogo(): string
-    {
-        return
-         <<<'HEADER'
-        ██████╗   ██████╗   ██████╗  ███████╗ ████████╗
-        ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ██╔════╝ ╚══██╔══╝
-        ██████╔╝ ██║   ██║ ██║   ██║ ███████╗    ██║
-        ██╔══██╗ ██║   ██║ ██║   ██║ ╚════██║    ██║
-        ██████╔╝ ╚██████╔╝ ╚██████╔╝ ███████║    ██║
-        ╚═════╝   ╚═════╝   ╚═════╝  ╚══════╝    ╚═╝
-        HEADER;
-    }
-
     protected function discoverEnvironment(): void
     {
-        $this->systemInstalledCodeEnvironments = $this->codeEnvironmentsDetector->discoverSystemInstalledCodeEnvironments();
-        $this->projectInstalledCodeEnvironments = $this->codeEnvironmentsDetector->discoverProjectInstalledCodeEnvironments(base_path());
+        if ($this->config->getAgents() !== []) {
+            return;
+        }
+
+        $this->systemInstalledAgents = $this->agentsDetector->discoverSystemInstalledAgents();
+        $this->projectInstalledAgents = $this->agentsDetector->discoverProjectInstalledAgents(base_path());
     }
 
     protected function collectInstallationPreferences(): void
     {
         $this->selectedBoostFeatures = $this->selectBoostFeatures();
-        $this->selectedAiGuidelines = $this->selectAiGuidelines();
-        $this->selectedTargetMcpClient = $this->selectTargetMcpClients();
-        $this->selectedTargetAgents = $this->selectTargetAgents();
-        $this->enforceTests = $this->determineTestEnforcement();
+
+        $this->selectedThirdPartyPackages = $this->selectedBoostFeatures->contains('guidelines') || $this->selectedBoostFeatures->contains('skills')
+            ? $this->selectThirdPartyPackages()
+            : collect();
+
+        $this->selectIntegrations();
+
+        $this->selectedAgents = $this->selectAgents();
+        $this->enforceTests = $this->selectedBoostFeatures->contains('guidelines') && $this->determineTestEnforcement();
     }
 
     protected function performInstallation(): void
     {
-        if ($this->installGuidelines) {
+        app()->instance(GuidelineConfig::class, $this->buildGuidelineConfig());
+
+        if ($this->selectedBoostFeatures->contains('guidelines')) {
             $this->installGuidelines();
         }
 
-        usleep(750000);
+        if ($this->shouldInstallCloudSkill()) {
+            $this->downloadCloudSkill();
+        }
 
-        if ($this->installMcpConfig && $this->selectedTargetMcpClient->isNotEmpty()) {
+        if ($this->selectedBoostFeatures->contains('skills')) {
+            $this->installSkills();
+        }
+
+        if ($this->selectedBoostFeatures->contains('mcp')) {
             $this->installMcpServerConfig();
+        }
+
+        $this->storeConfig();
+    }
+
+    protected function reportRenderFailures(): void
+    {
+        $renderFailures = app(RenderFailures::class);
+
+        if ($renderFailures->isEmpty()) {
+            return;
+        }
+
+        $paths = $renderFailures->paths();
+        $packages = $renderFailures->packages();
+
+        $this->newLine();
+        $this->warn(sprintf('Skipped %d %s that could not be rendered:', count($paths), Str::plural('file', $paths)));
+
+        foreach ($paths as $path) {
+            $this->line('  - '.str_replace(base_path().DIRECTORY_SEPARATOR, '', $path));
+        }
+
+        if ($packages !== []) {
+            $this->warn('These ship Boost files built for an older Boost version, so Boost used its own where it had them. Update them with: composer update '.implode(' ', $packages));
         }
     }
 
-    protected function discoverTools(): array
+    protected function noteInferConventions(): void
     {
-        $tools = [];
-        $toolDir = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'Mcp', 'Tools']);
-        $finder = Finder::create()
-            ->in($toolDir)
-            ->files()
-            ->name('*.php');
-
-        foreach ($finder as $toolFile) {
-            $fullyClassifiedClassName = 'Laravel\\Boost\\Mcp\\Tools\\'.$toolFile->getBasename('.php');
-            if (class_exists($fullyClassifiedClassName, false)) {
-                $tools[$fullyClassifiedClassName] = Str::headline($toolFile->getBasename('.php'));
-            }
-        }
-
-        ksort($tools);
-
-        return $tools;
+        note('💡 Run the infer-conventions skill to record your app conventions and sharpen code generation.');
     }
 
     protected function outro(): void
     {
-        $label = 'https://boost.laravel.com/installed';
-
-        $ideNames = $this->selectedTargetMcpClient->map(fn (McpClient $mcpClient): string => 'i:'.$mcpClient->mcpClientName())
-            ->toArray();
-        $agentNames = $this->selectedTargetAgents->map(fn (Agent $agent): string => 'a:'.$agent->agentName())->toArray();
-        $boostFeatures = $this->selectedBoostFeatures->map(fn ($feature): string => 'b:'.$feature)->toArray();
-
-        $guidelines = [];
-
-        $guidelines[] = 'g:ai';
-
-        if ($this->shouldInstallStyleGuidelines()) {
-            $guidelines[] = 'g:style';
-        }
-
-        $allData = array_merge($ideNames, $agentNames, $boostFeatures, $guidelines);
-        $installData = base64_encode(implode(',', $allData));
-
-        $link = $this->hyperlink($label, 'https://boost.laravel.com/installed/?d='.$installData);
-
+        $url = 'https://laravel.com/docs/boost';
+        $link = $this->hyperlink($url, $url);
         $text = 'Enjoy the boost 🚀 Next steps: ';
-        $paddingLength = (int) (floor(($this->terminal->cols() - mb_strlen($text.$label)) / 2)) - 2;
 
-        $this->output->write([
-            "\033[42m\033[2K".str_repeat(' ', max(0, $paddingLength)),
-            $this->black($this->bold($text.$link)).$this->reset(PHP_EOL).$this->reset(PHP_EOL),
-        ]);
-    }
-
-    protected function hyperlink(string $label, string $url): string
-    {
-        return "\033]8;;{$url}\007{$label}\033]8;;\033\\";
+        $this->displayOutro($text, $link, $this->terminal->cols());
     }
 
     /**
-     * We shouldn't add an AI guideline enforcing tests if they don't have a basic test setup.
+     * We shouldn't add an AI guideline enforcing test if they don't have a basic test setup.
      * This would likely just create headaches for them or be a waste of time as they
      * won't have the CI setup to make use of them anyway, so we're just wasting their
      * tokens/money by enforcing them.
      */
     protected function determineTestEnforcement(): bool
     {
-        if (! $this->installGuidelines) {
+        if (config('boost.enforce_tests') !== null) {
+            return (bool) config('boost.enforce_tests');
+        }
+
+        if (! file_exists(base_path('vendor/bin/phpunit'))) {
             return false;
         }
 
-        $hasMinimumTests = false;
+        $process = new Process([PHP_BINARY, 'artisan', 'test', '--list-tests'], base_path());
+        $process->run();
 
-        if (file_exists(base_path('vendor/bin/phpunit'))) {
-            $process = new Process([PHP_BINARY, 'artisan', 'test', '--list-tests'], base_path());
-            $process->run();
-
-            /** Count the number of tests - they'll always have :: between the filename and test name */
-            $hasMinimumTests = Str::of($process->getOutput())
-                ->trim()
-                ->explode("\n")
-                ->filter(fn ($line): bool => str_contains($line, '::'))
-                ->count() >= self::MIN_TEST_COUNT;
-        }
-
-        return $hasMinimumTests;
+        return Str::of($process->getOutput())
+            ->trim()
+            ->explode("\n")
+            ->filter(fn ($line): bool => str_contains($line, '::'))
+            ->count() >= self::MIN_TEST_COUNT;
     }
 
     /**
@@ -263,418 +219,450 @@ class InstallCommand extends Command
      */
     protected function selectBoostFeatures(): Collection
     {
-        if (! $this->installMcpConfig) {
-            return collect();
+        $featureLabels = collect([
+            'guidelines' => 'AI Guidelines',
+            'skills' => 'Agent Skills',
+            'mcp' => 'Boost MCP Server Configuration',
+        ]);
+
+        $explicit = $featureLabels->keys()->filter(fn ($feature) => $this->option($feature));
+
+        if ($explicit->isNotEmpty()) {
+            return $explicit->values();
         }
 
-        $features = collect(['mcp_server', 'ai_guidelines']);
+        $configValues = collect([
+            'guidelines' => $this->config->getGuidelines(),
+            'skills' => $this->config->hasSkills(),
+            'mcp' => $this->config->getMcp(),
+        ]);
 
-        if ($this->herd->isMcpAvailable() && $this->shouldConfigureHerdMcp()) {
-            $features->push('herd_mcp');
+        $defaults = $configValues->filter()->keys()->whenEmpty(fn () => $featureLabels->keys());
+
+        if (! $this->input->isInteractive()) {
+            return $defaults->values();
         }
 
-        if ($this->sail->isInstalled() && ($this->sail->isActive() || $this->shouldConfigureSail())) {
-            $features->push('sail');
-        }
-
-        return $features;
-    }
-
-    protected function shouldConfigureSail(): bool
-    {
-        return confirm(
-            label: 'Laravel Sail detected. Configure Boost MCP to use Sail?',
-            default: $this->config->getSail(),
-            hint: 'This will configure the MCP server to run through Sail. Note: Sail must be running to use Boost MCP',
-        );
-    }
-
-    protected function shouldConfigureHerdMcp(): bool
-    {
-        return confirm(
-            label: 'Would you like to install Herd MCP alongside Boost MCP?',
-            default: $this->config->getHerdMcp(),
-            hint: 'The Herd MCP provides additional tools like browser logs, which can help AI understand issues better',
-        );
+        return collect(multiselect(
+            label: 'Which Boost features would you like to configure?',
+            options: $featureLabels->all(),
+            default: $defaults->all(),
+            required: true,
+            hint: 'This will override the current guidelines, skills, and MCP configuration',
+        ));
     }
 
     /**
      * @return Collection<int, string>
      */
-    protected function selectAiGuidelines(): Collection
+    protected function selectThirdPartyPackages(): Collection
     {
-        if (! $this->installGuidelines) {
+        $packages = ThirdPartyPackage::discover();
+
+        if ($packages->isEmpty()) {
             return collect();
         }
 
-        $options = app(GuidelineComposer::class)->guidelines()
-            ->reject(fn (array $guideline): bool => $guideline['third_party'] === false);
+        $defaults = collect($this->config->getPackages())
+            ->filter(fn (string $name) => $packages->has($name))
+            ->values();
 
-        if ($options->isEmpty()) {
-            return collect();
+        if (! $this->input->isInteractive()) {
+            return $defaults;
         }
 
         return collect(multiselect(
-            label: 'Which third-party AI guidelines do you want to install?',
-            // @phpstan-ignore-next-line
-            options: $options->mapWithKeys(function (array $guideline, string $name): array {
-                $humanName = str_replace('/core', '', $name);
-
-                return [$name => "{$humanName} (~{$guideline['tokens']} tokens) {$guideline['description']}"];
-            }),
-            default: collect($this->config->getGuidelines()),
+            label: 'Which third-party AI guidelines/skills would you like to install?',
+            options: $packages->mapWithKeys(fn (ThirdPartyPackage $pkg, string $name): array => [
+                $name => $pkg->displayLabel(),
+            ])->toArray(),
+            default: $defaults->all(),
             scroll: 10,
             hint: 'You can add or remove them later by running this command again',
         ));
     }
 
-    /**
-     * @return Collection<int, CodeEnvironment>
-     */
-    protected function selectTargetMcpClients(): Collection
+    protected function selectIntegrations(): void
     {
-        if (! $this->installMcpConfig) {
-            return collect();
+        $integrations = collect([
+            'cloud' => [
+                'label' => 'Laravel Cloud',
+                'available' => $this->selectedBoostFeatures->contains('skills'),
+                'default' => $this->config->getCloud(),
+            ],
+            'nightwatch' => [
+                'label' => 'Laravel Nightwatch',
+                'available' => $this->nightwatch->isInstalled(),
+                'default' => $this->config->getNightwatch(),
+            ],
+            'sail' => [
+                'label' => 'Laravel Sail',
+                'available' => $this->sail->isInstalled(),
+                'default' => $this->sail->isActive() || $this->config->getSail(),
+            ],
+        ])->filter(fn (array $integration): bool => $integration['available']);
+
+        if ($integrations->isEmpty()) {
+            return;
         }
 
-        return $this->selectCodeEnvironments(
-            McpClient::class,
-            sprintf('Which code editors do you use to work on %s?', $this->projectName),
-            $this->config->getEditors(),
-        );
-    }
+        $defaults = $integrations->filter(fn (array $integration): bool => $integration['default'])->keys()->all();
 
-    /**
-     * @return Collection<int, CodeEnvironment>
-     */
-    protected function selectTargetAgents(): Collection
-    {
-        if (! $this->installGuidelines) {
-            return collect();
-        }
-
-        $defaults = $this->config->getAgents();
-
-        if ($this->selectedTargetMcpClient->isNotEmpty()) {
-            $defaults = $this->selectedTargetMcpClient
-                ->filter(fn (McpClient $client): bool => $client instanceof Agent)
-                ->map(fn (McpClient $client): string => $client->name())
-                ->values()
-                ->toArray();
-        }
-
-        return $this->selectCodeEnvironments(
-            Agent::class,
-            sprintf('Which agents need AI guidelines for %s?', $this->projectName),
-            $defaults,
-        );
-    }
-
-    /**
-     * Get configuration settings for contract-specific selection behavior.
-     *
-     * @return array{required: bool, displayMethod: string}
-     */
-    protected function getSelectionConfig(string $contractClass): array
-    {
-        return match ($contractClass) {
-            Agent::class => ['required' => false, 'displayMethod' => 'agentName'],
-            McpClient::class => ['required' => true, 'displayMethod' => 'displayName'],
-            default => throw new InvalidArgumentException("Unsupported contract class: {$contractClass}"),
-        };
-    }
-
-    /**
-     * @param  array<int, string>  $defaults
-     * @return Collection<int, CodeEnvironment>
-     */
-    protected function selectCodeEnvironments(string $contractClass, string $label, array $defaults): Collection
-    {
-        $allEnvironments = $this->codeEnvironmentsDetector->getCodeEnvironments();
-        $config = $this->getSelectionConfig($contractClass);
-
-        $availableEnvironments = $allEnvironments->filter(fn (CodeEnvironment $environment): bool => $environment instanceof $contractClass);
-
-        if ($availableEnvironments->isEmpty()) {
-            return collect();
-        }
-
-        $options = $availableEnvironments->mapWithKeys(function (CodeEnvironment $environment) use ($config): array {
-            $displayMethod = $config['displayMethod'];
-            $displayText = $environment->{$displayMethod}();
-
-            return [$environment->name() => $displayText];
-        })->sort();
-
-        $installedEnvNames = array_unique(array_merge(
-            $this->projectInstalledCodeEnvironments,
-            $this->systemInstalledCodeEnvironments
-        ));
-
-        $detectedDefaults = [];
-
-        if ($defaults === []) {
-            foreach ($installedEnvNames as $envKey) {
-                $matchingEnv = $availableEnvironments->first(fn (CodeEnvironment $env): bool => strtolower((string) $envKey) === strtolower($env->name()));
-                if ($matchingEnv) {
-                    $detectedDefaults[] = $matchingEnv->name();
-                }
-            }
-        }
-
-        $selectedCodeEnvironments = collect(multiselect(
-            label: $label,
-            options: $options->toArray(),
-            default: $defaults === [] ? $detectedDefaults : $defaults,
-            scroll: $options->count(),
-            required: $config['required'],
-            hint: $defaults === [] || $detectedDefaults === [] ? '' : sprintf('Auto-detected %s for you',
-                Arr::join(array_map(function ($className) use ($availableEnvironments, $config) {
-                    $env = $availableEnvironments->first(fn ($env): bool => $env->name() === $className);
-                    $displayMethod = $config['displayMethod'];
-
-                    return $env->{$displayMethod}();
-                }, $detectedDefaults), ', ', ' & ')
-            )
-        ))->sort();
-
-        return $selectedCodeEnvironments->map(
-            fn (string $name) => $availableEnvironments->first(fn ($env): bool => $env->name() === $name),
-        )->filter()->values();
-    }
-
-    protected function installGuidelines(): void
-    {
-        if ($this->selectedTargetAgents->isEmpty()) {
-            $this->info(' No agents selected for guideline installation.');
+        if (! $this->input->isInteractive()) {
+            $this->selectedBoostFeatures->push(...$defaults);
 
             return;
         }
 
-        $guidelineConfig = new GuidelineConfig;
-        $guidelineConfig->enforceTests = $this->enforceTests;
-        $guidelineConfig->laravelStyle = $this->shouldInstallStyleGuidelines();
-        $guidelineConfig->caresAboutLocalization = $this->detectLocalization();
-        $guidelineConfig->hasAnApi = false;
-        $guidelineConfig->aiGuidelines = $this->selectedAiGuidelines->values()->toArray();
-        $guidelineConfig->usesSail = $this->shouldUseSail();
-
-        $composer = app(GuidelineComposer::class)->config($guidelineConfig);
-        $guidelines = $composer->guidelines();
-
-        $this->newLine();
-        $this->info(sprintf(' Adding %d guidelines to your selected agents', $guidelines->count()));
-        DisplayHelper::grid(
-            $guidelines
-                ->map(fn ($guideline, string $key): string => $key.($guideline['custom'] ? '*' : ''))
-                ->values()
-                ->sort()
-                ->toArray(),
-            $this->terminal->cols()
+        $selected = multiselect(
+            label: 'Which integrations would you like to configure for Boost?',
+            options: $integrations->map(fn (array $integration): string => $integration['label'])->all(),
+            default: $defaults,
+            hint: 'Selected integrations will have their MCP servers or skills automatically configured',
         );
-        $this->newLine();
-        usleep(750000);
 
-        $failed = [];
+        $this->selectedBoostFeatures->push(...$selected);
+    }
+
+    /**
+     * @return Collection<int, Agent>
+     */
+    protected function selectAgents(): Collection
+    {
+        $allAgents = $this->agentsDetector->getAgents();
+
+        if ($allAgents->isEmpty()) {
+            return collect();
+        }
+
+        $featureInterfaces = [
+            'guidelines' => SupportsGuidelines::class,
+            'skills' => SupportsSkills::class,
+            'mcp' => SupportsMcp::class,
+        ];
+
+        $filteredAgents = $allAgents->filter(
+            fn (Agent $agent): bool => $this->selectedBoostFeatures->contains(
+                fn ($feature): bool => isset($featureInterfaces[$feature]) && $agent instanceof $featureInterfaces[$feature])
+        )->keyBy(fn (Agent $agent): string => $agent->name());
+
+        if ($filteredAgents->isEmpty()) {
+            return collect();
+        }
+
+        $options = $filteredAgents
+            ->mapWithKeys(fn (Agent $agent): array => [$agent->name() => $agent->displayName()])
+            ->sort();
+
+        $defaults = collect($this->config->getAgents())
+            ->filter(fn (string $name) => $filteredAgents->has($name))
+            ->whenEmpty(fn () => collect([...$this->projectInstalledAgents, ...$this->systemInstalledAgents])
+                ->unique()
+                ->filter(fn (string $name) => $filteredAgents->has($name))
+            )
+            ->values();
+
+        if (! $this->input->isInteractive()) {
+            return $defaults
+                ->map(fn (string $name) => $filteredAgents->get($name))
+                ->values();
+        }
+
+        $selected = multiselect(
+            label: 'Which AI agents would you like to configure?',
+            options: $options->all(),
+            default: $defaults->all(),
+            scroll: $options->count(),
+            required: true,
+        );
+
+        return collect($selected)
+            ->map(fn (string $name) => $filteredAgents->get($name))
+            ->values();
+    }
+
+    /**
+     * @return Collection<int, Agent&SupportsMcp>
+     */
+    protected function agentsWithMcp(): Collection
+    {
+        return $this->selectedAgents->filter(fn (Agent $a): bool => $a instanceof SupportsMcp);
+    }
+
+    /**
+     * @return Collection<int, Agent&SupportsGuidelines>
+     */
+    protected function agentsWithGuidelines(): Collection
+    {
+        return $this->selectedAgents->filter(fn (Agent $a): bool => $a instanceof SupportsGuidelines);
+    }
+
+    /**
+     * @return Collection<int, Agent&SupportsSkills>
+     */
+    protected function agentsWithSkills(): Collection
+    {
+        return $this->selectedAgents->filter(fn (Agent $a): bool => $a instanceof SupportsSkills);
+    }
+
+    protected function installGuidelines(): void
+    {
+        $guidelinesAgents = $this->agentsWithGuidelines();
+        $guidelineConfig = $this->buildGuidelineConfig();
+        $composer = app(GuidelineComposer::class)->config($guidelineConfig);
+
+        $this->syncRuleFiles($composer);
+
+        $guidelines = $composer->guidelines();
         $composedAiGuidelines = $composer->compose();
 
-        $longestAgentName = max(1, ...$this->selectedTargetAgents->map(fn ($agent) => Str::length($agent->agentName()))->toArray());
-        /** @var CodeEnvironment $agent */
-        foreach ($this->selectedTargetAgents as $agent) {
-            $agentName = $agent->agentName();
-            $displayAgentName = str_pad((string) $agentName, $longestAgentName);
-            $this->output->write("  {$displayAgentName}... ");
-            /** @var Agent $agent */
-            try {
-                (new GuidelineWriter($agent))
-                    ->write($composedAiGuidelines);
+        $this->installFeature(
+            agents: $guidelinesAgents,
+            emptyMessage: 'No agents are selected for guideline installation.',
+            headerMessage: sprintf('Adding %d guidelines to your selected agents', $guidelines->count()),
+            nameResolver: fn (Agent $agent): string => $agent->displayName(),
+            processor: fn (Agent&SupportsGuidelines $agent): int => (new GuidelineWriter($agent))->write($composedAiGuidelines),
+            featureName: 'guidelines',
+            beforeProcess: fn () => grid($guidelines->map(fn ($guideline, string $key): string => $key.($guideline['custom'] ? '*' : ''))->sort()->values()->toArray()),
+            withDelay: true,
+        );
+    }
 
-                $this->line($this->greenTick);
-            } catch (Exception $e) {
-                $failed[$agentName] = $e->getMessage();
-                $this->line($this->redCross);
+    protected function syncRuleFiles(GuidelineComposer $composer): void
+    {
+        $repository = app(RuleRepository::class);
+
+        if (! config('boost.rules.enabled', true) || ! config('boost.rules.scoped_guidelines', false)) {
+            rescue(fn () => $repository->clearManaged(), report: false);
+
+            return;
+        }
+
+        try {
+            $written = $repository->syncManaged((new RuleComposer($composer))->composeManaged());
+        } catch (Throwable) {
+            try {
+                $repository->clearManaged();
+            } catch (Throwable $cleanupError) {
+                throw new RuntimeException(
+                    'Failed to write path-scoped rules and could not clear .ai/rules/boost. '
+                    .'Resolve the directory (it may be locked) and re-run boost:install.',
+                    0,
+                    $cleanupError,
+                );
             }
+
+            $composer->withoutRuleExtraction();
+
+            $this->warn('Could not write path-scoped rules to .ai/rules/boost — keeping them inline in the guidelines instead.');
+
+            return;
+        }
+
+        if ($written !== []) {
+            $this->info(sprintf('Extracted %d path-scoped %s to .ai/rules/boost', count($written), Str::plural('rule file', count($written))));
+        }
+    }
+
+    protected function installSkills(): void
+    {
+        $skillsAgents = $this->agentsWithSkills();
+        $skillsComposer = app(SkillComposer::class)->config($this->buildGuidelineConfig());
+        $skills = $skillsComposer->skills();
+
+        $this->installedSkillNames = $skills->keys()->toArray();
+
+        /** @var Collection<int, SupportsSkills&Agent> $skillsAgents */
+        $this->installFeature(
+            agents: $skillsAgents,
+            emptyMessage: 'No agents are selected for skill installation.',
+            headerMessage: sprintf('Syncing %d skills for skills-capable agents', $skills->count()),
+            nameResolver: fn (SupportsSkills&Agent $agent): string => $agent->displayName(),
+            processor: fn (SupportsSkills&Agent $agent): array => (new SkillWriter($agent))->sync($skills, $this->config->getSkills()),
+            featureName: 'skills',
+            beforeProcess: $skills->isNotEmpty()
+                ? fn () => grid($skills->map(fn (Skill $skill): string => $skill->displayName())->sort()->values()->toArray())
+                : null,
+        );
+    }
+
+    protected function buildGuidelineConfig(): GuidelineConfig
+    {
+        $guidelineConfig = new GuidelineConfig;
+        $guidelineConfig->enforceTests = $this->enforceTests;
+        $guidelineConfig->hasAnApi = false;
+        $guidelineConfig->aiGuidelines = $this->selectedThirdPartyPackages->values()->toArray();
+        $guidelineConfig->usesSail = $this->shouldUseSail();
+        $guidelineConfig->hasSkills = $this->selectedBoostFeatures->contains('skills');
+        $guidelineConfig->hasMcp = $this->selectedBoostFeatures->contains('mcp') || ($this->isExplicitFlagMode() && $this->config->getMcp());
+
+        return $guidelineConfig;
+    }
+
+    protected function shouldInstallCloudSkill(): bool
+    {
+        return $this->selectedBoostFeatures->contains('cloud');
+    }
+
+    protected function downloadCloudSkill(): void
+    {
+        try {
+            $repository = GitHubRepository::fromInput($this->cloud->skillRepo().'/'.$this->cloud->skillPath());
+            $provider = new GitHubSkillProvider($repository);
+            $skill = $provider->discoverSkills()->get($this->cloud->skillName());
+
+            if (! $skill instanceof RemoteSkill) {
+                return;
+            }
+
+            $provider->downloadSkill($skill, base_path('.ai/skills/'.$this->cloud->skillName()));
+        } catch (Exception $exception) {
+            $this->warn('Failed to download Cloud skill: '.$exception->getMessage());
+            $this->line('You can install it later with: php artisan boost:add-skill '.$this->cloud->skillRepo());
+        }
+    }
+
+    protected function storeConfig(): void
+    {
+        $explicitMode = $this->isExplicitFlagMode();
+
+        if (! $explicitMode) {
+            $this->config->flush();
+            $this->config->setAgents($this->selectedAgents->map(fn (Agent $agent): string => $agent->name())->values()->toArray());
+            $this->config->setPackages($this->selectedThirdPartyPackages->values()->toArray());
+        } elseif ($this->selectedBoostFeatures->contains('guidelines') || $this->selectedBoostFeatures->contains('skills')) {
+            $this->config->setPackages($this->selectedThirdPartyPackages->values()->toArray());
+        }
+
+        if ($this->selectedBoostFeatures->contains('guidelines')) {
+            $this->config->setGuidelines(true);
+        }
+
+        if ($this->selectedBoostFeatures->contains('skills')) {
+            $this->config->setSkills($this->installedSkillNames);
+        }
+
+        if ($this->selectedBoostFeatures->contains('skills')) {
+            $this->config->setCloud($this->selectedBoostFeatures->contains('cloud'));
+        }
+
+        if ($this->selectedBoostFeatures->contains('mcp')) {
+            $this->config->setMcp(true);
+            $this->config->setSail($this->shouldUseSail());
+            $this->config->setNightwatch($this->shouldInstallNightwatchMcp());
+        }
+    }
+
+    protected function shouldInstallNightwatchMcp(): bool
+    {
+        return $this->selectedBoostFeatures->contains('nightwatch');
+    }
+
+    protected function shouldUseSail(): bool
+    {
+        if ($this->selectedBoostFeatures->contains('mcp')) {
+            return $this->selectedBoostFeatures->contains('sail');
+        }
+
+        return $this->config->getSail();
+    }
+
+    protected function isExplicitFlagMode(): bool
+    {
+        if ($this->option('guidelines')) {
+            return true;
+        }
+
+        if ($this->option('skills')) {
+            return true;
+        }
+
+        return (bool) $this->option('mcp');
+    }
+
+    protected function installMcpServerConfig(): void
+    {
+        $this->installFeature(
+            agents: $this->agentsWithMcp(),
+            emptyMessage: 'No agents are selected for MCP installation.',
+            headerMessage: 'Installing MCP servers to your selected Agents',
+            nameResolver: fn (Agent $agent): string => $agent->displayName(),
+            processor: fn (Agent&SupportsMcp $agent): int => (new McpWriter($agent))->write(
+                $this->shouldUseSail() ? $this->sail : null,
+                $this->shouldInstallNightwatchMcp() ? $this->nightwatch : null
+            ),
+            featureName: 'MCP servers',
+            withDelay: true,
+        );
+    }
+
+    /**
+     * @template T
+     *
+     * @param  Collection<int, T>  $agents
+     * @param  callable(T): string  $nameResolver
+     * @param  callable(T): mixed  $processor
+     * @param  ?callable(): void  $beforeProcess
+     */
+    protected function installFeature(
+        Collection $agents,
+        string $emptyMessage,
+        string $headerMessage,
+        callable $nameResolver,
+        callable $processor,
+        string $featureName,
+        ?callable $beforeProcess = null,
+        bool $withDelay = false,
+    ): void {
+        if ($agents->isEmpty()) {
+            $this->info($emptyMessage);
+
+            return;
+        }
+
+        $this->newLine();
+        $this->info($headerMessage);
+
+        if ($beforeProcess !== null) {
+            $beforeProcess();
         }
 
         $this->newLine();
 
+        if ($withDelay) {
+            usleep(750000);
+        }
+
+        $failed = [];
+        $nameMap = $agents->map(fn ($agent): string => $nameResolver($agent));
+        $longestName = $nameMap->map(fn (string $name) => Str::length($name))->max() ?? 0;
+
+        foreach ($agents as $index => $agent) {
+            $name = $nameMap[$index];
+            $this->output->write('  '.str_pad($name, $longestName).'... ');
+
+            try {
+                $processor($agent);
+                $this->line($this->green('✓'));
+            } catch (Exception $e) {
+                $failed[$name] = $e->getMessage();
+                $this->line($this->red('✗'));
+            }
+        }
+
         if ($failed !== []) {
-            $this->error(sprintf('✗ Failed to install guidelines to %d agent%s:',
+            $this->newLine();
+            $this->error(sprintf('✗ Failed to install %s to %d agent%s:',
+                $featureName,
                 count($failed),
                 count($failed) === 1 ? '' : 's'
             ));
+
             foreach ($failed as $agentName => $error) {
                 $this->line("  - {$agentName}: {$error}");
             }
         }
 
-        if ($this->installMcpConfig) {
-            $this->config->setSail(
-                $this->shouldUseSail()
-            );
-
-            $this->config->setHerdMcp(
-                $this->shouldInstallHerdMcp()
-            );
-
-            $this->config->setEditors(
-                $this->selectedTargetMcpClient->map(fn (McpClient $mcpClient): string => $mcpClient->name())->values()->toArray()
-            );
-        }
-
-        $this->config->setAgents(
-            $this->selectedTargetAgents->map(fn (Agent $agent): string => $agent->name())->values()->toArray()
-        );
-
-        $this->config->setGuidelines(
-            $this->selectedAiGuidelines->values()->toArray()
-        );
-    }
-
-    protected function shouldInstallStyleGuidelines(): bool
-    {
-        return false;
-    }
-
-    protected function shouldInstallHerdMcp(): bool
-    {
-        return $this->selectedBoostFeatures->contains('herd_mcp');
-    }
-
-    protected function shouldUseSail(): bool
-    {
-        if ($this->selectedBoostFeatures->isEmpty()) {
-            return $this->config->getSail();
-        }
-
-        return $this->selectedBoostFeatures->contains('sail');
-    }
-
-    protected function buildMcpCommand(McpClient $mcpClient): array
-    {
-        $serverName = 'laravel-boost';
-
-        if ($this->shouldUseSail()) {
-            return $this->sail->buildMcpCommand($serverName);
-        }
-
-        $inWsl = $this->isRunningInWsl();
-
-        return array_filter([
-            $serverName,
-            $inWsl ? 'wsl.exe' : false,
-            $mcpClient->getPhpPath($inWsl),
-            $mcpClient->getArtisanPath($inWsl),
-            'boost:mcp',
-        ]);
-    }
-
-    protected function installMcpServerConfig(): void
-    {
-        if ($this->selectedTargetMcpClient->isEmpty()) {
-            $this->info('No agents selected for guideline installation.');
-
-            return;
-        }
-
         $this->newLine();
-        $this->info(' Installing MCP servers to your selected IDEs');
-        $this->newLine();
-
-        usleep(750000);
-
-        $failed = [];
-        $longestIdeName = max(
-            1,
-            ...$this->selectedTargetMcpClient->map(
-                fn (McpClient $mcpClient) => Str::length($mcpClient->mcpClientName())
-            )->toArray()
-        );
-
-        foreach ($this->selectedTargetMcpClient as $mcpClient) {
-            $ideName = $mcpClient->mcpClientName();
-            $ideDisplay = str_pad((string) $ideName, $longestIdeName);
-            $this->output->write("  {$ideDisplay}... ");
-            $results = [];
-
-            $mcp = $this->buildMcpCommand($mcpClient);
-
-            try {
-                $result = $mcpClient->installMcp(
-                    array_shift($mcp),
-                    array_shift($mcp),
-                    $mcp
-                );
-
-                if ($result) {
-                    $results[] = $this->greenTick.' Boost';
-                } else {
-                    $results[] = $this->redCross.' Boost';
-                    $failed[$ideName]['boost'] = 'Failed to write configuration';
-                }
-            } catch (Exception $e) {
-                $results[] = $this->redCross.' Boost';
-                $failed[$ideName]['boost'] = $e->getMessage();
-            }
-
-            // Install Herd MCP if enabled
-            if ($this->shouldInstallHerdMcp()) {
-                $php = $mcpClient->getPhpPath();
-
-                try {
-                    $result = $mcpClient->installMcp(
-                        key: 'herd',
-                        command: $php,
-                        args: [$this->herd->mcpPath()],
-                        env: ['SITE_PATH' => base_path()]
-                    );
-
-                    if ($result) {
-                        $results[] = $this->greenTick.' Herd';
-                    } else {
-                        $results[] = $this->redCross.' Herd';
-                        $failed[$ideName]['herd'] = 'Failed to write configuration';
-                    }
-                } catch (Exception $e) {
-                    $results[] = $this->redCross.' Herd';
-                    $failed[$ideName]['herd'] = $e->getMessage();
-                }
-            }
-
-            $this->line(implode(' ', $results));
-        }
-
-        $this->newLine();
-
-        if ($failed !== []) {
-            $this->error(sprintf('%s Some MCP servers failed to install:', $this->redCross));
-
-            foreach ($failed as $ideName => $errors) {
-                foreach ($errors as $server => $error) {
-                    $this->line("  - {$ideName} ({$server}): {$error}");
-                }
-            }
-        }
-    }
-
-    /**
-     * Is the project actually using localization for their new features?
-     */
-    protected function detectLocalization(): bool
-    {
-        $actuallyUsing = false;
-
-        /** @phpstan-ignore-next-line  */
-        return $actuallyUsing && is_dir(base_path('lang'));
-    }
-
-    /**
-     * Are we running inside a Windows Subsystem for Linux (WSL) environment?
-     * This differentiates between a regular Linux installation and a WSL.
-     */
-    private function isRunningInWsl(): bool
-    {
-        // Check for WSL-specific environment variables.
-        return ! empty(getenv('WSL_DISTRO_NAME')) || ! empty(getenv('IS_WSL'));
     }
 }

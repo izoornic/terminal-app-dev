@@ -387,5 +387,80 @@ V 2.0.0.3 ( 1.7.2026.) @upgrade/laravel11
 V 2.0.0.4 ( 2.7.2026.) @upgrade/laravel11
     - Dodata 2FA recovery stranica za admina
 
-V 2.0.0.5 ( 5.7.2026.) @main
+V 2.0.0.5 ( 15.8.2026.) @main
     - Boost i clude.md update
+    - Update php 8.4
+
+V 2.1.0 ( 15.8.2026.) @upgrade/php84
+    - Upgrade to Laravel 12 (12.66.0)
+    - Reseni security advisory-ji koji nisu imali patch u Laravel 11 (Signed URL path confusion, CRLF u email rule)
+
+V 2.2.0 ( 15.8.2026.) @upgrade/php84
+    - Upgrade to Laravel 13 (13.25.0), Symfony 8.1
+    - PHPUnit 12, laravel/tinker 3, laravel/boost 2
+    - Uklonjen propaganistas/laravel-phone (nije bio koriscen ni na jednom mestu)
+    - laravel-maps 0.19 -> 0.21 zbog L13 podrske - PAZNJA: prelazi na Google AdvancedMarkerElement, proveriti mape
+
+V 2.2.1 ( 15.8.2026.) @upgrade/php84
+    - Ispravljen bug kod isteka roka bankomat tiketa (is_time_expired). MySQL je TIME kolonu time_frame
+      pretvarao u cifre HHMMSS umesto u sekunde, pa su se tiketi crvenili prekasno (Hitno 5h33min
+      umesto 2h, Visok 2 dana 18h umesto 1 dan, Srednji 5 dana 13h umesto 2 dana). Sada ide kroz TIME_TO_SEC()
+    - Dodat test tests/Feature/BankomatTiketExpiryTest.php
+
+V 2.2.2 ( 16.8.2026.) @upgrade/php84
+    - FAZA 6 upgrade-a: post-upgrade ciscenje
+    - Ispravljena dinamicka svojstva (deprecirana u PHP 8.2, fatalna u PHP 9):
+        - DistPredracunControler::vrstaDokumenta() - anonimna klasa dobijala 4 dinamicka svojstva,
+          sada deklarisana. PDF izlaz bajt-identican.
+        - DistributerLokacija::$modelId - nedeklarisano svojstvo koje Livewire ne serijalizuje,
+          pa vrednost nije prezivljavala zahtev. Dodato public $modelId;
+    - Dodat test tests/Unit/DinamickaSvojstvaTest.php
+    - BrowserSessionsTest dobio asercije (PHPUnit ga je prijavljivao kao risky)
+    - composer.json minimum-stability: dev -> stable (rupa kroz koju je framework bio na 11.x-dev)
+    - Verifikovano automatski na stvarnim podacima: dompdf v3 (oba PDF kontrolera) i Excel export
+    - .cpanel.yml sada sam bira DEPLOYPATH po grani (main -> servis-epos-app, sve ostalo ->
+      develop-servis-epos-app), pa se vise ne prebacuje rucno pri merge-u. Fallback ide na develop,
+      tako da promasaj nikad ne gadja produkciju. Uklonjen .cpanel.yml iz .gitignore - bio je bez
+      efekta (fajl je tracked) i opasno navodio na zakljucak da sme da ostane van gita.
+    - PAZNJA (nije ispravljeno): dugme "Ukloni lokaciju" u distributer-lokacija.blade.php zove
+      wire:click="delete", a komponenta DistributerLokacija nema delete() metodu -> puca na sretnom putu.
+      Nije regresija upgrade-a, ceka odluku o implementaciji.
+
+V 2.2.3 ( 16.8.2026.) @upgrade/php84
+    - Ispravljen bug u API-ju /api/licenca/{sn}: parametri licence se nisu vracali za vecinu licenci.
+      Provera "da li licenca uopste ima parametre" gledala je licenca_parametars.id umesto
+      licenca_parametars.licenca_tipId, pa je poredila dva nepovezana ID prostora. Radilo je samo
+      slucajno - za licencu "esir" (licenca_tips.id = 1) jer u licenca_parametars postoji red sa id = 1.
+      Za "Test licenca" (licenca_tips.id = 12) nije radilo jer nema parametra sa id = 12.
+      Primer: terminal A26-12RB-1K13445 sada vraca ["Param 1","Param 2"] umesto praznog niza.
+    - Dodat test tests/Feature/Api/LicencaParametriTest.php
+    - Preimenovana metoda getGatumKrajLicence -> getDatumKrajLicence (kozmeticki, typo)
+
+V 2.2.4 ( 16.8.2026.) @upgrade/php84
+    - Uklonjeno nefunkcionalno brisanje lokacije distributera sa stranice "Distributer-lokacija".
+      Dugme "Ukloni lokaciju" je zvalo wire:click="delete", a komponenta DistributerLokacija nikada
+      nije imala delete() metodu, pa je pucalo MethodNotFoundException - i to bas kada je brisanje
+      bilo dozvoljeno (dugme se prikazivalo samo ako nema gresaka). Obrisano: dugme u redu tabele,
+      modal za brisanje, deleteShowModal(), svojstva modalDeleteLocVisible/modelId/l_naziv/delete_error
+      i importi User/TerminalLokacija koji su ostali neiskorisceni.
+    - Usput ispravljen nevazeci HTML: dugme je otvarano kao <x-jet-danger-button>, zatvarano kao </x-jet-button>
+    - Iz tests/Unit/DinamickaSvojstvaTest.php uklonjen test za DistributerLokacija::$modelId
+      jer to svojstvo vise ne postoji. Dio koji pokriva DistPredracunControler ostaje.
+
+V 2.2.5 ( 16.8.2026.) @upgrade/php84
+    - .cpanel.yml: "cp -a *" zamenjen sa "rsync -a --delete". Stari deploy je samo prepisivao fajlove
+      i nikada nije brisao one uklonjene iz repozitorijuma, pa se na serverima gomilao otpad -
+      npr. paketi propaganistas/laravel-phone i giggsey/libphonenumber-for-php-lite, uklonjeni u
+      FAZI 5, i dalje su tamo. Uz to je rsync znatno brzi jer salje samo izmenjene fajlove
+      (deploy je 15623 fajla, od toga 14813 vendor).
+    - Iskljuceni iz sinhronizacije (postoje na serveru, nema ih u gitu - brisanje bi bio gubitak podataka):
+        --exclude='/.*'              svi dotfajlovi u korenu: .env, .htaccess, .user.ini, .git
+                                     (cp -a * ih ionako nikada nije kopirao)
+        --exclude=/storage/          logovi, sesije, storage/app/public/blacklist.txt
+        --exclude=/public/bl/        blacklist.txt koji generise TerminalBacklist.php i citaju terminali
+        --exclude=/public/predracuni/, /public/storage, /public/hot, /node_modules/
+    - Zadnji task (brisanje storage/framework/views/*.php) ostaje nuzan bas zato sto je storage/
+      iskljucen iz rsync-a, pa stare kompajlirane blade sablone rsync ne moze da pocisti.
+    - PRE UPOTREBE NA MAIN-U: pustiti isti rsync sa --dry-run -v preko SSH-a i procitati listu
+      brisanja. Prvi deploy brise godine nakupljenog otpada odjednom. Proveriti i "which rsync"
+      (putanja moze biti drukcija od /usr/bin/rsync).

@@ -423,105 +423,334 @@ php artisan about
 
 ---
 
-## FAZA 4 — Laravel 11 → 12
+## FAZA 4 — Laravel 11 → 12 ✅ KOMPLETIRANA (2026-08-15)
 
 > Preduslov: FAZA 3 završena — aplikacija stabilna na PHP 8.4.
 > Laravel 12 je namjerno minimalan release (uglavnom bump zavisnosti, malo breaking changes).
 > Ovdje je L12 **checkpoint**, ne krajnja destinacija — odmah slijedi L13 (FAZA 5).
+>
+> **Rezultat:** `laravel/framework` `11.x-dev` → **`v12.66.0`** (stabilan tag; ranije je bio prikovan
+> na dev granu). Uklonjen `illuminate/json-schema`. Nijedan drugi paket nije trebalo dirati.
+> **`composer audit` sada čist** — tri L11 CVE-a (Signed URL path confusion, CRLF u email rule)
+> nestala su s prelaskom na 12.x.
 
-### 4.1 Provjera ekosistema prije bumpa
+### 4.1 Provjera ekosistema prije bumpa ✅
 
-Potvrditi da svi paketi imaju L12-kompatibilne verzije prije nego se dira framework:
+Svi paketi već deklarišu L12 podršku — **nema blokera**, uključujući i `laravel-maps` koji je bio označen kao rizik:
 
-| Paket | Napomena |
-| --- | --- |
-| laravel/jetstream | provjeriti ^5 podršku za L12 |
-| livewire/livewire | provjeriti ^3 podršku za L12 |
-| laravel/sanctum | provjeriti ^4 podršku za L12 |
-| laravel/fortify | provjeriti |
-| spatie/laravel-permission | provjeriti ^6 |
-| maatwebsite/excel | provjeriti ^3 |
-| barryvdh/laravel-dompdf | provjeriti |
-| larswiegers/laravel-maps | ⚠️ neizvjesno — najvjerovatniji blocker (već označeno u FAZA 2) |
+| Paket | Instalirano | Podržava | Status |
+| --- | --- | --- | --- |
+| laravel/jetstream | v5.5.3 | ^11\|^12\|^13 | ✅ |
+| livewire/livewire | v3.8.4 | ^10\|^11\|^12\|^13 | ✅ |
+| laravel/sanctum | v4 | ✅ | ✅ |
+| laravel/fortify | v1 | ✅ | ✅ |
+| spatie/laravel-permission | 6.25.0 | ^11\|^12\|^13 | ✅ |
+| maatwebsite/excel | 3.1.70 | ^11\|^12\|^13 | ✅ |
+| barryvdh/laravel-dompdf | v3.1.2 | ^11\|^12\|^13 | ✅ |
+| blade-ui-kit/blade-icons | 1.10.1 | ^11\|^12\|^13 | ✅ |
+| **larswiegers/laravel-maps** | v0.19 | ^11\|**^12** (nema ^13) | ✅ za L12, **⚠️ bloker za L13** |
+| **propaganistas/laravel-phone** | 5.3.6 | ^11\|**^12** (nema ^13) | ✅ za L12, **⚠️ bloker za L13** |
 
 ```bash
 # Dry-run provjera konflikta
-composer require laravel/framework:^12.0 --dry-run 2>&1 | grep -i "conflict\|error"
+composer require laravel/framework:^12.0 -W --dry-run
 ```
 
-### 4.2 Upgrejd
+### 4.2 Upgrejd ✅
 
 ```bash
 composer require laravel/framework:^12.0 -W
 php artisan optimize:clear
 ```
 
-### 4.3 Ključne provjere (utvrditi tačno u zvaničnom 12.x upgrade guide-u)
+### 4.3 Ključne provjere iz zvaničnog 12.x upgrade guide-a ✅
 
-- [ ] Carbon 3 — provjeriti formatiranje/parsiranje datuma kroz app
-- [ ] `image` validacijsko pravilo — provjeriti SVG ponašanje (promijenjen default)
-- [ ] Proći cijeli zvanični upgrade guide za sitne breaking changes
+Prošao cijeli guide; ništa od breaking changes ne pogađa ovu aplikaciju:
 
-### 4.4 Verifikacija
+- [x] **Carbon 3** — već je bio instaliran (3.13.2) prije ovog bumpa, `composer.lock` ga nije dirao →
+      semantika `diffIn*` (float, predznačeno) nije promijenjena u ovoj fazi. Formatiranje/parsiranje
+      provjereno kroz `App\Http\Helpers` (`datumKalendarNow`, `addMonthsToDate`) — radi.
+- [x] **`image` validacijsko pravilo (SVG)** — aplikacija **ne koristi** `image` pravilo nigdje u `app/`.
+- [x] **Models i UUIDv7** (medium impact) — nema `HasUuids`/`HasUlids` ni u jednom modelu.
+- [x] **Multi-schema DB inspecting** — nema poziva `Schema::getTables/getViews/getTypes/getTableListing`.
+- [x] **Local disk root → `storage/app/private`** — `config/filesystems.php` **eksplicitno** definiše
+      `local` disk s `root => storage_path('app')`, pa promjena defaulta ne utiče.
+- [x] **Route precedence (duplikati imena)** — 77 imenovanih ruta, nula duplikata
+      (jedini duplirani `name('dashboard')` u `routes/web.php:43` je zakomentarisan).
+- [x] **`mergeIfMissing()` s dot-notacijom** — nema upotrebe u kodu.
+- [x] **Blueprint/Grammar konstruktori** — nema `new Blueprint`, `setConnection()` ni `withTablePrefix()`.
+- [x] **Container: default vrijednosti class-property zavisnosti** — nema pogođenih konstruktora.
 
-- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ručno testirati: tiket, licence, bankomat, rezervacije/transfer, Excel, PDF, auth
-- [ ] Provjeriti `larswiegers/laravel-maps` (menadžment modul + Google mape)
+### 4.4 Verifikacija ✅
+
+- [x] `php artisan test` — **43 prošlo, 8 skipped, 1 risky** (131 asertacija, 16s). Identično stanju
+      prije bumpa; skipped/risky su Jetstream testovi za isključene feature (API tokeni, registracija,
+      email verifikacija) + `BrowserSessionsTest` bez asertacija — sve pre-postojeće.
+- [x] `php artisan config:cache && php artisan route:cache && php artisan view:cache` — sve tri prolaze
+      (`view:cache` kompajlira sve Blade šablone, što pokriva i `<x-maps-google>` komponentu).
+- [x] HTTP smoke (iz kontejnera): `/login` → 200 s Livewire assetima, `/dashboard` → 302 na login.
+- [x] **PDF (dompdf v3)** — `app('dompdf.wrapper')` generiše validan `%PDF-` izlaz.
+- [x] **Excel** — `LicencaNaplataExport` generiše XLSX (~19 KB) nad stvarnim podacima.
+- [ ] Ručno testirati u browseru: tiket, licence, bankomat, rezervacije/transfer, auth
+- [ ] Ručno provjeriti `larswiegers/laravel-maps` mape (menadžment modul — Google Maps se renderuje u browseru)
+
+> ℹ️ Napomena o lokalnom okruženju: na WSL hostu port 80 drži lokalni Apache, pa `curl localhost/...`
+> ne pogađa Sail. Smoke testove pokretati **iz kontejnera**: `docker compose exec laravel.test curl ...`
 
 ---
 
-## FAZA 5 — Laravel 12 → 13
+## FAZA 5 — Laravel 12 → 13 ✅ KOMPLETIRANA (2026-08-15)
 
 > Preduslov: FAZA 4 završena — aplikacija stabilna na L12 + PHP 8.4.
 > ⚠️ Laravel 13 zahtijeva **PHP ≥ 8.3** — zato PHP 8.4 (FAZA 3) ide prije frameworka.
+>
+> **Rezultat:** `laravel/framework` **v12.66.0 → v13.25.0**, PHP 8.4.24, 43 testa zelena.
+> `composer audit` čist. Symfony stack prešao 7.4 → 8.1 (vidi 5.2).
 
-### 5.1 Provjera ekosistema prije bumpa
+### 5.1 Provjera ekosistema prije bumpa ✅
 
-- [ ] Jetstream — L13-kompatibilna verzija
-- [ ] Livewire 3 — L13 podrška
-- [ ] Sanctum / Fortify — L13 podrška
-- [ ] spatie/laravel-permission — L13 podrška
-- [ ] larswiegers/laravel-maps — ⚠️ provjeriti (isti rizik kao u FAZA 4)
+Oba blokera označena u FAZI 4 **riješena su upstream** u međuvremenu:
+
+| Paket | Bilo | Sad | Ishod |
+| --- | --- | --- | --- |
+| larswiegers/laravel-maps | v0.19 (do `^12.0`) | **v0.21** (2026-07-01, `^13.0`) | ✅ bump — ali nosi breaking change, vidi 5.5 |
+| propaganistas/laravel-phone | 5.3.6 (do `^12.0`) | 6.0.3 (`^13.0`) | ✅ **paket uklonjen** — vidi 5.2 |
+| laravel/tinker | ^2.9 (do `^12.0`) | **^3.0** (v3.0.2) | ✅ bump |
+| laravel/boost | ^1.1 (roster ide do `^12.0`) | **^2.5** (v2.5.3, roster v1.0.0) | ✅ bump — bio je stvarni bloker |
+| phpunit/phpunit | ^11 | **^12** (12.5.33) | ✅ bump, traži ga L13 guide |
+| nunomaduro/collision | ^8 | ^8 (v9 ne postoji) | ✅ ostaje |
+| Jetstream, Livewire, sanctum, fortify, spatie/permission, excel, dompdf, blade-icons, ignition, sail | — | — | ✅ već deklarisali `^13.0` |
+
+### 5.2 Upgrejd ✅
 
 ```bash
-composer require laravel/framework:^13.0 --dry-run 2>&1 | grep -i "conflict\|error"
-```
-
-### 5.2 Upgrejd
-
-```bash
-composer require laravel/framework:^13.0 -W
+composer remove propaganistas/laravel-phone          # neiskorišćen, vidi ispod
+composer require larswiegers/laravel-maps:^0.21 -W
+composer require --dev laravel/boost:^2.5 -W
+composer require laravel/framework:^13.0 laravel/tinker:^3.0 -W
+composer remove symfony/serializer symfony/property-access symfony/property-info symfony/type-info -W
+composer require --dev phpunit/phpunit:^12.0 -W
 php artisan optimize:clear
 ```
 
-### 5.3 Breaking changes
+**`propaganistas/laravel-phone` uklonjen** (odluka korisnika, 2026-08-15). Razlog: paket nije imao
+**nijednu aktivnu upotrebu** — sva 4 `phone:` validacijska pravila su zakomentarisana
+(`Prijava.php:66`, `Bankomati/Lokacije.php:248,286`, `Bankomati/Komponente/KontaktOsobe.php:37`),
+nema `config/phone.php`, nema importa. Uklonjen je i tranzitivni `giggsey/libphonenumber-for-php-lite`.
+⚠️ Ako se ta pravila ikad odkomentarišu bez vraćanja paketa, Laravel će baciti
+`BadMethodCallException: Method ... validatePhone does not exist`. Vraćanje:
+`composer require propaganistas/laravel-phone:^6.0`.
 
-- [ ] Proći cijeli zvanični 13.x upgrade guide — specifične promjene utvrditi tamo (L13 je izvan ovog plana u trenutku pisanja)
+**Symfony pinovi iz FAZE 3 skinuti.** L13 povlači Symfony 8.1 za console/http-foundation/http-kernel/
+mailer/mime/process/routing/uid/var-dumper/finder/error-handler. Pinovi na `^7.4` za
+`serializer|property-access|property-info|type-info` (dodati u FAZI 3 da se izbjegne miješani stack)
+sad su davali **obrnut efekat** — držali su ta 4 paketa na 7.4 dok je ostatak otišao na 8.1.
+Uklonjeni su iz `composer.json`; nema direktne upotrebe u `app/` (samo tranzitivno kroz
+`web-auth/webauthn-lib`, koji prihvata `^6.4|^7.0|^8.0`). Sad je Symfony konzistentno 8.1.
 
-### 5.4 Verifikacija
+### 5.3 Breaking changes iz zvaničnog 13.x upgrade guide-a ✅
 
-- [ ] `php artisan test` (uklj. `tests/Feature/RolePermissionTest.php`)
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ručno testirati sve module
+- [x] **Request Forgery Protection** (high impact) — `VerifyCsrfToken` → `PreventRequestForgery`
+      + provjera `Sec-Fetch-Site` zaglavlja. **Ne pogađa nas**: custom `VerifyCsrfToken` klasa je
+      nestala još u FAZI 2 (L11), `bootstrap/app.php` je ne pominje, a u `app/Http/Middleware/`
+      su ostale samo `Authenticate`, `EnsureUserRoleIsAllowedToAccess`, `RedirectIfAuthenticated`, `TrustHosts`.
+- [x] **Cache `serializable_classes`** (medium impact) — novi default `false` u framework configu.
+      **Ne pogađa nas**: `config/cache.php` uopšte nema taj ključ, a `CacheManager::getSerializableClasses()`
+      radi `?? null`, pa store-ovi preskaču `allowed_classes` ograničenje → staro ponašanje ostaje.
+      App ne kešira PHP objekte (nema `Cache::put`/`remember` u `app/`), driver je `file`.
+      ℹ️ *Opciono za kasnije:* dodati `'serializable_classes' => false` u `config/cache.php` kao hardening.
+- [x] **Pagination Bootstrap view names** — nema referenci na `pagination::default` / `simple-default`.
+- [x] **Domain route registration precedence** — nema nijedne `->domain()` rute.
+- [x] **Manager `extend` callback binding** — nema `::extend(` u `app/`.
+- [x] **`QueueBusy` `$connection` → `$connectionName`**, **`JobAttempted` `$exceptionOccurred` → `$exception`** —
+      nema listenera za te evente (`QUEUE_CONNECTION=sync`).
+- [x] **`withScheduling` timing** — ne koristi se; scheduling je u `routes/console.php`
+      (`Schedule::command('eurorates:info')->dailyAt('08:05')` — provjereno da je preživio).
+- [x] **`Js::from` sad koristi `JSON_UNESCAPED_UNICODE`** — jedina upotreba je `@js($recoveryCodes)`
+      u `two-factor-recovery.blade.php`; recovery kodovi su ASCII, pa nema razlike.
+- [x] **`Str` factories reset između testova** — testovi ne koriste custom UUID/ULID/random factory.
+- [x] **Default password reset subject** — nema override-a stringa „Reset Password Notification".
+
+### 5.4 Verifikacija ✅
+
+- [x] `php artisan test` — **43 prošlo, 8 skipped, 1 risky** (131 asertacija). Identično L11 i L12 stanju.
+- [x] `config:cache` + `route:cache` + `view:cache` — sve tri prolaze.
+- [x] HTTP smoke (iz kontejnera): `/login` → 200, `/dashboard` → 302.
+- [x] **PDF (dompdf v3)** — validan izlaz, uklj. ćirilične/latinične dijakritike u sadržaju.
+- [x] **Excel** — `LicencaNaplataExport` generiše XLSX (~19 KB) nad stvarnim podacima.
+- [x] `<x-maps-google>` se renderuje bez greške na serveru (3.6 KB HTML za 2 markera).
+- [ ] **Ručno u browseru: obje managment mape** — vidi 5.5, ovo je jedini otvoreni rizik.
+- [ ] Ručno testirati: tiket, licence, bankomat, rezervacije/transfer, auth
 - [ ] Deploy na staging i finalni test
+
+### 5.5 ⚠️ OTVOREN RIZIK — Google mape poslije laravel-maps v0.21
+
+`laravel-maps` v0.21 je **breaking**: prešao je s `google.maps.Marker` na
+`google.maps.marker.AdvancedMarkerElement` (stari Marker je Google deprecirao 21.2.2024).
+
+**Problem:** Google zahtijeva **registrovan Cloud Map ID** za Advanced Markers. Paket prosljeđuje
+`mapId: '{{$mapId}}'`, gdje je `$mapId` samo `Str::random()` — isti string koji služi kao DOM `id`
+elementa. Potvrđeno renderom: `mapId: 'wgbhy2J2zbyd6F3b'`. To **nije** validan Cloud Map ID.
+
+**Šta testirati:** otvoriti obje mape u browseru i provjeriti prikazuju li se markeri —
+`livewire/managment/distributer-terminali-mapa.blade.php` i `distirbuteri-licence-mapa.blade.php`.
+U konzoli tražiti `InvalidMapIdError` ili poruku o Map ID-u.
+
+**Fix ako puknu** (bez forkovanja paketa): napraviti Map ID u Google Cloud Console
+(Google Maps Platform → Map Management), staviti ga u `.env`, pa ga proslijediti komponenti
+kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
+
+```blade
+<x-maps-google :markers="$pins" :fitToBounds="true" id="{{ config('services.google_maps.map_id') }}"></x-maps-google>
+```
+
+**Sporedno:** markeri s `icon` ključem se sad renderuju kao `<img>` fiksno 32×32 px unutar flex diva
+(prije je Google skalirao ikonu sam), pa ikone mogu izgledati drugačije. Obje mape koriste `icon`.
 
 ---
 
 ## FAZA 6 — Post-upgrade čišćenje
 
-- [ ] `php artisan optimize:clear`
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ažurirati `phpunit.xml` za PHPUnit 11 format
-- [ ] Ručno testirati: tiket workflow
-- [ ] Ručno testirati: licence i naplata
-- [ ] Ručno testirati: bankomat module
-- [ ] Ručno testirati: rezervacije i transfer dijelova
-- [ ] Ručno testirati: Excel exportovi
-- [ ] Ručno testirati: PDF generisanje (dompdf)
-- [ ] Ručno testirati: Spatie Permission role/permission dodjele — automatski: `tests/Feature/RolePermissionTest.php` (re-run na PHP 8.4)
-- [ ] Ručno testirati: autentifikacija i email verifikacija
-- [ ] Deploy na staging i finalni test
+> Automatizovani dio odrađen 2026-08-16, ručno testiranje u browseru takođe —
+> uključujući Google mape, čime je pao zadnji otvoreni rizik iz FAZE 5.
+> Deploy na test lokaciju (`develop-servis-epos-app`) prošao 2026-08-16 s novim
+> rsync deploy-em. Ostaje samo produkcija.
+
+- [x] `php artisan optimize:clear`
+- [x] `php artisan config:cache && php artisan route:cache && php artisan view:cache` — sve tri prolaze;
+      `route:cache` znači da nema closure ruta, `view:cache` da se svi Blade šabloni kompajliraju na PHP 8.4
+- [x] `phpunit.xml` — **već je u modernom formatu** (`<source>` umjesto `<coverage><include>`),
+      PHPUnit 12.5.33 ga prihvata bez ijedne poruke o migraciji. Nije trebalo mijenjati.
+- [x] `minimum-stability` `dev` → `stable` u `composer.json` — zatvara rupu kroz koju je
+      `laravel/framework` bio prikovan na `11.x-dev` (nalaz FAZE 4). Nijedan paket nije bio na dev verziji,
+      pa je promjena bez efekta na instalirani stack (`composer update --lock`, lock diff = 2 linije).
+- [x] Excel export (`LicencaNaplataExport`) — **automatski smoke test** na stvarnim podacima:
+      17.5 KB validan XLSX, 121 red, ispravna zaglavlja
+- [x] PDF generisanje (dompdf v3) — **automatski smoke test** na stvarnim podacima:
+      `PredracunPdfControler` 984 KB / 239 licenci, `DistPredracunControler` oba tipa (`p` i `r`) ~879 KB.
+      Sve `%PDF-` validno. dompdf v2→v3 nije donio regresiju.
+- [x] Spatie Permission role/permission dodjele — `tests/Feature/RolePermissionTest.php` zelen na PHP 8.4
+- [x] Sken ostataka Livewire 2 sintakse (`emit*`, `dispatchBrowserEvent`, `wire:model.defer/.lazy`,
+      `$listeners`, `Livewire.emit`) — **čisto**, jedina pojava je zakomentarisana linija
+      u `Managment/DistributerLicencePregled.php:25`
+- [x] **RUČNO** — Google mape u browseru (vidi odjeljak 5.5 — jedini otvoreni rizik iz FAZE 5)
+- [x] **RUČNO** — tiket workflow
+- [x] **RUČNO** — licence i naplata
+- [x] **RUČNO** — bankomat module
+- [x] **RUČNO** — rezervacije i transfer dijelova
+- [x] **RUČNO** — autentifikacija i email verifikacija
+- [x] Deploy na test lokaciju (`develop-servis-epos-app`) — prošao, PHP 8.4.23 CLI,
+      MariaDB 11.4.12, 94 tabele, `db:show` se konektuje
+- [x] Ekstenzije na test lokaciji — **sve prisutne**, uključujući `gd` i `zip` (vidi nalaz 4)
+- [ ] **Prije merge-a na `main`:** produkcija prebačena na PHP 8.4 (isti cPanel nalog, pa bi
+      set ekstenzija trebao biti isti — potvrditi kroz **web** PHP, ne samo CLI)
+- [ ] Deploy na produkciju i finalni test
+
+### Nalazi FAZE 6
+
+**1. Dinamička svojstva (PHP 8.2+ deprecacija, fatalno u PHP 9) — ISPRAVLJENO**
+
+Skeniranje deprecacija u FAZI 3 bilo je statičko i ovo je promašilo; izašlo je tek pri
+*izvršavanju* PDF kontrolera:
+
+```
+Creation of dynamic property class@anonymous::$tip is deprecated
+  in app/Http/Controllers/Distributer/DistPredracunControler.php on line 98
+```
+
+- `DistPredracunControler::vrstaDokumenta()` — anonimna klasa `new class{}` je dobijala
+  4 dinamička svojstva. Sada su deklarisana. PDF izlaz je bajt-identičan prije i poslije.
+- `DistributerLokacija::$modelId` — postavljano u `deleteShowModal()` bez deklaracije.
+  Pored deprecacije, ovo je i **Livewire problem**: nedeklarisana svojstva se ne serijalizuju,
+  pa vrijednost ne preživi zahtjev. Dodato `public $modelId;` po konvenciji siblinga.
+
+Regresioni test: `tests/Unit/DinamickaSvojstvaTest.php` (diže `E_DEPRECATED` u izuzetak;
+provjereno da sva 3 testa padaju bez ispravki).
+
+Sken cijelog `app/` nije našao druga živa mjesta — preostalih 6 kandidata su zakomentarisane linije.
+
+**2. `BrowserSessionsTest` bez asercija — ISPRAVLJENO**
+
+Jetstream boilerplate koji je PHPUnit prijavljivao kao *risky*. Dodato
+`->assertHasNoErrors()->assertSuccessful()`.
+
+**3. `DistributerLokacija` — dugme „Ukloni lokaciju" zove metodu koja ne postoji — RIJEŠENO UKLANJANJEM**
+
+`resources/views/livewire/distributer-lokacija.blade.php:94` je imao `wire:click="delete"`,
+a komponenta nema `delete()` metodu — potvrđeno i reflection-om nad cijelom hijerarhijom
+(`Component`, `WithPagination`, trait-ovi). Dugme se renderovalo samo kad je `$delete_error`
+prazan — dakle baš na „sretnom putu" pucalo je `MethodNotFoundException`.
+
+**Nije bila regresija upgrade-a** (isto bi puklo i na LW2). Korisnik je odlučio da se
+funkcionalnost ukloni umjesto da se implementira, pa je obrisan cio mrtvi tok:
+dugme u redu tabele, modal za brisanje, `deleteShowModal()`, četiri svojstva koja su
+služila samo njemu (`modalDeleteLocVisible`, `modelId`, `l_naziv`, `delete_error`) i
+importi `User` / `TerminalLokacija` koji su nakon toga ostali neiskorišteni.
+
+Usput je otišao i nevažeći HTML — dugme je otvarano kao `<x-jet-danger-button>`,
+a zatvarano kao `</x-jet-button>`.
+
+Zbog toga je iz `tests/Unit/DinamickaSvojstvaTest.php` uklonjen test
+`test_distributer_lokacija_ima_deklarisan_model_id` — svojstvo koje je čuvao više ne postoji.
+Dio testa koji pokriva `DistPredracunControler` ostaje.
+
+**4. Dev kontejner ima ekstenzije kojih na serveru nema**
+
+Otkriveno na test deploy-u: `php artisan db:show` je uredno ispisao bazu (MariaDB 11.4.12,
+94 tabele) pa pukao na kraju, u Laravelovom formatiranju brojeva:
+
+```
+RuntimeException: The "intl" PHP extension is required to use the [format] method.
+  vendor/laravel/framework/src/Illuminate/Support/Number.php:385
+```
+
+**`intl` aplikaciji ne treba** — nije u `composer check-platform-reqs` listi, kod
+`phpoffice/phpspreadsheet` stoji samo pod `suggest`, a `Number::` se u kodu ne koristi nigdje.
+Greška je kozmetička i pogađa samo `db:show`.
+
+Ali je otkrila stvarnu razliku: **Sail kontejner ima `intl`, cPanel nema.** Feature koji lokalno
+prođe može zato pući u produkciji. Prije merge-a na `main` provjeriti da produkcijski PHP 8.4
+ima isti set ekstenzija.
+
+Platform zahtjevi iz `composer check-platform-reqs` (uz `pdo_mysql`, koji Laravel traži kroz
+konfiguraciju a ne kroz composer):
+
+```
+curl date dom fileinfo filter gd hash iconv json libxml mbstring openssl pcre
+phar session simplexml tokenizer xml xmlreader xmlwriter zip zlib
+```
+
+Provjera na serveru:
+
+```bash
+for e in curl dom fileinfo filter gd hash iconv json libxml mbstring openssl pcre \
+         phar session simplexml tokenizer xml xmlreader xmlwriter zip zlib pdo_mysql; do
+  php -m | grep -qix "$e" || echo "NEDOSTAJE: $e"
+done
+```
+
+`gd` treba dompdf-u za slike, `zip` phpspreadsheet-u za `.xlsx` — dakle PDF i Excel padaju bez njih.
+`mbstring` composer prihvata i preko `symfony/polyfill-mbstring`, ali prava ekstenzija je bitno brža.
+
+**Rezultat (2026-08-16):** na test lokaciji su **sve prisutne**. Pošto su dev i prod dva
+direktorijuma na **istom cPanel nalogu** (`/home/eposrs/`), set ekstenzija bi trebao biti isti i
+za produkciju — ostaje samo prebaciti prod domen na PHP 8.4 i potvrditi kroz **web** PHP, jer
+MultiPHP Manager verziju postavlja po domenu, pa se web i CLI mogu razlikovati.
+
+Sporedno, s istog deploy-a: warning „nd_mysql, pdo_mysql skipped as conflicting" iz cPanel PHP
+selektora je bezopasan — isti drajveri postoje u dvije familije (`nd_*` = mysqlnd, obična =
+libmysqlclient), selektor zadrži jednu. `PDO::getAvailableDrivers()` vraća `mysql`, veza radi.
+`nd_mysql` je uz to ostatak stare selekcije: `ext/mysql` je izbačen još u PHP 7.0.
+
+### Stanje testova na kraju FAZE 6
+
+```
+Tests: 55 passed, 8 skipped (162 assertions)
+```
+
+8 preskočenih su Jetstream funkcije isključene u konfiguraciji (API tokeni, registracija,
+email verifikacija) — očekivano, ne zavisi od upgrade-a. Nula deprecacija uz
+`--display-deprecations`, `composer audit` čist.
 
 ---
 

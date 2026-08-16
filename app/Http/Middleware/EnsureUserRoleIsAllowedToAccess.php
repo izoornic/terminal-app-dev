@@ -37,7 +37,7 @@ class EnsureUserRoleIsAllowedToAccess
     /**
      * The default user access role.
      *
-     * @return void
+     * @return array
      */
     private function defaultUserAccessRole()
     {

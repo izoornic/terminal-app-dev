@@ -16,9 +16,11 @@ use Laravel\Boost\Install\GuidelineAssist;
 use Laravel\Boost\Install\GuidelineConfig;
 use Laravel\Boost\Mcp\Boost;
 use Laravel\Boost\Middleware\InjectBoost;
+use Laravel\Boost\Rules\RuleRepository;
 use Laravel\Boost\Services\BrowserLogger;
+use Laravel\Boost\Support\RenderFailures;
 use Laravel\Mcp\Facades\Mcp;
-use Laravel\Roster\Roster;
+use Laravel\Roster\ProjectManager;
 
 class BoostServiceProvider extends ServiceProvider
 {
@@ -29,43 +31,22 @@ class BoostServiceProvider extends ServiceProvider
             'boost'
         );
 
+        $this->app->singleton(RenderFailures::class, fn (): RenderFailures => new RenderFailures);
+
         if (! $this->shouldRun()) {
             return;
         }
 
         $this->app->singleton(BoostManager::class, fn (): BoostManager => new BoostManager);
 
-        $this->app->singleton(Roster::class, function () {
-            $lockFiles = [
-                base_path('composer.lock'),
-                base_path('package-lock.json'),
-                base_path('bun.lock'),
-                base_path('bun.lockb'),
-                base_path('pnpm-lock.yaml'),
-                base_path('yarn.lock'),
-            ];
-
-            $cacheKey = 'boost.roster.scan';
-            $lastModified = max(array_map(fn (string $path): int|false => file_exists($path) ? filemtime($path) : 0, $lockFiles));
-
-            $cached = cache()->get($cacheKey);
-            if ($cached && isset($cached['timestamp']) && $cached['timestamp'] >= $lastModified) {
-                return $cached['roster'];
-            }
-
-            $roster = Roster::scan(base_path());
-            cache()->put($cacheKey, [
-                'roster' => $roster,
-                'timestamp' => time(),
-            ], now()->addHours(24));
-
-            return $roster;
-        });
+        $this->app->singleton(ProjectManager::class, fn (): ProjectManager => new ProjectManager);
 
         $this->app->singleton(GuidelineConfig::class, fn (): GuidelineConfig => new GuidelineConfig);
 
+        $this->app->singleton(RuleRepository::class, fn (): RuleRepository => new RuleRepository(base_path('.ai/rules')));
+
         $this->app->singleton(GuidelineAssist::class, fn ($app): GuidelineAssist => new GuidelineAssist(
-            $app->make(Roster::class),
+            $app->make(ProjectManager::class),
             $app->make(GuidelineConfig::class)
         ));
     }
@@ -106,6 +87,8 @@ class BoostServiceProvider extends ServiceProvider
                 Console\InstallCommand::class,
                 Console\UpdateCommand::class,
                 Console\ExecuteToolCommand::class,
+                Console\AddSkillCommand::class,
+                Console\ListSkillCommand::class,
             ]);
         }
     }
@@ -114,6 +97,13 @@ class BoostServiceProvider extends ServiceProvider
     {
         Route::post('/_boost/browser-logs', function (Request $request) {
             $logs = $request->input('logs', []);
+
+            // Handle sendBeacon's text/plain content type.
+            if (empty($logs) && ! $request->isJson()) {
+                $decoded = json_decode($request->getContent(), true);
+                $logs = $decoded['logs'] ?? [];
+            }
+
             /** @var Logger $logger */
             $logger = Log::channel('browser');
 
@@ -179,7 +169,7 @@ class BoostServiceProvider extends ServiceProvider
         config([
             'logging.channels.browser' => [
                 'driver' => 'single',
-                'path' => storage_path('logs/browser.log'),
+                'path' => storage_path('logs'.DIRECTORY_SEPARATOR.'browser.log'),
                 'level' => env('LOG_LEVEL', 'debug'),
                 'days' => 14,
             ],

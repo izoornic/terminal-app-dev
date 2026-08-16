@@ -8,13 +8,15 @@ ATM/Terminal and Spare Parts management system for a POS/ATM service business. T
 
 ## Current Version State (read this first)
 
-This project is mid-way through a staged upgrade (L10 → L13, PHP 8.2 → 8.4; see [UPGRADE.md](UPGRADE.md)). The `upgrade/laravel11` phase has been merged to `main`. Installed stack:
+The staged upgrade (L10 → L13, PHP 8.2 → 8.4; see [UPGRADE.md](UPGRADE.md)) has **reached its target** — all phases 0–6 are done on branch `upgrade/php84`, which is **not yet merged to `main`** (`main` is still at the L11 phase, merged via PR #15). Installed stack:
 
-- **Laravel 11.54** (L11 structure: `bootstrap/app.php` + `bootstrap/providers.php`; there is **no** `app/Http/Kernel.php` or `RouteServiceProvider`). Middleware aliases, trusted proxies, and appended middleware are configured in [bootstrap/app.php](bootstrap/app.php).
+- **Laravel 13.25** on **PHP 8.4.24** with **Symfony 8.1** (L11+ structure: `bootstrap/app.php` + `bootstrap/providers.php`; there is **no** `app/Http/Kernel.php` or `RouteServiceProvider`). Middleware aliases, trusted proxies, and appended middleware are configured in [bootstrap/app.php](bootstrap/app.php).
 - **Livewire 3**, with one deliberate deviation from Boost's `livewire/v3` guidance below: `config/livewire.php` sets `class_namespace => 'App\Http\Livewire'`, so **all components live in the legacy `App\Http\Livewire` namespace**, not the LW3 default `app/Livewire` (which is empty). They otherwise use LW3 idioms (`$this->dispatch(...)`, `wire:model.live`). Add new components under `App\Http\Livewire` and match sibling syntax.
-- Jetstream 5 + Fortify + Sanctum 4, Spatie Permission 6, PHPUnit 11.
+- Jetstream 5 + Fortify + Sanctum 4, Spatie Permission 6, PHPUnit 12, dompdf 3.
 
-The Laravel Boost block at the end of this file is auto-generated (`php artisan boost:update`) and now reflects this L11/LW3 stack.
+⚠️ **Before merging to `main`, the cPanel production host must be on PHP 8.4** — `composer.json` requires `^8.4`, so deploy breaks otherwise.
+
+⚠️ The Laravel Boost block at the end of this file is auto-generated, but `php artisan boost:update` is currently a no-op (exits 0, writes nothing), so its version list was corrected by hand to match the installed stack. Its `laravel/v11 rules` section is still titled for L11 — those rules (streamlined structure, `bootstrap/app.php`, auto-registered commands) remain accurate on L13.
 
 ## Commands
 
@@ -26,7 +28,7 @@ npm run dev          # one-off dev build (alias: development)
 npm run watch        # rebuild on change
 npm run prod         # minified + versioned production build
 
-# Tests (PHPUnit 11)
+# Tests (PHPUnit 12)
 php artisan test                                   # full suite
 php artisan test tests/Feature/RolePermissionTest.php
 php artisan test --filter=testName                 # single test after a change
@@ -86,7 +88,7 @@ Many models carry `*History` siblings — mutations are expected to append histo
 - Follow the Boost `=== php rules ===` (curly braces always, promoted constructor props, explicit return types, PHPDoc over inline comments) and `=== laravel/core rules ===` (Form Requests for validation, Eloquent over `DB::`, eager-load to avoid N+1) below — those remain accurate.
 - **Casts:** existing models use the `$casts` property (none use the L11 `casts()` method yet) — match siblings, even though Boost's `laravel/v11` rule suggests `casts()`.
 - Tests use factories; DB-touching tests run against the `testing` database. Don't remove existing tests.
-- The changelog ([CHANGELOG.md](CHANGELOG.md)) is Serbian and version-tagged (`V x.y.z`); the current line is 2.0.0.x.
+- The changelog ([CHANGELOG.md](CHANGELOG.md)) is Serbian and version-tagged (`V x.y.z ( d.m.yyyy.) @branch`); the current line is 2.2.x. Keep it in sync with `version` in [config/global.php](config/global.php).
 
 ---
 
@@ -100,15 +102,15 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.2.30
+- php - 8.4.24
 - laravel/fortify (FORTIFY) - v1
-- laravel/framework (LARAVEL) - v11
+- laravel/framework (LARAVEL) - v13
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
 - livewire/livewire (LIVEWIRE) - v3
 - laravel/mcp (MCP) - v0
 - laravel/sail (SAIL) - v1
-- phpunit/phpunit (PHPUNIT) - v11
+- phpunit/phpunit (PHPUNIT) - v12
 
 ## Conventions
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
