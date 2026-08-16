@@ -446,3 +446,21 @@ V 2.2.4 ( 16.8.2026.) @upgrade/php84
     - Usput ispravljen nevazeci HTML: dugme je otvarano kao <x-jet-danger-button>, zatvarano kao </x-jet-button>
     - Iz tests/Unit/DinamickaSvojstvaTest.php uklonjen test za DistributerLokacija::$modelId
       jer to svojstvo vise ne postoji. Dio koji pokriva DistPredracunControler ostaje.
+
+V 2.2.5 ( 16.8.2026.) @upgrade/php84
+    - .cpanel.yml: "cp -a *" zamenjen sa "rsync -a --delete". Stari deploy je samo prepisivao fajlove
+      i nikada nije brisao one uklonjene iz repozitorijuma, pa se na serverima gomilao otpad -
+      npr. paketi propaganistas/laravel-phone i giggsey/libphonenumber-for-php-lite, uklonjeni u
+      FAZI 5, i dalje su tamo. Uz to je rsync znatno brzi jer salje samo izmenjene fajlove
+      (deploy je 15623 fajla, od toga 14813 vendor).
+    - Iskljuceni iz sinhronizacije (postoje na serveru, nema ih u gitu - brisanje bi bio gubitak podataka):
+        --exclude='/.*'              svi dotfajlovi u korenu: .env, .htaccess, .user.ini, .git
+                                     (cp -a * ih ionako nikada nije kopirao)
+        --exclude=/storage/          logovi, sesije, storage/app/public/blacklist.txt
+        --exclude=/public/bl/        blacklist.txt koji generise TerminalBacklist.php i citaju terminali
+        --exclude=/public/predracuni/, /public/storage, /public/hot, /node_modules/
+    - Zadnji task (brisanje storage/framework/views/*.php) ostaje nuzan bas zato sto je storage/
+      iskljucen iz rsync-a, pa stare kompajlirane blade sablone rsync ne moze da pocisti.
+    - PRE UPOTREBE NA MAIN-U: pustiti isti rsync sa --dry-run -v preko SSH-a i procitati listu
+      brisanja. Prvi deploy brise godine nakupljenog otpada odjednom. Proveriti i "which rsync"
+      (putanja moze biti drukcija od /usr/bin/rsync).
