@@ -31,6 +31,7 @@ class DistributerLokacija extends Component
 
     //brisanje lokacije
     public $modalDeleteLocVisible;
+    public $modelId;
     public $l_naziv;
     public $delete_error;
     /**

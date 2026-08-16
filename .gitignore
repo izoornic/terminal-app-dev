@@ -6,7 +6,9 @@
 /public/bl/blacklist.txt
 /storage/*.key
 .env
-.cpanel.yml
+# .cpanel.yml NE ignorisati - cPanel ga cita iz repozitorijuma na serveru.
+# Ako bi ostao van gita, deploy grane bi koristio zadnju commit-ovanu putanju
+# i mogao bi da prepise produkciju. Putanja se sada bira automatski po grani.
 .phpunit.result.cache
 docker-compose.yml
 docker-compose.override.yml

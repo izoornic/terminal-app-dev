@@ -10042,6 +10042,7 @@ return array(
     'Tests\\CreatesApplication' => $baseDir . '/tests/CreatesApplication.php',
     'Tests\\Feature\\ApiTokenPermissionsTest' => $baseDir . '/tests/Feature/ApiTokenPermissionsTest.php',
     'Tests\\Feature\\AuthenticationTest' => $baseDir . '/tests/Feature/AuthenticationTest.php',
+    'Tests\\Feature\\BankomatTiketExpiryTest' => $baseDir . '/tests/Feature/BankomatTiketExpiryTest.php',
     'Tests\\Feature\\BrowserSessionsTest' => $baseDir . '/tests/Feature/BrowserSessionsTest.php',
     'Tests\\Feature\\CreateApiTokenTest' => $baseDir . '/tests/Feature/CreateApiTokenTest.php',
     'Tests\\Feature\\DeleteAccountTest' => $baseDir . '/tests/Feature/DeleteAccountTest.php',

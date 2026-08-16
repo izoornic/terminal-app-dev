@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/eposrs/servis-epos-app/
+    - 'if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then export DEPLOYPATH=/home/eposrs/servis-epos-app/; else export DEPLOYPATH=/home/eposrs/develop-servis-epos-app/; fi'
     - /bin/cp -a * $DEPLOYPATH
     - /bin/rm -f $DEPLOYPATH/bootstrap/cache/packages.php $DEPLOYPATH/bootstrap/cache/services.php $DEPLOYPATH/bootstrap/cache/config.php $DEPLOYPATH/bootstrap/cache/compiled.php
     - /bin/rm -f $DEPLOYPATH/storage/framework/views/*.php

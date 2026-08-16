@@ -406,3 +406,22 @@ V 2.2.1 ( 15.8.2026.) @upgrade/php84
       pretvarao u cifre HHMMSS umesto u sekunde, pa su se tiketi crvenili prekasno (Hitno 5h33min
       umesto 2h, Visok 2 dana 18h umesto 1 dan, Srednji 5 dana 13h umesto 2 dana). Sada ide kroz TIME_TO_SEC()
     - Dodat test tests/Feature/BankomatTiketExpiryTest.php
+
+V 2.2.2 ( 16.8.2026.) @upgrade/php84
+    - FAZA 6 upgrade-a: post-upgrade ciscenje
+    - Ispravljena dinamicka svojstva (deprecirana u PHP 8.2, fatalna u PHP 9):
+        - DistPredracunControler::vrstaDokumenta() - anonimna klasa dobijala 4 dinamicka svojstva,
+          sada deklarisana. PDF izlaz bajt-identican.
+        - DistributerLokacija::$modelId - nedeklarisano svojstvo koje Livewire ne serijalizuje,
+          pa vrednost nije prezivljavala zahtev. Dodato public $modelId;
+    - Dodat test tests/Unit/DinamickaSvojstvaTest.php
+    - BrowserSessionsTest dobio asercije (PHPUnit ga je prijavljivao kao risky)
+    - composer.json minimum-stability: dev -> stable (rupa kroz koju je framework bio na 11.x-dev)
+    - Verifikovano automatski na stvarnim podacima: dompdf v3 (oba PDF kontrolera) i Excel export
+    - .cpanel.yml sada sam bira DEPLOYPATH po grani (main -> servis-epos-app, sve ostalo ->
+      develop-servis-epos-app), pa se vise ne prebacuje rucno pri merge-u. Fallback ide na develop,
+      tako da promasaj nikad ne gadja produkciju. Uklonjen .cpanel.yml iz .gitignore - bio je bez
+      efekta (fajl je tracked) i opasno navodio na zakljucak da sme da ostane van gita.
+    - PAZNJA (nije ispravljeno): dugme "Ukloni lokaciju" u distributer-lokacija.blade.php zove
+      wire:click="delete", a komponenta DistributerLokacija nema delete() metodu -> puca na sretnom putu.
+      Nije regresija upgrade-a, ceka odluku o implementaciji.

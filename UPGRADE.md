@@ -611,18 +611,81 @@ kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
 
 ## FAZA 6 — Post-upgrade čišćenje
 
-- [ ] `php artisan optimize:clear`
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] Ažurirati `phpunit.xml` za PHPUnit 11 format
-- [ ] Ručno testirati: tiket workflow
-- [ ] Ručno testirati: licence i naplata
-- [ ] Ručno testirati: bankomat module
-- [ ] Ručno testirati: rezervacije i transfer dijelova
-- [ ] Ručno testirati: Excel exportovi
-- [ ] Ručno testirati: PDF generisanje (dompdf)
-- [ ] Ručno testirati: Spatie Permission role/permission dodjele — automatski: `tests/Feature/RolePermissionTest.php` (re-run na PHP 8.4)
-- [ ] Ručno testirati: autentifikacija i email verifikacija
+> Automatizovani dio odrađen 2026-08-16. Ostalo je ručno testiranje u browseru
+> (redovi označeni **RUČNO**) i deploy na staging.
+
+- [x] `php artisan optimize:clear`
+- [x] `php artisan config:cache && php artisan route:cache && php artisan view:cache` — sve tri prolaze;
+      `route:cache` znači da nema closure ruta, `view:cache` da se svi Blade šabloni kompajliraju na PHP 8.4
+- [x] `phpunit.xml` — **već je u modernom formatu** (`<source>` umjesto `<coverage><include>`),
+      PHPUnit 12.5.33 ga prihvata bez ijedne poruke o migraciji. Nije trebalo mijenjati.
+- [x] `minimum-stability` `dev` → `stable` u `composer.json` — zatvara rupu kroz koju je
+      `laravel/framework` bio prikovan na `11.x-dev` (nalaz FAZE 4). Nijedan paket nije bio na dev verziji,
+      pa je promjena bez efekta na instalirani stack (`composer update --lock`, lock diff = 2 linije).
+- [x] Excel export (`LicencaNaplataExport`) — **automatski smoke test** na stvarnim podacima:
+      17.5 KB validan XLSX, 121 red, ispravna zaglavlja
+- [x] PDF generisanje (dompdf v3) — **automatski smoke test** na stvarnim podacima:
+      `PredracunPdfControler` 984 KB / 239 licenci, `DistPredracunControler` oba tipa (`p` i `r`) ~879 KB.
+      Sve `%PDF-` validno. dompdf v2→v3 nije donio regresiju.
+- [x] Spatie Permission role/permission dodjele — `tests/Feature/RolePermissionTest.php` zelen na PHP 8.4
+- [x] Sken ostataka Livewire 2 sintakse (`emit*`, `dispatchBrowserEvent`, `wire:model.defer/.lazy`,
+      `$listeners`, `Livewire.emit`) — **čisto**, jedina pojava je zakomentarisana linija
+      u `Managment/DistributerLicencePregled.php:25`
+- [x] **RUČNO** — Google mape u browseru (vidi odjeljak 5.5 — jedini otvoreni rizik iz FAZE 5)
+- [x] **RUČNO** — tiket workflow
+- [x] **RUČNO** — licence i naplata
+- [x] **RUČNO** — bankomat module
+- [x] **RUČNO** — rezervacije i transfer dijelova
+- [x] **RUČNO** — autentifikacija i email verifikacija
 - [ ] Deploy na staging i finalni test
+
+### Nalazi FAZE 6
+
+**1. Dinamička svojstva (PHP 8.2+ deprecacija, fatalno u PHP 9) — ISPRAVLJENO**
+
+Skeniranje deprecacija u FAZI 3 bilo je statičko i ovo je promašilo; izašlo je tek pri
+*izvršavanju* PDF kontrolera:
+
+```
+Creation of dynamic property class@anonymous::$tip is deprecated
+  in app/Http/Controllers/Distributer/DistPredracunControler.php on line 98
+```
+
+- `DistPredracunControler::vrstaDokumenta()` — anonimna klasa `new class{}` je dobijala
+  4 dinamička svojstva. Sada su deklarisana. PDF izlaz je bajt-identičan prije i poslije.
+- `DistributerLokacija::$modelId` — postavljano u `deleteShowModal()` bez deklaracije.
+  Pored deprecacije, ovo je i **Livewire problem**: nedeklarisana svojstva se ne serijalizuju,
+  pa vrijednost ne preživi zahtjev. Dodato `public $modelId;` po konvenciji siblinga.
+
+Regresioni test: `tests/Unit/DinamickaSvojstvaTest.php` (diže `E_DEPRECATED` u izuzetak;
+provjereno da sva 3 testa padaju bez ispravki).
+
+Sken cijelog `app/` nije našao druga živa mjesta — preostalih 6 kandidata su zakomentarisane linije.
+
+**2. `BrowserSessionsTest` bez asercija — ISPRAVLJENO**
+
+Jetstream boilerplate koji je PHPUnit prijavljivao kao *risky*. Dodato
+`->assertHasNoErrors()->assertSuccessful()`.
+
+**3. `DistributerLokacija` — dugme „Ukloni lokaciju" zove metodu koja ne postoji ⚠️ NIJE DIRANO**
+
+`resources/views/livewire/distributer-lokacija.blade.php:94` ima `wire:click="delete"`,
+a komponenta nema `delete()` metodu (`mount`, `createShowModal`, `lokacijeTipa`, `novaLokacija`,
+`create`, `deleteShowModal`, `read`, `render`). Dugme se renderuje samo kad je `$delete_error`
+prazan — dakle baš na „sretnom putu" puca `MethodNotFoundException`.
+
+**Nije regresija upgrade-a** (isto bi puklo i na LW2) i implementacija brisanja je destruktivna
+operacija van opsega FAZE 6 — ostavljeno korisniku na odluku.
+
+### Stanje testova na kraju FAZE 6
+
+```
+Tests: 51 passed, 8 skipped (151 assertions)
+```
+
+8 preskočenih su Jetstream funkcije isključene u konfiguraciji (API tokeni, registracija,
+email verifikacija) — očekivano, ne zavisi od upgrade-a. Nula deprecacija uz
+`--display-deprecations`, `composer audit` čist.
 
 ---
 

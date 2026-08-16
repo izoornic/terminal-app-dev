@@ -91,14 +91,24 @@ class DistPredracunControler extends Controller
         return $pdf->stream('predracun.pdf');
     }
 
-    private function vrstaDokumenta($tip)
+    /**
+     * Opis dokumenta za PDF šablon.
+     *
+     * @param  string  $tip  'p' za predračun, 'r' za račun
+     */
+    private function vrstaDokumenta(string $tip): object
     {
         $p = ($tip=='p') ? true : false;
-        $retval = new class{};
+        $retval = new class{
+            public string $tip = '';
+            public string $naslov = '';
+            public string $placanje = '';
+            public string $datum = '';
+        };
         $retval->tip = $tip;
         $retval->naslov = ($p) ? 'Predračun':'Račun';
         $retval->placanje = ($p) ? 'Za uplatu' : 'Ukupno';
-        $retval->datum = ($p) ? 'Datum dospeća:' : 'Datum:'; 
+        $retval->datum = ($p) ? 'Datum dospeća:' : 'Datum:';
         return $retval;
     }
 }
