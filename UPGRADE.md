@@ -1,26 +1,45 @@
 # Plan upgrejda: Laravel 10 → 13 + PHP 8.2 → 8.4
 
-> Datum kreiranja: 2026-04-28
-> Polazna verzija: Laravel 10.x, PHP 8.2.30, Livewire 2.5
-> Ciljana verzija: Laravel 13.x, PHP 8.4.x, Livewire 3.x
+## ✅ ZAVRŠENO — 2026-08-16
+
+> Sve faze (0–6) su gotove, merge-ovano na `main` kroz **PR #16**, deploy-ovano na obje
+> cPanel lokacije. Verzija **V 2.2.5**. Trajalo 2026-04-28 → 2026-08-16.
 >
-> **Redoslijed (od 2026-06-23):** L11 i PHP su razdvojeni jer L13 zahtijeva PHP ≥ 8.3.
-> Zato PHP 8.4 ide prije frameworka, pa onda inkrementalno L12 → L13:
-> FAZA 3 (PHP 8.4) → FAZA 4 (L12) → FAZA 5 (L13) → FAZA 6 (čišćenje).
+> **Ovaj dokument je od sada istorijski zapis, ne plan.** Korisno je i dalje: nalazi po fazama,
+> odluke i njihova obrazloženja, te grabulje na koje se nagazilo (Livewire 3 dupli Alpine,
+> `laravel-maps` Advanced Markers, dinamička svojstva u PHP 8.4, cPanel deploy koji nije brisao
+> fajlove). Aktuelno stanje stack-a stoji u [CLAUDE.md](CLAUDE.md).
+>
+> Dio kvadratića u ranijim fazama ostao je neoznačen. To **nije** zaostali posao — te stavke su
+> ili prevaziđene kasnijim fazama, ili svjesno preskočene. Primjer: „ažurirati `$casts` property
+> u `casts()` metodu" nije urađeno namjerno, modeli i dalje koriste `$casts` (vidi
+> [CLAUDE.md](CLAUDE.md)). Mjerodavan je status po fazama na vrhu, ne pojedinačni kvadratići.
 
 ---
 
-## Trenutno stanje zavisnosti
+## Rezultat
 
-| Komponenta | Trenutno | Cilj |
+| Komponenta | Bilo (2026-04-28) | Sada |
 | --- | --- | --- |
-| PHP | 8.2.30 | 8.4.x |
-| Laravel | 10.x | 13.x |
-| Livewire | 2.5 | 3.x |
-| Jetstream | 2.6 | 4.x |
-| Sanctum | 3.2 | 4.x |
-| PHPUnit | 9.5 | 11.x |
-| Collision | 6.1 | 8.x |
+| PHP | 8.2.30 | **8.4.24** |
+| Laravel | 10.x | **13.25.0** |
+| Symfony | 6.x | **8.1** |
+| Livewire | 2.5 | **3.8.4** |
+| Jetstream | 2.6 | **5.x** |
+| Sanctum | 3.2 | **4.x** |
+| PHPUnit | 9.5 | **12.5.33** |
+| Collision | 6.1 | **8.x** |
+| dompdf | 2.x | **3.x** |
+
+Testovi: 55 prolazi, 8 preskočeno (Jetstream funkcije isključene u konfiguraciji).
+`composer audit` čist, nula deprecacija na PHP 8.4.
+
+### Polazni plan (za kontekst nalaza ispod)
+
+> Datum kreiranja: 2026-04-28
+> **Redoslijed (od 2026-06-23):** L11 i PHP su razdvojeni jer L13 zahtijeva PHP ≥ 8.3.
+> Zato PHP 8.4 ide prije frameworka, pa onda inkrementalno L12 → L13:
+> FAZA 3 (PHP 8.4) → FAZA 4 (L12) → FAZA 5 (L13) → FAZA 6 (čišćenje).
 
 ---
 
@@ -642,9 +661,9 @@ kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
 - [x] Deploy na test lokaciju (`develop-servis-epos-app`) — prošao, PHP 8.4.23 CLI,
       MariaDB 11.4.12, 94 tabele, `db:show` se konektuje
 - [x] Ekstenzije na test lokaciji — **sve prisutne**, uključujući `gd` i `zip` (vidi nalaz 4)
-- [ ] **Prije merge-a na `main`:** produkcija prebačena na PHP 8.4 (isti cPanel nalog, pa bi
-      set ekstenzija trebao biti isti — potvrditi kroz **web** PHP, ne samo CLI)
-- [ ] Deploy na produkciju i finalni test
+- [x] Produkcija prebačena na PHP 8.4, ekstenzije potvrđene
+- [x] Deploy na produkciju i finalni test — **prošao**
+- [x] Merge `upgrade/php84` → `main` (PR #16, 2026-08-16) — **upgrade zatvoren**
 
 ### Nalazi FAZE 6
 

@@ -8,13 +8,13 @@ ATM/Terminal and Spare Parts management system for a POS/ATM service business. T
 
 ## Current Version State (read this first)
 
-The staged upgrade (L10 → L13, PHP 8.2 → 8.4; see [UPGRADE.md](UPGRADE.md)) has **reached its target** — all phases 0–6 are done on branch `upgrade/php84`, which is **not yet merged to `main`** (`main` is still at the L11 phase, merged via PR #15). Installed stack:
+The staged upgrade (L10 → L13, PHP 8.2 → 8.4; see [UPGRADE.md](UPGRADE.md)) is **finished and merged to `main`** (PR #16, 2026-08-16) — all phases 0–6 done, deployed to both cPanel locations, V 2.2.5. `main` is now the current line again; treat [UPGRADE.md](UPGRADE.md) as a historical record, not a plan. Installed stack:
 
 - **Laravel 13.25** on **PHP 8.4.24** with **Symfony 8.1** (L11+ structure: `bootstrap/app.php` + `bootstrap/providers.php`; there is **no** `app/Http/Kernel.php` or `RouteServiceProvider`). Middleware aliases, trusted proxies, and appended middleware are configured in [bootstrap/app.php](bootstrap/app.php).
 - **Livewire 3**, with one deliberate deviation from Boost's `livewire/v3` guidance below: `config/livewire.php` sets `class_namespace => 'App\Http\Livewire'`, so **all components live in the legacy `App\Http\Livewire` namespace**, not the LW3 default `app/Livewire` (which is empty). They otherwise use LW3 idioms (`$this->dispatch(...)`, `wire:model.live`). Add new components under `App\Http\Livewire` and match sibling syntax.
 - Jetstream 5 + Fortify + Sanctum 4, Spatie Permission 6, PHPUnit 12, dompdf 3.
 
-⚠️ **Before merging to `main`, the cPanel production host must be on PHP 8.4** — `composer.json` requires `^8.4`, so deploy breaks otherwise.
+**Deployment note:** `composer.json` requires PHP `^8.4`, and both cPanel locations now run it. Deploy is [.cpanel.yml](.cpanel.yml) — `rsync -a --delete` which picks its target from the checked-out branch (`main` → prod, anything else → develop). It does **not** run `migrate`; new migrations must be applied by hand on the server.
 
 ⚠️ The Laravel Boost block at the end of this file is auto-generated, but `php artisan boost:update` is currently a no-op (exits 0, writes nothing), so its version list was corrected by hand to match the installed stack. Its `laravel/v11 rules` section is still titled for L11 — those rules (streamlined structure, `bootstrap/app.php`, auto-registered commands) remain accurate on L13.
 
