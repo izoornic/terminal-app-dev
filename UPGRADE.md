@@ -641,7 +641,9 @@ kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
 - [x] **RUČNO** — autentifikacija i email verifikacija
 - [x] Deploy na test lokaciju (`develop-servis-epos-app`) — prošao, PHP 8.4.23 CLI,
       MariaDB 11.4.12, 94 tabele, `db:show` se konektuje
-- [ ] **Prije merge-a na `main`:** produkcija na PHP 8.4 **i ista lista ekstenzija** (vidi nalaz 4)
+- [x] Ekstenzije na test lokaciji — **sve prisutne**, uključujući `gd` i `zip` (vidi nalaz 4)
+- [ ] **Prije merge-a na `main`:** produkcija prebačena na PHP 8.4 (isti cPanel nalog, pa bi
+      set ekstenzija trebao biti isti — potvrditi kroz **web** PHP, ne samo CLI)
 - [ ] Deploy na produkciju i finalni test
 
 ### Nalazi FAZE 6
@@ -729,6 +731,11 @@ done
 
 `gd` treba dompdf-u za slike, `zip` phpspreadsheet-u za `.xlsx` — dakle PDF i Excel padaju bez njih.
 `mbstring` composer prihvata i preko `symfony/polyfill-mbstring`, ali prava ekstenzija je bitno brža.
+
+**Rezultat (2026-08-16):** na test lokaciji su **sve prisutne**. Pošto su dev i prod dva
+direktorijuma na **istom cPanel nalogu** (`/home/eposrs/`), set ekstenzija bi trebao biti isti i
+za produkciju — ostaje samo prebaciti prod domen na PHP 8.4 i potvrditi kroz **web** PHP, jer
+MultiPHP Manager verziju postavlja po domenu, pa se web i CLI mogu razlikovati.
 
 Sporedno, s istog deploy-a: warning „nd_mysql, pdo_mysql skipped as conflicting" iz cPanel PHP
 selektora je bezopasan — isti drajveri postoje u dvije familije (`nd_*` = mysqlnd, obična =
