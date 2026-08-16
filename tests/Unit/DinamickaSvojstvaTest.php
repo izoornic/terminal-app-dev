@@ -3,11 +3,9 @@
 namespace Tests\Unit;
 
 use App\Http\Controllers\Distributer\DistPredracunControler;
-use App\Http\Livewire\DistributerLokacija;
 use ErrorException;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
-use ReflectionObject;
 
 /**
  * Dinamička svojstva su deprecirana od PHP 8.2 i biće fatalna u PHP 9.
@@ -62,23 +60,4 @@ class DinamickaSvojstvaTest extends TestCase
         $this->assertSame('Datum:', $racun->datum);
     }
 
-    /**
-     * Livewire ne serijalizuje nedeklarisana svojstva, pa `modelId` mora biti
-     * deklarisan da bi preživio zahtjev između otvaranja modala i brisanja.
-     */
-    public function test_distributer_lokacija_ima_deklarisan_model_id(): void
-    {
-        $komponenta = new DistributerLokacija();
-
-        $this->assertTrue(
-            (new ReflectionObject($komponenta))->hasProperty('modelId'),
-            'DistributerLokacija::$modelId mora biti deklarisan, ne dinamički.'
-        );
-
-        $this->bezDeprecacija(function () use ($komponenta): void {
-            $komponenta->modelId = 42;
-        });
-
-        $this->assertSame(42, $komponenta->modelId);
-    }
 }

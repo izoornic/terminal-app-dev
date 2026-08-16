@@ -435,3 +435,14 @@ V 2.2.3 ( 16.8.2026.) @upgrade/php84
       Primer: terminal A26-12RB-1K13445 sada vraca ["Param 1","Param 2"] umesto praznog niza.
     - Dodat test tests/Feature/Api/LicencaParametriTest.php
     - Preimenovana metoda getGatumKrajLicence -> getDatumKrajLicence (kozmeticki, typo)
+
+V 2.2.4 ( 16.8.2026.) @upgrade/php84
+    - Uklonjeno nefunkcionalno brisanje lokacije distributera sa stranice "Distributer-lokacija".
+      Dugme "Ukloni lokaciju" je zvalo wire:click="delete", a komponenta DistributerLokacija nikada
+      nije imala delete() metodu, pa je pucalo MethodNotFoundException - i to bas kada je brisanje
+      bilo dozvoljeno (dugme se prikazivalo samo ako nema gresaka). Obrisano: dugme u redu tabele,
+      modal za brisanje, deleteShowModal(), svojstva modalDeleteLocVisible/modelId/l_naziv/delete_error
+      i importi User/TerminalLokacija koji su ostali neiskorisceni.
+    - Usput ispravljen nevazeci HTML: dugme je otvarano kao <x-jet-danger-button>, zatvarano kao </x-jet-button>
+    - Iz tests/Unit/DinamickaSvojstvaTest.php uklonjen test za DistributerLokacija::$modelId
+      jer to svojstvo vise ne postoji. Dio koji pokriva DistPredracunControler ostaje.

@@ -667,20 +667,30 @@ Sken cijelog `app/` nije našao druga živa mjesta — preostalih 6 kandidata su
 Jetstream boilerplate koji je PHPUnit prijavljivao kao *risky*. Dodato
 `->assertHasNoErrors()->assertSuccessful()`.
 
-**3. `DistributerLokacija` — dugme „Ukloni lokaciju" zove metodu koja ne postoji ⚠️ NIJE DIRANO**
+**3. `DistributerLokacija` — dugme „Ukloni lokaciju" zove metodu koja ne postoji — RIJEŠENO UKLANJANJEM**
 
-`resources/views/livewire/distributer-lokacija.blade.php:94` ima `wire:click="delete"`,
-a komponenta nema `delete()` metodu (`mount`, `createShowModal`, `lokacijeTipa`, `novaLokacija`,
-`create`, `deleteShowModal`, `read`, `render`). Dugme se renderuje samo kad je `$delete_error`
-prazan — dakle baš na „sretnom putu" puca `MethodNotFoundException`.
+`resources/views/livewire/distributer-lokacija.blade.php:94` je imao `wire:click="delete"`,
+a komponenta nema `delete()` metodu — potvrđeno i reflection-om nad cijelom hijerarhijom
+(`Component`, `WithPagination`, trait-ovi). Dugme se renderovalo samo kad je `$delete_error`
+prazan — dakle baš na „sretnom putu" pucalo je `MethodNotFoundException`.
 
-**Nije regresija upgrade-a** (isto bi puklo i na LW2) i implementacija brisanja je destruktivna
-operacija van opsega FAZE 6 — ostavljeno korisniku na odluku.
+**Nije bila regresija upgrade-a** (isto bi puklo i na LW2). Korisnik je odlučio da se
+funkcionalnost ukloni umjesto da se implementira, pa je obrisan cio mrtvi tok:
+dugme u redu tabele, modal za brisanje, `deleteShowModal()`, četiri svojstva koja su
+služila samo njemu (`modalDeleteLocVisible`, `modelId`, `l_naziv`, `delete_error`) i
+importi `User` / `TerminalLokacija` koji su nakon toga ostali neiskorišteni.
+
+Usput je otišao i nevažeći HTML — dugme je otvarano kao `<x-jet-danger-button>`,
+a zatvarano kao `</x-jet-button>`.
+
+Zbog toga je iz `tests/Unit/DinamickaSvojstvaTest.php` uklonjen test
+`test_distributer_lokacija_ima_deklarisan_model_id` — svojstvo koje je čuvao više ne postoji.
+Dio testa koji pokriva `DistPredracunControler` ostaje.
 
 ### Stanje testova na kraju FAZE 6
 
 ```
-Tests: 51 passed, 8 skipped (151 assertions)
+Tests: 55 passed, 8 skipped (162 assertions)
 ```
 
 8 preskočenih su Jetstream funkcije isključene u konfiguraciji (API tokeni, registracija,

@@ -2,10 +2,7 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
-
 use App\Models\Lokacija;
-use App\Models\TerminalLokacija;
 use App\Models\LicencaDistributerTip;
 use App\Models\DistributerLokacijaIndex;
 
@@ -29,11 +26,6 @@ class DistributerLokacija extends Component
     public $searchPlokacijaMesto;
     public $searchPlokacijaRegion;
 
-    //brisanje lokacije
-    public $modalDeleteLocVisible;
-    public $modelId;
-    public $l_naziv;
-    public $delete_error;
     /**
      * mount
      *
@@ -108,29 +100,6 @@ class DistributerLokacija extends Component
         $this->modalAddLocVisible = false;
     }
     // Customer::find($customer_id)->decrement('loyalty_points', 50);
-
-    /**
-     * Otvara modal ya brisanje lokacije
-     *
-     * @return [type]
-     * 
-     */
-    public function deleteShowModal($id, $naziv)
-    {
-        $this->delete_error = [];
-        //dd($id, $naziv);
-        $this->modelId = $id;
-        $this->l_naziv = $naziv;
-        //
-        if(User::where('lokacijaId', '=', $this->modelId)->where('pozicija_tipId', '=', '8')->first()){
-            $this->delete_error[0] = 'Jedan ili više korisnika je povezano sa lokacijom koju želite da uklonite. Korisnici se moraju obrisati pre nego što se lokacija odvoji od Distributera!';  
-        }
-        if(TerminalLokacija::where('lokacijaId', '=', $this->modelId)->where('distributerId', '=', $this->distId)->first() ){
-            array_push($this->delete_error,  'Jedan ili više treminala je povezano sa lokacijom koju želite da uklonite. Terminali se moraju premestiti pre nego što se lokacija odvoji od Distributera!'); 
-        }
-        
-        $this->modalDeleteLocVisible = true;
-    }
 
     /**
      * The read function.
