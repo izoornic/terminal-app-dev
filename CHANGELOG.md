@@ -425,3 +425,13 @@ V 2.2.2 ( 16.8.2026.) @upgrade/php84
     - PAZNJA (nije ispravljeno): dugme "Ukloni lokaciju" u distributer-lokacija.blade.php zove
       wire:click="delete", a komponenta DistributerLokacija nema delete() metodu -> puca na sretnom putu.
       Nije regresija upgrade-a, ceka odluku o implementaciji.
+
+V 2.2.3 ( 16.8.2026.) @upgrade/php84
+    - Ispravljen bug u API-ju /api/licenca/{sn}: parametri licence se nisu vracali za vecinu licenci.
+      Provera "da li licenca uopste ima parametre" gledala je licenca_parametars.id umesto
+      licenca_parametars.licenca_tipId, pa je poredila dva nepovezana ID prostora. Radilo je samo
+      slucajno - za licencu "esir" (licenca_tips.id = 1) jer u licenca_parametars postoji red sa id = 1.
+      Za "Test licenca" (licenca_tips.id = 12) nije radilo jer nema parametra sa id = 12.
+      Primer: terminal A26-12RB-1K13445 sada vraca ["Param 1","Param 2"] umesto praznog niza.
+    - Dodat test tests/Feature/Api/LicencaParametriTest.php
+    - Preimenovana metoda getGatumKrajLicence -> getDatumKrajLicence (kozmeticki, typo)
