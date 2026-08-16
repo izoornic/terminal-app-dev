@@ -611,8 +611,10 @@ kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
 
 ## FAZA 6 — Post-upgrade čišćenje
 
-> Automatizovani dio odrađen 2026-08-16. Ostalo je ručno testiranje u browseru
-> (redovi označeni **RUČNO**) i deploy na staging.
+> Automatizovani dio odrađen 2026-08-16, ručno testiranje u browseru takođe —
+> uključujući Google mape, čime je pao zadnji otvoreni rizik iz FAZE 5.
+> Deploy na test lokaciju (`develop-servis-epos-app`) prošao 2026-08-16 s novim
+> rsync deploy-em. Ostaje samo produkcija.
 
 - [x] `php artisan optimize:clear`
 - [x] `php artisan config:cache && php artisan route:cache && php artisan view:cache` — sve tri prolaze;
@@ -637,7 +639,10 @@ kroz `id` atribut — komponenta ga tada koristi umjesto `Str::random()`:
 - [x] **RUČNO** — bankomat module
 - [x] **RUČNO** — rezervacije i transfer dijelova
 - [x] **RUČNO** — autentifikacija i email verifikacija
-- [ ] Deploy na staging i finalni test
+- [x] Deploy na test lokaciju (`develop-servis-epos-app`) — prošao, PHP 8.4.23 CLI,
+      MariaDB 11.4.12, 94 tabele, `db:show` se konektuje
+- [ ] **Prije merge-a na `main`:** produkcija na PHP 8.4 **i ista lista ekstenzija** (vidi nalaz 4)
+- [ ] Deploy na produkciju i finalni test
 
 ### Nalazi FAZE 6
 
@@ -686,6 +691,49 @@ a zatvarano kao `</x-jet-button>`.
 Zbog toga je iz `tests/Unit/DinamickaSvojstvaTest.php` uklonjen test
 `test_distributer_lokacija_ima_deklarisan_model_id` — svojstvo koje je čuvao više ne postoji.
 Dio testa koji pokriva `DistPredracunControler` ostaje.
+
+**4. Dev kontejner ima ekstenzije kojih na serveru nema**
+
+Otkriveno na test deploy-u: `php artisan db:show` je uredno ispisao bazu (MariaDB 11.4.12,
+94 tabele) pa pukao na kraju, u Laravelovom formatiranju brojeva:
+
+```
+RuntimeException: The "intl" PHP extension is required to use the [format] method.
+  vendor/laravel/framework/src/Illuminate/Support/Number.php:385
+```
+
+**`intl` aplikaciji ne treba** — nije u `composer check-platform-reqs` listi, kod
+`phpoffice/phpspreadsheet` stoji samo pod `suggest`, a `Number::` se u kodu ne koristi nigdje.
+Greška je kozmetička i pogađa samo `db:show`.
+
+Ali je otkrila stvarnu razliku: **Sail kontejner ima `intl`, cPanel nema.** Feature koji lokalno
+prođe može zato pući u produkciji. Prije merge-a na `main` provjeriti da produkcijski PHP 8.4
+ima isti set ekstenzija.
+
+Platform zahtjevi iz `composer check-platform-reqs` (uz `pdo_mysql`, koji Laravel traži kroz
+konfiguraciju a ne kroz composer):
+
+```
+curl date dom fileinfo filter gd hash iconv json libxml mbstring openssl pcre
+phar session simplexml tokenizer xml xmlreader xmlwriter zip zlib
+```
+
+Provjera na serveru:
+
+```bash
+for e in curl dom fileinfo filter gd hash iconv json libxml mbstring openssl pcre \
+         phar session simplexml tokenizer xml xmlreader xmlwriter zip zlib pdo_mysql; do
+  php -m | grep -qix "$e" || echo "NEDOSTAJE: $e"
+done
+```
+
+`gd` treba dompdf-u za slike, `zip` phpspreadsheet-u za `.xlsx` — dakle PDF i Excel padaju bez njih.
+`mbstring` composer prihvata i preko `symfony/polyfill-mbstring`, ali prava ekstenzija je bitno brža.
+
+Sporedno, s istog deploy-a: warning „nd_mysql, pdo_mysql skipped as conflicting" iz cPanel PHP
+selektora je bezopasan — isti drajveri postoje u dvije familije (`nd_*` = mysqlnd, obična =
+libmysqlclient), selektor zadrži jednu. `PDO::getAvailableDrivers()` vraća `mysql`, veza radi.
+`nd_mysql` je uz to ostatak stare selekcije: `ext/mysql` je izbačen još u PHP 7.0.
 
 ### Stanje testova na kraju FAZE 6
 
