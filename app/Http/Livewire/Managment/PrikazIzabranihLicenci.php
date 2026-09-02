@@ -109,8 +109,10 @@ class PrikazIzabranihLicenci extends Component
                 return $query->where('licenca_naplatas.terminal_sn', 'like', '%'.$this->searchTerminalSn.'%');
             })
             ->when($this->searchMesto, function ($query) {
-                return $query->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-                             ->orWhere('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%');
+                return $query->where(function ($q) {
+                    $q->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+                      ->orWhere('lokacijas.l_naziv', 'like', '%'.$this->searchMesto.'%');
+                });
             })
             ->orderBy(\DB::raw("COALESCE(licenca_naplatas.datum_kraj_licence, '9999-12-31')", 'ASC'))
             ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');

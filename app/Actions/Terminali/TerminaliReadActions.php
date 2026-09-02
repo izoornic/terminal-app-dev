@@ -159,9 +159,11 @@ class TerminaliReadActions
                 return $query->where('terminals.broj_kutije', 'like', '%' . $searchKutija . '%');
             })
             ->when($searchLokacija, function ($rtval, $searchLokacija){
-                return $rtval->where('lokacijas.mesto', 'like', '%'.$searchLokacija.'%')
-                    ->orWhere('lokacijas.adresa', 'like', '%'.$searchLokacija.'%')
-                    ->orWhere('lokacijas.l_naziv', 'like', '%'.$searchLokacija.'%');
+                return $rtval->where(function ($query) use ($searchLokacija) {
+                    $query->where('lokacijas.mesto', 'like', '%'.$searchLokacija.'%')
+                        ->orWhere('lokacijas.adresa', 'like', '%'.$searchLokacija.'%')
+                        ->orWhere('lokacijas.l_naziv', 'like', '%'.$searchLokacija.'%');
+                });
             })
             ->when($searchTipLicence, function ($rtval, $searchTipLicence){
                 return $rtval->where('licenca_distributer_cenas.id', '=', ($searchTipLicence == 1000) ? null : $searchTipLicence);

@@ -464,3 +464,16 @@ V 2.2.5 ( 16.8.2026.) @upgrade/php84
     - PRE UPOTREBE NA MAIN-U: pustiti isti rsync sa --dry-run -v preko SSH-a i procitati listu
       brisanja. Prvi deploy brise godine nakupljenog otpada odjednom. Proveriti i "which rsync"
       (putanja moze biti drukcija od /usr/bin/rsync).
+
+V 2.2.6 ( 2.9.2026.) @main
+    - Ispravljen bug: distributer je u pretrazi po adresi (i po mestu) video terminale koji mu ne pripadaju.
+      U TerminaliReadActions::DistributerTerminaliRead() OR uslovi za mesto/adresu/naziv nisu bili grupisani,
+      pa se zbog prioriteta AND nad OR uslov "distributerId = X" vezivao samo za poslednji clan (l_naziv).
+      Posledica: svaki terminal cija adresa ili mesto sadrze trazeni tekst prolazio je kroz filter, bez obzira
+      na distributera, uz ponistene ostale filtere (SN, broj kutije, PIB, tip licence). Pretraga po nazivu
+      lokacije je izgledala ispravno jer je taj clan bio poslednji, pa jedini ANDovan sa distributerom.
+      Pogadjalo je stranice DistLicence, DistributerTerminal i LicencaTerminal.
+    - Isti propust ispravljen i u Managment/PrikazIzabranihLicenci.php (mesto OR naziv lokacije), gde je
+      curilo preko filtera distId, aktivna i esir.
+    - Novi test tests/Feature/Terminali/DistributerTerminaliReadTest.php pokriva pretragu po adresi, mestu,
+      nazivu i kombinaciju adresa + PIB.
