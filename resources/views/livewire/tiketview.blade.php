@@ -25,7 +25,7 @@
                                             Prijava telefon: <span class="font-bold"> +{{ $kreiranOlineInfo->prijava_tel }}</span>
                         </div>
                         @endif
-                        <div>Kvar: <span class="font-bold text-{{$tiket->btn_collor}}">{{$tiket->tok_naziv}}</div>
+                        <div>Kvar: <span class="font-bold text-{{$tiket->btn_collor}}">{{$tiket->tok_naziv}}</span> @if($tiket->tks_naziv != "Zatvoren" && $this->mozePromenitiVrstuKvara())<x-jet-secondary-button wire:click="promeniKvarShowModal" title='promeni vrstu kvara'>Promeni vrstu kvara</x-jet-secondary-button>@endif</div>
                         <div>Opis: {{$tiket->opis}}</div>
                         <div class="mt-4 pr-4">
                             <p class="font-bold">Akcije:</p>
@@ -43,6 +43,7 @@
                     <a href="{{ route( 'tiket' ) }}"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$prioritetInfo->tr_bg_collor}} text-{{$prioritetInfo->btn_collor}}">TIKETI</span></a>
                     <br />
                     <p>Tiket zatvorio: <span class="font-bold">@if($zatvorioId > 0){{ $this->zatvorioInfo()->name }} @endif</span></p>
+                    @if($this->mozePonovoOtvoriti())<div class="pt-4"><x-jet-secondary-button wire:click="ponovoOtvoriShowModal" title='ponovo otvori tiket'><svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg> ponovo otvori tiket</x-jet-secondary-button></div>@endif
                     @endif
                     @if($curentUserPozicija == 1)<div class="py-4"><x-jet-button wire:click="obrisiTiketShowModal" title='promeni status'><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg> obriši tiket</x-jet-button></div>
                         @endif
@@ -290,6 +291,60 @@
                 <x-jet-danger-button class="ml-2" wire:click="closeTiket" wire:loading.attr="disabled">
                     {{ __('Zatvori tiket') }}
                 </x-jet-danger-button>         
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- Ponovo otvori tiket MODAL --}}
+    <x-jet-dialog-modal wire:model.live="modalPonovoOtvoriVisible">
+        <x-slot name="title">
+        <svg class="float-left w-6 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
+        Ponovo otvori tiket
+    </x-slot>
+
+        <x-slot name="content">
+            <p class="font-bold my-4">Da li ste sigurni da želite da ponovo otvorite tiket #{{ $tikid }} ?</p>
+            <hr/>
+            <x-jet-label for="ponovo_otvori_komentar" value="{{ __('Razlog ponovnog otvaranja:') }}" class="mt-4" />
+            <x-jet-textarea id="ponovo_otvori_komentar" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model="newKoment" />
+            @error('ponovoOtvori') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+        </x-slot>
+
+        <x-slot name="footer">
+        <x-jet-secondary-button wire:click="$toggle('modalPonovoOtvoriVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+                <x-jet-danger-button class="ml-2" wire:click="ponovoOtvoriTiket" wire:loading.attr="disabled">
+                    {{ __('Ponovo otvori tiket') }}
+                </x-jet-danger-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- Promeni vrstu kvara MODAL --}}
+    <x-jet-dialog-modal wire:model.live="modalPromeniKvarVisible">
+        <x-slot name="title">
+        Promeni vrstu kvara
+    </x-slot>
+
+        <x-slot name="content">
+            <p class="my-4">Tiket #{{ $tikid }} &nbsp; Trenutna vrsta kvara: <span class="font-bold">{{ $tiket->tok_naziv ?? '---' }}</span></p>
+            <hr/>
+            <x-jet-label for="novi_opis_kvara" value="{{ __('Izaberi kvar iz liste') }}" class="mt-4" />
+            <select wire:model="noviOpisKvaraId" id="novi_opis_kvara" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option value="">---</option>
+                @foreach (App\Models\TiketOpisKvaraTip::opisList() as $key => $value)
+                    <option value="{{ $key }}">{{ $value }}</option>
+                @endforeach
+            </select>
+            @error('opisKvara') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+        </x-slot>
+
+        <x-slot name="footer">
+        <x-jet-secondary-button wire:click="$toggle('modalPromeniKvarVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+                <x-jet-danger-button class="ml-2" wire:click="promeniVrstuKvara" wire:loading.attr="disabled">
+                    {{ __('Promeni vrstu kvara') }}
+                </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>
 

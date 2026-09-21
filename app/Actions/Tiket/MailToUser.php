@@ -184,6 +184,11 @@ class MailToUser
                 $heding = 'Na servisnom portalu zatvoren je tiket #';
                 $zatvorio = ' | Tiket zatvorio: '.auth()->user()->name;
             break;
+            case 'ponovo_otvoren':
+                $subject = 'Ponovo otvoren tiket #';
+                $heding = 'Na servisnom portalu ponovo je otvoren tiket #';
+                $zatvorio = ' | Tiket ponovo otvorio: '.auth()->user()->name;
+            break;
         }
 
         $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $this->tiket->opis_kvaraId)->first();

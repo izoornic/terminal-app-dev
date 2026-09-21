@@ -477,3 +477,21 @@ V 2.2.6 ( 2.9.2026.) @main
       curilo preko filtera distId, aktivna i esir.
     - Novi test tests/Feature/Terminali/DistributerTerminaliReadTest.php pokriva pretragu po adresi, mestu,
       nazivu i kombinaciju adresa + PIB.
+
+V 2.2.7 ( 21.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Nova funkcija: ponovno otvaranje zatvorenog tiketa (stranica tiketview, dugme "ponovo otvori tiket").
+      Dozvoljeno samo pozicijama Admin i Call centar (provera i na serveru, ne samo u prikazu).
+      Tiket se vraca u status "Dodeljen" ako je dodeljen korisniku, inace u "Otvoren"; korisnik_zatvorio_id se brise.
+      Pre izmene se u tiket_histories upisuje snapshot zatvorenog tiketa, a dodaje se komentar
+      "Tiket je ponovo otvoren. Razlog: ..." od korisnika koji ga je otvorio. Salje se mail "Ponovo otvoren tiket #".
+    - Tiket se ne moze ponovo otvoriti ako terminal u medjuvremenu vec ima drugi otvoren tiket.
+    - Logika u app/Actions/Tiket/TiketPonovoOtvori.php, test tests/Feature/Tiket/TiketPonovoOtvoriTest.php.
+    - Nova funkcija: promena vrste kvara na tiketu (stranica tiketview, dugme "Promeni vrstu kvara" pored reda "Kvar").
+      Dozvoljeno samo pozicijama Admin i Call centar (provera i na serveru), i samo za tiket koji nije zatvoren.
+      Pre izmene se u tiket_histories upisuje snapshot tiketa, a dodaje se komentar
+      "Promenjena vrsta kvara: stara -> nova" od korisnika koji je promenio. Dodela tiketa se ne menja.
+      Logika u app/Actions/Tiket/TiketPromeniVrstuKvara.php, test tests/Feature/Tiket/TiketPromeniVrstuKvaraTest.php.
+    - Lista tiketa: novo polje za pretragu "Dodeljen" (po imenu korisnika kome je tiket dodeljen), vraca listu na prvu stranu.
+      Test tests/Feature/Tiket/TiketsPretragaTest.php.
+    - Lista tiketa: public polja pretrage dobila tipove. searchRegion je ?int jer opcija "---" salje prazan string;
+      sa int bi Livewire uradio unset() i lista bi pukla (PropertyNotFoundException). Pokriveno u TiketsPretragaTest.
