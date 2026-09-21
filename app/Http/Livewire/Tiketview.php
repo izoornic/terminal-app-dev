@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use App\Actions\Tiket\MailToUser;
+use App\Actions\Tiket\TiketPonovoOtvori;
+use App\Actions\Tiket\TiketPromeniVrstuKvara;
 use App\Actions\Terminali\TerminalHistory;
 use App\Actions\Terminali\SelectedTerminalInfo;
 
@@ -71,6 +73,9 @@ class Tiketview extends Component
     public $zatvorioId;
     public $curentUserPozicija;
     public $obrisiTiketModalVisible;
+    public $modalPonovoOtvoriVisible;
+    public $modalPromeniKvarVisible;
+    public $noviOpisKvaraId;
     public $kreiranOlineInfo;
     private $mailToUser;
 
@@ -428,6 +433,57 @@ class Tiketview extends Component
         $this->mailToUser->sendEmails('zatvoren', $comentari);
 
         $this->modalZatvoriTiketVisible = false;
+        $this->dispatch('tiketRefresh');
+    }
+
+    /**
+     * Da li ulogovani korisnik sme da vrati zatvoren tiket u otvoren (Admin, Call centar)
+     */
+    public function mozePonovoOtvoriti(): bool
+    {
+        return TiketPonovoOtvori::mozeDaOtvori(auth()->user());
+    }
+
+    public function ponovoOtvoriShowModal(): void
+    {
+        $this->resetErrorBag('ponovoOtvori');
+        $this->newKoment = '';
+        $this->modalPonovoOtvoriVisible = true;
+    }
+
+    public function ponovoOtvoriTiket(): void
+    {
+        TiketPonovoOtvori::otvori((int) $this->tikid, auth()->user(), $this->newKoment);
+        $this->zatvorioId = 0;
+
+        $this->mailToUser = new MailToUser($this->tikid);
+        $comentari = $this->readComments();
+        $this->mailToUser->sendEmails('ponovo_otvoren', $comentari);
+
+        $this->modalPonovoOtvoriVisible = false;
+        $this->dispatch('tiketRefresh');
+    }
+
+    /**
+     * Da li ulogovani korisnik sme da menja vrstu kvara (Admin, Call centar)
+     */
+    public function mozePromenitiVrstuKvara(): bool
+    {
+        return TiketPromeniVrstuKvara::mozeDaPromeni(auth()->user());
+    }
+
+    public function promeniKvarShowModal(): void
+    {
+        $this->resetErrorBag('opisKvara');
+        $this->noviOpisKvaraId = $this->kvarAkcijaId;
+        $this->modalPromeniKvarVisible = true;
+    }
+
+    public function promeniVrstuKvara(): void
+    {
+        TiketPromeniVrstuKvara::promeni((int) $this->tikid, auth()->user(), (int) $this->noviOpisKvaraId);
+
+        $this->modalPromeniKvarVisible = false;
         $this->dispatch('tiketRefresh');
     }
 

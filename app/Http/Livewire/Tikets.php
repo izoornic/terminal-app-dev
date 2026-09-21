@@ -30,11 +30,12 @@ class Tikets extends Component
     use WithPagination;
     
     //koja je funkcija usera
-    public $userPozicija;
+    public int $userPozicija;
     //READ main table
-    public $searchLokacijaNaziv;
-    public $searchMesto;
-    public $searchRegion;
+    public string $searchLokacijaNaziv = '';
+    public string $searchMesto = '';
+    public ?int $searchRegion = null;
+    public string $searchDodeljenIme = '';
     public $searchPrioritet;
     public $searchStatus;
     public $searchTerminalId;
@@ -164,8 +165,13 @@ class Tikets extends Component
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
             ->leftJoin('tiket_opis_kvara_tips', 'tikets.opis_kvaraId', '=', 'tiket_opis_kvara_tips.id')
-            ->where('l_naziv', 'like', '%'.$this->searchLokacijaNaziv.'%')
+            ->when($this->searchLokacijaNaziv != "", function ($rtval){
+                return $rtval->where('l_naziv', 'like', '%'.$this->searchLokacijaNaziv.'%');
+            })
             ->where('mesto', 'like', '%'.$this->searchMesto.'%')
+            ->when($this->searchDodeljenIme != "", function ($rtval){
+                return $rtval->where('users.name', 'like', '%'.$this->searchDodeljenIme.'%');
+            })
             ->where('regions.id', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
             ->where('tikets.tiket_prioritetId', ($this->searchPrioritet > 0) ? '=' : '<>', $this->searchPrioritet)
             ->where('terminals.sn', 'like', '%'.$this->searchTerminalId.'%')
@@ -199,6 +205,14 @@ class Tikets extends Component
     public function searchOpisKvara()
     {
         $this->searchOpis = $this->searchTxtOpisKvara;
+    }
+
+    /**
+     * Nova pretraga po dodeljenom korisniku vraća listu na prvu stranu
+     */
+    public function updatedSearchDodeljenIme(): void
+    {
+        $this->resetPage('tik');
     }
 
     /**
