@@ -12,6 +12,8 @@ use App\Models\TiketOpisKvaraTip;
 use App\Models\TiketAkcijaKorisnikPozicija;
 use App\Models\Lokacija;
 
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -23,13 +25,12 @@ use App\Http\Helpers;
 use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Tiket\MailToUser;
 
-//use App\Http\Controllers\SendEmailController;
-
 class Tikets extends Component
 {
     use WithPagination;
     
     //koja je funkcija usera
+    #[Locked]
     public int $userPozicija;
     //READ main table
     public string $searchLokacijaNaziv = '';
@@ -83,11 +84,20 @@ class Tikets extends Component
 
     //akcije nad tiketom u zavisnosti od pozicije korisnika
     //oderdjuje ko koje tikete vidi
+    #[Locked]
     public $tiketAkcija;
+    #[Locked]
     public $userRegion;
 
     //Klasa koja salje mailove
     private $mailToUser;
+
+    
+    #[On('newTiketEvent')]
+    public function newTiketEvent()
+    {
+        $this->newTiketShowModal();
+    }
 
     /**
      * The validation rules
@@ -228,13 +238,23 @@ class Tikets extends Component
     }
 
     /**
+     * Prekida zahtev sa 403 ako pozicija korisnika ne sme da otvori novi tiket
+     * (isto pravo kao dugme "Novi tiket" u headeru stranice, čita se iz baze).
+     */
+    private function proveriPravoKreiranjaTiketa(): void
+    {
+        abort_unless(TiketAkcijaKorisnikPozicija::daliPozicijaMozeKreiratiTiket(auth()->user()->pozicija_tipId), 403);
+    }
+
+    /**
      * Shows the create modal
      *
      * @return void
      */
-    public function newTiketShowModal()
+    public function newTiketShowModal(): void
     {
-        
+        $this->proveriPravoKreiranjaTiketa();
+
         $this->resetValidation();
         $this->resetAll();
         $this->modalNewTiketVisible = true;
@@ -345,8 +365,9 @@ class Tikets extends Component
      *
      * @return void
      */
-    public function create()
+    public function create(): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         //dd($this->sefServisa());
         $tik = Tiket::create($this->modelData());
@@ -365,16 +386,18 @@ class Tikets extends Component
      * @param  mixed $dodela
      * @return void
      */
-    public function createCallCentar($dodela)
+    public function createCallCentar($dodela): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         $this->dodeljenUserId = ($dodela) ? $this->sefServisa()->id : null;
         $this->tiketStatusId = ($dodela) ? 2 : 1;
         $this->create();
     }
 
-    public function createCallCentarClosedTiket()
+    public function createCallCentarClosedTiket(): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         $this->tiketStatusId = 3;
         $this->dodeljenUserId = null;

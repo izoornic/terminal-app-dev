@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 
 use Auth;
@@ -36,7 +37,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tiketview extends Component
 {
+    #[Locked]
     public $validTiket;
+    #[Locked]
     public $tikid;
     protected $tiket;
     public $kvarAkcijaId;
@@ -48,8 +51,11 @@ class Tiketview extends Component
     
     //akcije nad tiketom u zavisnosti od pozicije korisnika
     //oderdjuje ko koje tikete vidi
+    #[Locked]
     public $tiketAkcija;
+    #[Locked]
     public $userRegion;
+    #[Locked]
     public $tiketRegion;
 
     //dodeli tiket modal 

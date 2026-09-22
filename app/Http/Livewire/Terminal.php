@@ -18,6 +18,7 @@ use App\Models\DistributerLokacijaIndex;
 use App\Models\TiketAkcijaKorisnikPozicija;
 
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -90,6 +91,7 @@ class Terminal extends Component
 
     //add Tiket Modal
     public $newTiketVisible;
+    #[Locked]
     public $userPozicija;
     public $prioritetTiketa;
     public $newTerminalInfo;
@@ -110,7 +112,9 @@ class Terminal extends Component
     public $dodeljenUserId;
     public $dodeljenUserInfo;
 
+    #[Locked]
     public $tiketAkcija;
+    #[Locked]
     public $userRegion;
 
     private $mailToUser;
@@ -148,8 +152,19 @@ class Terminal extends Component
     public $terminal_id;
     public $vendor_id;
 
-    public function newTiketShowModal($tid)
+    /**
+     * Prekida zahtev sa 403 ako pozicija korisnika ne sme da otvori novi tiket
+     * (isto pravo kao dugme "Novi tiket" na stranici tiketa, čita se iz baze).
+     */
+    private function proveriPravoKreiranjaTiketa(): void
     {
+        abort_unless(TiketAkcijaKorisnikPozicija::daliPozicijaMozeKreiratiTiket(auth()->user()->pozicija_tipId), 403);
+    }
+
+    public function newTiketShowModal($tid): void
+    {
+        $this->proveriPravoKreiranjaTiketa();
+
         $this->zatvorioId = 0;
         $this->opisKvataTxt = '';
         $this->tiketStatusId = 2;
@@ -175,16 +190,18 @@ class Terminal extends Component
      * @param  mixed $dodela
      * @return void
      */
-    public function createCallCentar($dodela)
+    public function createCallCentar($dodela): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         $this->dodeljenUserId = ($dodela) ? $this->sefServisa()->id : null;
         $this->tiketStatusId = ($dodela) ? 2 : 1;
         $this->createTiket();
     }
 
-    public function createCallCentarClosedTiket()
+    public function createCallCentarClosedTiket(): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         $this->tiketStatusId = 3;
         $this->dodeljenUserId = null;
@@ -196,8 +213,9 @@ class Terminal extends Component
      *
      * @return void
      */
-    public function createTiket()
+    public function createTiket(): void
     {
+        $this->proveriPravoKreiranjaTiketa();
         $this->validate();
         //dd($this->sefServisa());
         $tik = Tiket::create($this->modelTiketData());
@@ -894,6 +912,7 @@ class Terminal extends Component
     {
         return view('livewire.terminal', [
             'data' => $this->read(),
+            'mozeKreiratiTiket' => TiketAkcijaKorisnikPozicija::daliPozicijaMozeKreiratiTiket(auth()->user()->pozicija_tipId),
         ]);
     }
 }
