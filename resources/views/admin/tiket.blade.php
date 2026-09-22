@@ -6,12 +6,14 @@
                 {{ __('Tiketi') }}
             </div>
             <div class="flex" >
+                @if(App\Models\PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, 'tiket-vrste-kvara'))
                 <div class="flex justify-end mr-4">
-                    <button class="flex bg-gray-200 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" wire:click="btnClick" title="Nova vrsta kvara">
-                        <x-heroicon-o-plus-circle class="w-5 h-5 ml-1" />
-                        <span class="mx-2">Nova vrsta kvara</span>
-                    </button>
+                    <a href="{{ route('tiket-vrste-kvara') }}" class="flex bg-gray-200 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" title="Vrste kvara">
+                        <x-heroicon-o-wrench-screwdriver class="w-5 h-5 ml-1" />
+                        <span class="mx-2">Vrste kvara</span>
+                    </a>
                 </div>
+                @endif
 
                 @if(App\Models\TiketAkcijaKorisnikPozicija::daliPozicijaMozeKreiratiTiket(auth()->user()->pozicija_tipId))
                 <span class="mr-2 pr-2">

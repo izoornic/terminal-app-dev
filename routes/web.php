@@ -74,6 +74,10 @@ Route::group(['middleware' => [
         return view('admin.tiketview');
         })->name('tiketview');
 
+    Route::get('/tiket-vrste-kvara', function(){
+        return view('admin.tiket-vrste-kvara');
+        })->name('tiket-vrste-kvara');
+
     //Rute za Menagera licenci
     Route::get('/licenca-lokacije', function(){
         return view('admin.licenca-lokacije');

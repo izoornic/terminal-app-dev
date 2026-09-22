@@ -515,3 +515,14 @@ V 2.2.8 ( 22.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
     - Header stranice tiketi: dugme "Nova vrsta kvara" (u izradi, jos nema funkciju).
     - Testovi: Tiket/TiketNoviTiketDugmeTest, Tiket/TiketZakljucanaSvojstvaTest, Tiket/MailToUserTest,
       Terminali/TerminalNoviTiketTest, BankomatTiketMailingTest; zajednicki trait tests/NedostupanSmtp.php.
+
+V 2.2.9 ( 22.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Nova stranica "Vrste kvara" (ruta tiket-vrste-kvara): lista vrsta kvara (naziv, nadleznost kod online prijave,
+      redosled, broj tiketa) s pretragom, dodavanje i izmena u modalu. Naziv mora biti jedinstven, nova vrsta ide na kraj
+      liste (termnal_tipId = 1). Brisanje samo za vrstu koju ne koristi nijedan tiket; brisu se i koraci za servisera
+      (tiket_opis_akcija_indices).
+    - Stranicu vide samo Admin i Call centar. Pristup je u pozicija_prikaz_stranicas (show_in_meni = 0, nije u meniju);
+      svaka akcija komponente proverava isto pravo, jer Livewire zahtevi ne prolaze kroz accessrole middleware.
+    - Stranica tiketi: dugme "Nova vrsta kvara" zamenjeno linkom "Vrste kvara", vidljiv po istom pravu kao ruta.
+    - Na svakoj bazi rucno pokrenuti SQL koji dodaje red u stranicas i prava za pozicije 1 i 2 (bez njega ruta vraca 403).
+    - Test tests/Feature/Tiket/TiketVrsteKvaraTest.php.
