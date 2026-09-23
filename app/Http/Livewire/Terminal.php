@@ -31,6 +31,7 @@ use App\Http\Helpers;
 use App\Actions\Licence\CryptoSign;
 use App\Actions\Terminali\TerminalHistory;
 use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Terminali\StatusZaPremestanje;
 use App\Actions\Tiket\MailToUser;
 
 use App\Actions\Terminali\TerminaliReadActions;
@@ -436,7 +437,7 @@ class Terminal extends Component
         //$this->multiSelectedInfo = $this->multiSelectedTInfo();
 
         //status na listi se setuje prema prvom izabranom terminalu
-        $this->modalStatusPremesti = TerminalLokacija::where('id', $this->selectedTerminals[0])->first()->terminal_statusId;
+        $this->modalStatusPremesti = StatusZaPremestanje::premaPrvomIzabranom($this->selectedTerminals);
         //dd($this->modalStatusPremesti);
 
         $this->plokacijaTip = 0;

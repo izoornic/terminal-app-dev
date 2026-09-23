@@ -526,3 +526,12 @@ V 2.2.9 ( 22.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
     - Stranica tiketi: dugme "Nova vrsta kvara" zamenjeno linkom "Vrste kvara", vidljiv po istom pravu kao ruta.
     - Na svakoj bazi rucno pokrenuti SQL koji dodaje red u stranicas i prava za pozicije 1 i 2 (bez njega ruta vraca 403).
     - Test tests/Feature/Tiket/TiketVrsteKvaraTest.php.
+
+V 2.2.10 ( 23.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Premestanje vise izabranih terminala (stranice Terminali, Licenca terminali, Distributer terminali):
+      status u modalu se uzima sa prvog izabranog reda, a ako tog reda nema nudi se "Instaliran".
+      Ranije je nedostajuci red rusio stranicu (citanje svojstva nad null), a na stranici Distributer terminali
+      se tragalo po pogresnoj koloni (terminalId umesto id, a checkbox nosi id reda terminal_lokacijas),
+      pa se dobijao status tudjeg terminala ili null.
+    - Logika izdvojena u App\Actions\Terminali\StatusZaPremestanje; sva tri mesta zovu istu akciju.
+    - Testovi: Terminali/StatusZaPremestanjeTest, Terminali/DistTerminalPremestiTest.

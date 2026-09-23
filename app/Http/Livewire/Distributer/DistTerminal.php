@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Terminali\StatusZaPremestanje;
 
 use App\Helpers\PaginationHelper;
 
@@ -136,8 +137,8 @@ class DistTerminal extends Component
         $this->multiSelected = true;
         $this->multiSelectedInfo = $this->multiSelectedTInfo();
 
-        //status na listi se setuje prema prvom izabranom terminalu
-        $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selectedTerminals[0])->first()->terminal_statusId;
+        //status na listi se setuje prema prvom izabranom terminalu, a ako ga nema na "Instaliran"
+        $this->modalStatusPremesti = StatusZaPremestanje::premaPrvomIzabranom($this->selectedTerminals);
         //dd($this->modalStatusPremesti);
         $this->selectedCampagin = null;
 
