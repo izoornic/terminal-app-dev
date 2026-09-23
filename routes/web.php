@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiDataController;
-//use App\Http\Controllers\SendEmailController;
 use App\Http\Controllers\PredracunPdfControler;
 use App\Http\Controllers\Distributer\DistPredracunControler;
 use App\Models\PozicijaTip;
@@ -37,7 +36,6 @@ Route::get('/apitest', [ApiDataController::class, 'index']);
 
 Route::get('pdf-predracun', [PredracunPdfControler::class, 'index']);
 
-//Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard'); */
@@ -75,6 +73,10 @@ Route::group(['middleware' => [
     Route::get('/tiketview', function(){
         return view('admin.tiketview');
         })->name('tiketview');
+
+    Route::get('/tiket-vrste-kvara', function(){
+        return view('admin.tiket-vrste-kvara');
+        })->name('tiket-vrste-kvara');
 
     //Rute za Menagera licenci
     Route::get('/licenca-lokacije', function(){

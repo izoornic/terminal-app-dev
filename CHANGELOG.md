@@ -495,3 +495,43 @@ V 2.2.7 ( 21.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
       Test tests/Feature/Tiket/TiketsPretragaTest.php.
     - Lista tiketa: public polja pretrage dobila tipove. searchRegion je ?int jer opcija "---" salje prazan string;
       sa int bi Livewire uradio unset() i lista bi pukla (PropertyNotFoundException). Pokriveno u TiketsPretragaTest.
+
+V 2.2.8 ( 22.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Stranica tiketi: dugme "Novi tiket" premesteno u header stranice (komponenta add-new-item-button, event newTiketEvent),
+      staro dugme iznad tabele zakomentarisano. Ispravljen listener u Tikets: nedostajao je use Livewire\Attributes\On.
+      Dugme vide samo pozicije cija je akcija "kreira tiket" "sve" ili "region" (Admin, Call centar, Sef servisa).
+    - Pravo na kreiranje tiketa proverava se i na serveru (TiketAkcijaKorisnikPozicija::daliPozicijaMozeKreiratiTiket).
+      Bez prava newTiketShowModal, create/createTiket, createCallCentar i createCallCentarClosedTiket vracaju 403,
+      u komponentama Tikets i Terminal.
+    - Stranica terminal: kolona "Tiket" (novi tiket za terminal) vidljiva samo pozicijama koje smeju da kreiraju tiket;
+      Serviser je vise ne vidi.
+    - Bezbednost: svojstva s pravima korisnika zakljucana s #[Locked] i ne mogu se menjati iz browsera:
+      Tikets i Terminal (tiketAkcija, userRegion, userPozicija), Tiketview (tikid, validTiket, tiketAkcija, userRegion, tiketRegion).
+      Ranije je korisnik iz konzole ($wire.set) mogao da vidi sve tikete, ili da promenom tikid otvori tudji tiket.
+    - Mail obavestenja (MailToUser, BankomatTiketMailingActions): neuspelo slanje (npr. SMTP nedostupan) se loguje
+      i ne rusi akciju nad tiketom, niti prekida slanje ostalim primaocima. Ranije je pad SMTP-a davao gresku korisniku
+      (Mail::failures() ne postoji od Laravel 9), a kod online prijave je ponistavao ceo tiket.
+    - Obrisan neiskorisceni debug kontroler SendEmailController (ruta je bila zakomentarisana).
+    - Header stranice tiketi: dugme "Nova vrsta kvara" (u izradi, jos nema funkciju).
+    - Testovi: Tiket/TiketNoviTiketDugmeTest, Tiket/TiketZakljucanaSvojstvaTest, Tiket/MailToUserTest,
+      Terminali/TerminalNoviTiketTest, BankomatTiketMailingTest; zajednicki trait tests/NedostupanSmtp.php.
+
+V 2.2.9 ( 22.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Nova stranica "Vrste kvara" (ruta tiket-vrste-kvara): lista vrsta kvara (naziv, nadleznost kod online prijave,
+      redosled, broj tiketa) s pretragom, dodavanje i izmena u modalu. Naziv mora biti jedinstven, nova vrsta ide na kraj
+      liste (termnal_tipId = 1). Brisanje samo za vrstu koju ne koristi nijedan tiket; brisu se i koraci za servisera
+      (tiket_opis_akcija_indices).
+    - Stranicu vide samo Admin i Call centar. Pristup je u pozicija_prikaz_stranicas (show_in_meni = 0, nije u meniju);
+      svaka akcija komponente proverava isto pravo, jer Livewire zahtevi ne prolaze kroz accessrole middleware.
+    - Stranica tiketi: dugme "Nova vrsta kvara" zamenjeno linkom "Vrste kvara", vidljiv po istom pravu kao ruta.
+    - Na svakoj bazi rucno pokrenuti SQL koji dodaje red u stranicas i prava za pozicije 1 i 2 (bez njega ruta vraca 403).
+    - Test tests/Feature/Tiket/TiketVrsteKvaraTest.php.
+
+V 2.2.10 ( 23.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
+    - Premestanje vise izabranih terminala (stranice Terminali, Licenca terminali, Distributer terminali):
+      status u modalu se uzima sa prvog izabranog reda, a ako tog reda nema nudi se "Instaliran".
+      Ranije je nedostajuci red rusio stranicu (citanje svojstva nad null), a na stranici Distributer terminali
+      se tragalo po pogresnoj koloni (terminalId umesto id, a checkbox nosi id reda terminal_lokacijas),
+      pa se dobijao status tudjeg terminala ili null.
+    - Logika izdvojena u App\Actions\Terminali\StatusZaPremestanje; sva tri mesta zovu istu akciju.
+    - Testovi: Terminali/StatusZaPremestanjeTest, Terminali/DistTerminalPremestiTest.

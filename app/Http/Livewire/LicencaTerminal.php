@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Config;
 use App\Http\Helpers;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\Terminali\StatusZaPremestanje;
 
 use App\Actions\Terminali\TerminaliReadActions;
 
@@ -230,7 +231,7 @@ class LicencaTerminal extends Component
         $this->multiSelected = true;
 
         //status na listi se setuje prema prvom izabranom terminalu
-        $this->modalStatusPremesti = TerminalLokacija::where('id', $this->selectedTerminals[0])->first()->terminal_statusId;
+        $this->modalStatusPremesti = StatusZaPremestanje::premaPrvomIzabranom($this->selectedTerminals);
         //dd($this->modalStatusPremesti);
 
         $this->plokacijaTip = 0;

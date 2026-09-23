@@ -11,8 +11,9 @@ use App\Models\User;
 use App\Http\Helpers;
 
 use Mail;
-use Exception;
 use App\Mail\BakomatiNotifyMail;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class BankomatTiketMailingActions
 {
@@ -42,23 +43,28 @@ class BankomatTiketMailingActions
     /**
      * Send emails to primaci based on given subject and optional list of kommentari.
      *
+     * Neuspelo slanje (npr. SMTP nedostupan) se loguje i ne prekida slanje ostalima,
+     * niti akciju nad tiketom koja je mail pokrenula.
+     *
      * @param string $subject Predefinisan moze biti: 'novi', 'komentar', 'dodeljen', 'zatvoren'.
      * @param array|null $comentari Optional list of kommentari.
+     * @return list<string> adrese na koje slanje nije uspelo
      */
-    public function sendEmails($subject, $comentari = null)
+    public function sendEmails($subject, $comentari = null): array
     {
-        //dd($this->tiketData($subject), $comentari);
+        $neuspesneAdrese = [];
+
         foreach ($this->email_primaoci as $mail_address) {
             try {
                 Mail::to($mail_address)
                     ->send(new BakomatiNotifyMail($this->tiketData($subject), $comentari));
-            } catch (Exception $e) {
-                if (count(Mail::failures()) > 0) {
-                    $failures[] = $mail_address;
-                }
+            } catch (Throwable $e) {
+                $neuspesneAdrese[] = $mail_address;
+                Log::error("Bankomat tiket #{$this->tiketId}: slanje maila ({$subject}) na {$mail_address} nije uspelo: {$e->getMessage()}");
             }
         }
-        //dd($this->email_primaoci);
+
+        return $neuspesneAdrese;
     }
 
     /**

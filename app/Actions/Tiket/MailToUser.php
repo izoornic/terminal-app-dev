@@ -17,6 +17,8 @@ use App\Http\Helpers;
 
 use Mail;
 use App\Mail\NotyfyMail;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class MailToUser
 {
@@ -40,19 +42,26 @@ class MailToUser
        $this->email_primaoci = $this->setEmailPrimaoce();
     }
 
-    public function sendEmails($subject, $comentari = null)
+    /**
+     * Šalje obaveštenje svakom primaocu posebno. Neuspelo slanje (npr. SMTP nedostupan) se loguje
+     * i ne prekida slanje ostalima, niti akciju nad tiketom koja je mail pokrenula.
+     *
+     * @return list<string> adrese na koje slanje nije uspelo
+     */
+    public function sendEmails($subject, $comentari = null): array
     {
+        $neuspesneAdrese = [];
 
         foreach ($this->email_primaoci as $mail_address) {
             try {
                 Mail::to($mail_address)->send(new NotyfyMail($this->tiketData($subject), $comentari));
-            } catch (Exception $e) {
-                if (count(Mail::failures()) > 0) {
-                    $failures[] = $mail_address;
-                }
+            } catch (Throwable $e) {
+                $neuspesneAdrese[] = $mail_address;
+                Log::error("Tiket #{$this->tiketId}: slanje maila ({$subject}) na {$mail_address} nije uspelo: {$e->getMessage()}");
             }
         }
-        //dd($this->email_primaoci);
+
+        return $neuspesneAdrese;
     }
 
     /**

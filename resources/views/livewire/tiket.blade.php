@@ -1,12 +1,12 @@
 <div class="p-6">
-    <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
+    {{-- <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
         @if($tiketAkcija[2]=="sve" || $tiketAkcija[2]=="region" )
         <x-jet-button wire:click="newTiketShowModal">
         <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
             {{ __('Novi tiket') }}
         </x-jet-button>
         @endif
-    </div>
+    </div> --}}
     {{-- The data table --}}
     <div class="flex flex-col">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

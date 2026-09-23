@@ -81,7 +81,9 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Status</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Premesti</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Istorija</th>
+                                @if($mozeKreiratiTiket)
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Tiket</th>
+                                @endif
                                 <th class="px-1 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500">Komentari</th>
                             </tr>
                         </thead>
@@ -181,11 +183,13 @@
                                             </button>
                                         </td>
                                         {{-- Tiket --}}
+                                        @if($mozeKreiratiTiket)
                                         <td class="px-1 py-1">
                                             <button class="px-2 py-2 text-sm relative text-gray-800 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="newTiketShowModal({{ $item->tlid }})" title="Novi tiket">
                                                 <x-icon-ticket-plus class="fill-current w-4 h-4 mr-0" />
                                             </button>
                                         </td>
+                                        @endif
                                         {{-- Komentari --}}
                                         <td>
                                             <button class="px-2 py-1 text-sm relative text-gray-600 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="commentsShowModal({{ $item->tlid }})" title="Komentari">
