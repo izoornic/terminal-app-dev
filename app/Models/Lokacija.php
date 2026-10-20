@@ -27,7 +27,11 @@ class Lokacija extends Model
         'pib',
         'distributerId',
         'mb',
-        'email'
+        'email',
+        'acq_mid',
+        'mcc',
+        'ptt',
+        'precizna_lokacija',
     ];
 
     public function region(): BelongsTo
