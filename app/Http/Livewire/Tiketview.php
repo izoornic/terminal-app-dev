@@ -447,7 +447,7 @@ class Tiketview extends Component
      */
     public function mozePonovoOtvoriti(): bool
     {
-        return TiketPonovoOtvori::mozeDaOtvori(auth()->user());
+        return TiketPonovoOtvori::mozeDaOtvori(Auth::user());
     }
 
     public function ponovoOtvoriShowModal(): void
@@ -459,7 +459,7 @@ class Tiketview extends Component
 
     public function ponovoOtvoriTiket(): void
     {
-        TiketPonovoOtvori::otvori((int) $this->tikid, auth()->user(), $this->newKoment);
+        TiketPonovoOtvori::otvori((int) $this->tikid, Auth::user(), $this->newKoment);
         $this->zatvorioId = 0;
 
         $this->mailToUser = new MailToUser($this->tikid);
@@ -475,7 +475,7 @@ class Tiketview extends Component
      */
     public function mozePromenitiVrstuKvara(): bool
     {
-        return TiketPromeniVrstuKvara::mozeDaPromeni(auth()->user());
+        return TiketPromeniVrstuKvara::mozeDaPromeni(Auth::user());
     }
 
     public function promeniKvarShowModal(): void
@@ -487,7 +487,7 @@ class Tiketview extends Component
 
     public function promeniVrstuKvara(): void
     {
-        TiketPromeniVrstuKvara::promeni((int) $this->tikid, auth()->user(), (int) $this->noviOpisKvaraId);
+        TiketPromeniVrstuKvara::promeni((int) $this->tikid, Auth::user(), (int) $this->noviOpisKvaraId);
 
         $this->modalPromeniKvarVisible = false;
         $this->dispatch('tiketRefresh');

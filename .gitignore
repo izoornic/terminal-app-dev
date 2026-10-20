@@ -20,3 +20,10 @@ yarn-error.log
 vendor/_laravel_ide/*
 /.idea
 /.vscode
+# barryvdh/laravel-ide-helper - generisano lokalno (php artisan ide-helper:generate / :meta / :models --nowrite)
+/_ide_helper.php
+/_ide_helper_models.php
+/.phpstorm.meta.php
+
+# Licne beleske (txt i sl.) - samo lokalno, ne ide u git ni na deploy
+/beleske/
