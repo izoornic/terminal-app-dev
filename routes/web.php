@@ -78,6 +78,11 @@ Route::group(['middleware' => [
         return view('admin.tiket-vrste-kvara');
         })->name('tiket-vrste-kvara');
 
+    //HALK - uvoz zahteva banke (instalacija / prekonfiguracija)
+    Route::get('/halk-uvoz-zahteva', function(){
+        return view('admin.halk-uvoz-zahteva');
+        })->name('halk-uvoz-zahteva');
+
     //Rute za Menagera licenci
     Route::get('/licenca-lokacije', function(){
         return view('admin.licenca-lokacije');

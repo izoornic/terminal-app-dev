@@ -61,6 +61,29 @@ class DodajTerminalAcq
     }
 
     /**
+     * TID iz zahteva banke koji čeka uređaj (Za instalaciju) ili tehničara (Čeka prekonfiguraciju).
+     * Status i lokacija su sopstveni, jer TID još nema uređaj.
+     *
+     * @param  array<string, mixed>  $podaci  kolone terminal_acq (bez terminalId, statusa, lokacije i autora)
+     *
+     * @throws RuntimeException kad TID ne zadovoljava pravila
+     */
+    public function bezUredjaja(array $podaci, int $lokacijaId, int $statusId, User $korisnik): TerminalAcq
+    {
+        $tid = $this->proveriTid($podaci['acq_tid'] ?? null);
+
+        return TerminalAcq::create([
+            ...$podaci,
+            'acq_tid' => $tid,
+            'terminalId' => null,
+            'terminal_statusId' => $statusId,
+            'lokacijaId' => $lokacijaId,
+            'korisnikId' => $korisnik->id,
+            'korisnikIme' => $korisnik->name,
+        ]);
+    }
+
+    /**
      * @param  array<string, ?string>  $dopuna
      * @return list<string> dopunjena polja
      */
