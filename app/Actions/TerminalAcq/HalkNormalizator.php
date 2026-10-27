@@ -126,6 +126,36 @@ class HalkNormalizator
     }
 
     /**
+     * Telefon za lokacija_kontakt_osobas: kao u formi lokacije, "+381" umesto vodeće nule
+     * ("066 500 000 2" → "+38166 500 000 2"). Već međunarodni broj ostaje kakav jeste.
+     */
+    public static function telefonZaKontakt(mixed $vrednost): ?string
+    {
+        $telefon = self::telefon($vrednost);
+        if ($telefon === null || str_starts_with($telefon, '+')) {
+            return $telefon;
+        }
+
+        if (str_starts_with($telefon, '00')) {
+            return '+'.substr($telefon, 2);
+        }
+
+        return str_starts_with($telefon, '0') ? '+381'.substr($telefon, 1) : $telefon;
+    }
+
+    /**
+     * Inventarni broj / ICCID: broj iz Excela kao tekst (bez ".0"), tekst ostaje tekst.
+     */
+    public static function oznaka(mixed $vrednost): ?string
+    {
+        if (is_float($vrednost) && floor($vrednost) === $vrednost) {
+            $vrednost = number_format($vrednost, 0, '', '');
+        }
+
+        return self::tekst($vrednost);
+    }
+
+    /**
      * Trim i jedan razmak umesto više; prazno → null.
      */
     public static function tekst(mixed $vrednost): ?string

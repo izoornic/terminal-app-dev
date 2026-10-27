@@ -130,6 +130,24 @@ class HalkNormalizatorTest extends TestCase
     }
 
     #[Test]
+    public function telefon_za_kontakt_dobija_381_kao_u_formi_lokacije(): void
+    {
+        $this->assertSame('+38166 500 000 2', HalkNormalizator::telefonZaKontakt('066 500 000 2'));
+        $this->assertSame('+381 64 3372518', HalkNormalizator::telefonZaKontakt('+381 64 3372518'));
+        $this->assertSame('+381641234567', HalkNormalizator::telefonZaKontakt('00381641234567'));
+        $this->assertNull(HalkNormalizator::telefonZaKontakt(''));
+    }
+
+    #[Test]
+    public function oznaka_iz_broja_postaje_tekst_bez_decimala(): void
+    {
+        $this->assertSame('2000034603', HalkNormalizator::oznaka(2000034603));
+        $this->assertSame('2000034603', HalkNormalizator::oznaka(2000034603.0));
+        $this->assertSame('89381030000359086511', HalkNormalizator::oznaka('89381030000359086511'));
+        $this->assertSame('integrator', HalkNormalizator::oznaka('integrator'));
+    }
+
+    #[Test]
     public function plus_kod(): void
     {
         $this->assertTrue(HalkNormalizator::jePlusKod('VGC9+45 Mrčajevci'));
