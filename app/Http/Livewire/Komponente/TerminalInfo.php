@@ -3,9 +3,9 @@
 namespace App\Http\Livewire\Komponente;
 
 use Livewire\Component;
-use App\Models\TerminalAcq;
 use App\Models\TerminalLokacija;
 use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\TerminalAcq\TidInfoUredjaja;
 
 class TerminalInfo extends Component
 {
@@ -30,35 +30,8 @@ class TerminalInfo extends Component
         }else{
             $this->terminal_lokacija_id = $terminal_lokacija_id;
             $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->terminal_lokacija_id);
-            $this->acq = $this->acqInfo();
+            $this->acq = TidInfoUredjaja::zaTerminalLokaciju($this->terminal_lokacija_id);
         }
-    }
-
-    /**
-     * @return array{acq_tid: string, naziv_na_slipu: ?string, komunikacija: ?string, testni: bool, datum_instalacije: ?string, acq_mid: ?string, mcc: ?string, naslednik: ?string}|null
-     */
-    private function acqInfo(): ?array
-    {
-        $terminalId = TerminalLokacija::query()->whereKey($this->terminal_lokacija_id)->value('terminalId');
-        $acq = $terminalId !== null
-            ? TerminalAcq::query()->with('naslednik')->where('terminalId', $terminalId)->first()
-            : null;
-        if ($acq === null) {
-            return null;
-        }
-
-        $lokacija = $acq->efektivnaLokacija();
-
-        return [
-            'acq_tid' => $acq->acq_tid,
-            'naziv_na_slipu' => $acq->naziv_na_slipu,
-            'komunikacija' => $acq->komunikacija,
-            'testni' => $acq->testni,
-            'datum_instalacije' => $acq->datum_instalacije?->format('d.m.Y'),
-            'acq_mid' => $lokacija?->acq_mid,
-            'mcc' => $lokacija?->mcc,
-            'naslednik' => $acq->naslednik?->acq_tid,
-        ];
     }
 
     private function multiSelectedTInfo()

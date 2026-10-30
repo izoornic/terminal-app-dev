@@ -6,6 +6,7 @@ use App\Http\Livewire\Tikets;
 use App\Models\Lokacija;
 use App\Models\Region;
 use App\Models\Terminal;
+use App\Models\TerminalAcq;
 use App\Models\TerminalLokacija;
 use App\Models\Tiket;
 use App\Models\TiketAkcijaKorisnikPozicija;
@@ -146,6 +147,35 @@ class TiketsPretragaTest extends TestCase
             ->set('searchDodeljenIme', 'Petar')
             ->assertSet('paginators.tik', 1)
             ->tap(fn (Testable $komponenta) => $this->assertTiketi([$tiketPetar->id], $komponenta));
+    }
+
+    #[Test]
+    public function pretraga_po_sn_ili_acq_tid_u_listi_i_u_modalu_novog_tiketa(): void
+    {
+        $region = Region::create(['r_naziv' => 'Beograd']);
+        $tiketSaTidom = $this->tiketURegionu($region->id, ['l_naziv' => 'Savski venac rent']);
+        $tiketBezTida = $this->tiketURegionu($region->id, ['l_naziv' => 'Market Centar']);
+        $terminalId = TerminalLokacija::find($tiketSaTidom->tremina_lokacijalId)->terminalId;
+        TerminalAcq::factory()->saUredjajem($terminalId)->create(['acq_tid' => 'PN004096']);
+        $snBezTida = Terminal::find(TerminalLokacija::find($tiketBezTida->tremina_lokacijalId)->terminalId)->sn;
+
+        $this->actingAs($this->admin($region->id));
+
+        $komponenta = Livewire::test(Tikets::class)
+            ->assertSee('TID PN004096')
+            ->set('searchTerminalId', 'pn0040');
+        $this->assertTiketi([$tiketSaTidom->id], $komponenta);
+
+        $komponenta->set('searchTerminalId', $snBezTida);
+        $this->assertTiketi([$tiketBezTida->id], $komponenta);
+
+        $komponenta->set('searchTerminalId', '');
+        $this->assertTiketi([$tiketSaTidom->id, $tiketBezTida->id], $komponenta);
+
+        $komponenta->set('searchTerminalSn', 'PN004096');
+        $nadjeni = $komponenta->instance()->searchTerminal();
+        $this->assertSame([$tiketSaTidom->tremina_lokacijalId], collect($nadjeni->items())->pluck('id')->all());
+        $this->assertSame('PN004096', $nadjeni->items()[0]->acq_tid);
     }
 
     /**

@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 use App\Http\Livewire\TerminalAcq\ZabranaPremestanjaAcq;
+use App\Actions\TerminalAcq\HalkNormalizator;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Lokacije\LokacijaInfo;
@@ -118,6 +119,12 @@ class Lokacijes extends Component
     public $email;
     public $email_is_set;
 
+    //Podaci banke (ACQ) o trgovcu
+    public $acq_mid;
+    public $mcc;
+    public $ptt;
+    public $precizna_lokacija;
+
 
     // koordinate
     public $latLogVisible;
@@ -167,10 +174,27 @@ class Lokacijes extends Component
                 'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
                 'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
                 'pib' => ($this->isUpdate) ? ['digits_between:8,16'] : ['digits_between:8,16', 'unique:lokacijas'],
-                'email' => ($this->email_is_set) ? [] : ['string', 'email', 'max:255', 'unique:lokacijas', 'nullable']  
+                'email' => ($this->email_is_set) ? [] : ['string', 'email', 'max:255', 'unique:lokacijas', 'nullable'],
+                'acq_mid' => ['nullable', 'regex:/^\d{1,15}$/'],
+                'mcc' => ['nullable', 'regex:/^\d{1,4}$/'],
+                'ptt' => ['nullable', 'regex:/^\d{5}$/'],
+                'precizna_lokacija' => ['nullable', 'string', 'max:128'],
             ];
         }
         
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'acq_mid.regex' => 'MID sme imati samo cifre (do 15).',
+            'mcc.regex' => 'MCC sme imati samo cifre (do 4).',
+            'ptt.regex' => 'PTT mora imati 5 cifara.',
+            'precizna_lokacija.max' => 'Precizna lokacija može imati najviše 128 znakova.',
+        ];
     }
 
 
@@ -246,6 +270,10 @@ class Lokacijes extends Component
         $this->email_is_set = false;
         $this->old_pib = '';
         $this->pib_count = 0;
+        $this->acq_mid = '';
+        $this->mcc = '';
+        $this->ptt = '';
+        $this->precizna_lokacija = '';
     }
 
     /**
@@ -347,6 +375,10 @@ class Lokacijes extends Component
         $this->mb = $data->mb;
         $this->email = $data->email;
         $this->email_is_set = isset($this->email);
+        $this->acq_mid = $data->acq_mid;
+        $this->mcc = $data->mcc;
+        $this->ptt = $data->ptt;
+        $this->precizna_lokacija = $data->precizna_lokacija;
 
         $this->regionId = $data->regionId;
         $this->lokacija_tipId = $data->lokacija_tipId;
@@ -383,7 +415,11 @@ class Lokacijes extends Component
             'lokacija_tipId'   => $this->lokacija_tipId,
             'pib'              => $this->pib, 
             'mb'               => $this->mb, 
-            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL
+            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL,
+            'acq_mid'          => HalkNormalizator::mid($this->acq_mid),
+            'mcc'              => HalkNormalizator::mcc($this->mcc),
+            'ptt'              => HalkNormalizator::ptt($this->ptt),
+            'precizna_lokacija' => HalkNormalizator::tekst($this->precizna_lokacija),
         ];
     }
 

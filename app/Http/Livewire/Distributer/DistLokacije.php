@@ -53,6 +53,16 @@ class DistLokacije extends Component
     public $email;
     public $email_is_set;
 
+    //Podaci banke (ACQ) o trgovcu - ovde samo za prikaz, menjaju se na stranici Lokacije
+    #[\Livewire\Attributes\Locked]
+    public $acq_mid;
+    #[\Livewire\Attributes\Locked]
+    public $mcc;
+    #[\Livewire\Attributes\Locked]
+    public $ptt;
+    #[\Livewire\Attributes\Locked]
+    public $precizna_lokacija;
+
     public $nameKo;
     public $telKo;
 
@@ -137,6 +147,10 @@ class DistLokacije extends Component
 
         $this->nameKo = '';
         $this->telKo = '';
+        $this->acq_mid = null;
+        $this->mcc = null;
+        $this->ptt = null;
+        $this->precizna_lokacija = null;
         //$this->pib = '';
         $this->mb = '';
         $this->email = '';
@@ -169,6 +183,10 @@ class DistLokacije extends Component
         $this->mb = $data->mb;
         $this->email = $data->email;
         $this->email_is_set = isset($this->email);
+        $this->acq_mid = $data->acq_mid;
+        $this->mcc = $data->mcc;
+        $this->ptt = $data->ptt;
+        $this->precizna_lokacija = $data->precizna_lokacija;
 
         $this->regionId = $data->regionId;
         $this->lokacija_tipId = $data->lokacija_tipId;

@@ -2,7 +2,16 @@
 
 namespace Tests\Feature\Terminali;
 
+use App\Actions\TerminalAcq\TidInfoUredjaja;
 use App\Http\Livewire\Komponente\TerminalInfo;
+use App\Http\Livewire\Tiketview;
+use App\Models\Tiket;
+use App\Models\TiketAkcijaKorisnikPozicija;
+use App\Models\TiketAkcijaTip;
+use App\Models\TiketAkcijaVrednostTip;
+use App\Models\TiketOpisKvaraTip;
+use App\Models\TiketPrioritetTip;
+use App\Models\TiketStatusTip;
 use App\Models\Lokacija;
 use App\Models\Region;
 use App\Models\Terminal;
@@ -88,6 +97,51 @@ class TerminalInfoAcqTest extends TestCase
             ->assertSee('A26-12RB-POD-TIDOM')
             ->assertSeeText('TID: PN004096')
             ->assertSee('A26-12RB-BEZ-TID');
+    }
+
+    #[Test]
+    public function tid_info_uredjaja(): void
+    {
+        $podTidom = $this->uredjaj('A26-12RB-POD-TIDOM');
+        $bezTida = $this->uredjaj('A26-12RB-BEZ-TID');
+        TerminalAcq::factory()->saUredjajem($podTidom->terminalId)->create(['acq_tid' => 'PN004096', 'naziv_na_slipu' => 'SLIP']);
+
+        $this->assertSame(
+            ['acq_tid' => 'PN004096', 'naziv_na_slipu' => 'SLIP', 'acq_mid' => '000000000004388', 'mcc' => '5812'],
+            array_intersect_key(TidInfoUredjaja::zaTerminalLokaciju($podTidom->id), array_flip(['acq_tid', 'naziv_na_slipu', 'acq_mid', 'mcc']))
+        );
+        $this->assertNull(TidInfoUredjaja::zaTerminalLokaciju($bezTida->id));
+        $this->assertNull(TidInfoUredjaja::zaTerminalLokaciju(null));
+    }
+
+    #[Test]
+    public function stranica_tiketa_prikazuje_tid_terminala(): void
+    {
+        $sve = TiketAkcijaVrednostTip::forceCreate(['akcija_vrednost_opis' => 'sve']);
+        foreach ([1 => 'vidi tiket', 2 => 'kreira tiket', 3 => 'dodeljuje tiket'] as $akcijaId => $akcija) {
+            TiketAkcijaKorisnikPozicija::forceCreate([
+                'korisnik_pozicijaId' => 1,
+                'tiket_akcijaId' => TiketAkcijaTip::forceCreate(['id' => $akcijaId, 'tiket_akcija' => $akcija])->id,
+                'tiket_akcijavrednostId' => $sve->id,
+            ]);
+        }
+        TiketStatusTip::forceCreate(['id' => 1, 'tks_naziv' => 'Otvoren']);
+        $prioritet = TiketPrioritetTip::forceCreate(['tp_naziv' => 'Normalan', 'btn_collor' => 'green-600', 'btn_hover_collor' => 'green-700', 'tr_bg_collor' => 'green-50']);
+        $kvar = TiketOpisKvaraTip::forceCreate(['termnal_tipId' => 1, 'tok_naziv' => 'Ne radi štampač', 'tok_dodela_nadleznostiId' => 1, 'list_order' => 1]);
+
+        $uredjaj = $this->uredjaj('A26-12RB-1K14121');
+        TerminalAcq::factory()->saUredjajem($uredjaj->terminalId)->create(['acq_tid' => 'PN004096', 'naziv_na_slipu' => 'SAVSKI VENAC RENT']);
+        $tiket = Tiket::create([
+            'tremina_lokacijalId' => $uredjaj->id, 'tiket_statusId' => 1, 'opis_kvaraId' => $kvar->id,
+            'opis' => 'Test kvar', 'tiket_prioritetId' => $prioritet->id, 'br_komentara' => 0, 'korisnik_zatvorio_id' => 0,
+            'korisnik_prijavaId' => auth()->id(),
+        ]);
+
+        Livewire::withQueryParams(['id' => $tiket->id])->test(Tiketview::class)
+            ->assertSee('A26-12RB-1K14121')
+            ->assertSee('PN004096')
+            ->assertSee('SAVSKI VENAC RENT')
+            ->assertSee('000000000004388');
     }
 
     private function uredjaj(string $sn): TerminalLokacija

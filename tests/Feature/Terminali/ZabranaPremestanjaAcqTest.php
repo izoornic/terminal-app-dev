@@ -144,6 +144,21 @@ class ZabranaPremestanjaAcqTest extends TestCase
         }
     }
 
+    #[Test]
+    public function pretraga_po_sn_ili_tid_na_listama_terminala(): void
+    {
+        $sn = fn (array $search): array => \App\Actions\Terminali\TerminaliReadActions::TerminaliRead($search)->pluck('sn')->sort()->values()->all();
+
+        $this->assertSame(['A26-12RB-POD-TIDOM'], $sn(['searchSB' => 'pn0040']));
+        $this->assertSame(['A26-12RB-SLOBODAN'], $sn(['searchSB' => 'SLOBODAN']));
+        $this->assertSame(['A26-12RB-POD-TIDOM', 'A26-12RB-SLOBODAN'], $sn(['searchSB' => 'A26-12RB']));
+
+        Livewire::test(\App\Http\Livewire\Terminal::class)
+            ->set('searchSB', 'PN004096')
+            ->assertSee('A26-12RB-POD-TIDOM')
+            ->assertDontSee('A26-12RB-SLOBODAN');
+    }
+
     private function assertNistaNijePremesteno(): void
     {
         $this->assertSame($this->trgovac->id, $this->podTidom->fresh()->lokacijaId);

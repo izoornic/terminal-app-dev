@@ -63,6 +63,14 @@
                         <div>
                             <p>Terminal: <span class="font-bold">{{$terminal->sn}}</span> </p>
                             <p>Staus: <span class="font-bold">{{ $terminal->ts_naziv }}</span></p>
+                            @if($acq)
+                                <p>ACQ TID: <span class="font-bold">{{ $acq['acq_tid'] }}</span>@if($acq['testni']) <span class="text-sm">(testni)</span>@endif</p>
+                                <p class="text-sm">
+                                    @if($acq['naziv_na_slipu'])Naziv na slipu: <span class="font-bold">{{ $acq['naziv_na_slipu'] }}</span> | @endif
+                                    MID: <span class="font-bold">{{ $acq['acq_mid'] ?? '—' }}</span> | MCC: <span class="font-bold">{{ $acq['mcc'] ?? '—' }}</span>
+                                    @if($acq['komunikacija']) | <span class="font-bold">{{ $acq['komunikacija'] }}</span>@endif
+                                </p>
+                            @endif
                             <p class="text-sm">Model: <span class="font-bold">{{ $terminal->treminal_model }}</span> | Proizvođač: <span class="font-bold">{{$terminal->treminal_proizvodjac}}</span></p>
                             <p>Lokacija:@if ($terminal->is_duplicate)<span class="text-red-500">*</span> @endif  <span class="font-bold">{{ $terminal->l_naziv }}&nbsp;{{ $terminal->l_naziv_sufix }}</span></p>
                             <p>Adresa: <span class="font-bold">{{ $terminal->adresa }}</span></p>

@@ -13,7 +13,7 @@
                                     <x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" />
                                 </td>
                                 <td class="p-1">
-                                    <x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN ili TID" />
                                 </td>
                                 <td class="p-1">
                                     <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" />

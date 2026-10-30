@@ -30,7 +30,7 @@
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
                                 <td colspan="2">
-                                <x-jet-input wire:model.live="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN Terminala" />
+                                <x-jet-input wire:model.live="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN ili TID terminala" />
                                 </td>
                                 
                                 <td>
@@ -112,6 +112,7 @@
                                         <td class="px-2 pr-2">
                                                  @if($item->is_duplicate)<span class="text-red-500">*</span>@endif
                                                 <span>{{ $item->l_naziv }}&nbsp;{{ $item->l_naziv_sufix }}</span>
+                                                @if($item->acq_tid)<span class="text-xs text-sky-700 ml-1">TID {{ $item->acq_tid }}</span>@endif
                                                 <br />
                                                 <span class="text-sm text-red-400">{{ $item->tok_naziv }}</span> 
                                         </td>
@@ -165,7 +166,7 @@
                     </tr>
                     <tr class="bg-orange-50">
                         <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                        <td><x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
+                        <td><x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN ili TID" /></td>
                         <td><x-jet-input wire:model.live="searchTerminalLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
                         <td><x-jet-input wire:model.live="searchTerminalMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
                     </tr>
@@ -174,7 +175,9 @@
                 @foreach ($this->searchTerminal() as $value)
                     <tr class="hover:bg-gray-100" wire:click="$set('newTerminalLokacijaId', {{ $value->id }})" >    
                             <td></td>
-                            <td>{{ $value->sn }}</td>
+                            <td>{{ $value->sn }}
+                                @if($value->acq_tid)<div class="text-xs text-sky-700">TID {{ $value->acq_tid }}</div>@endif
+                            </td>
                             <td>
                                 @if($value->is_duplicate)<span class="text-red-500">*</span>@endif
                                 {{ $value->l_naziv}}&nbsp;{{ $value->l_naziv_sufix }}</td>

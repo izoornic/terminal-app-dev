@@ -166,7 +166,8 @@ class Tikets extends Component
                     'tiket_prioritet_tips.btn_collor', 
                     'tiket_prioritet_tips.tr_bg_collor', 
                     'regions.r_naziv', 
-                    'tiket_opis_kvara_tips.tok_naziv')
+                    'tiket_opis_kvara_tips.tok_naziv',
+                    'terminal_acq.acq_tid')
             ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
             ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
             ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')
@@ -174,6 +175,7 @@ class Tikets extends Component
             ->leftJoin('lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
+            ->leftJoin('terminal_acq', 'terminal_acq.terminalId', '=', 'terminal_lokacijas.terminalId')
             ->leftJoin('tiket_opis_kvara_tips', 'tikets.opis_kvaraId', '=', 'tiket_opis_kvara_tips.id')
             ->when($this->searchLokacijaNaziv != "", function ($rtval){
                 return $rtval->where('l_naziv', 'like', '%'.$this->searchLokacijaNaziv.'%');
@@ -184,7 +186,7 @@ class Tikets extends Component
             })
             ->where('regions.id', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
             ->where('tikets.tiket_prioritetId', ($this->searchPrioritet > 0) ? '=' : '<>', $this->searchPrioritet)
-            ->where('terminals.sn', 'like', '%'.$this->searchTerminalId.'%')
+            ->tap(fn ($upit) => $this->snIliTid($upit, (string) $this->searchTerminalId))
             ->where('tiket_opis_kvara_tips.id', ($this->searchVrstaKvara > 0) ? '=' : '<>', $this->searchVrstaKvara)
             ->where('tikets.opis', 'like', '%'.$this->searchOpis.'%')
             ->when($this->searchStatus == 1, function ($rtval){
@@ -303,13 +305,15 @@ class Tikets extends Component
                     'lokacijas.l_naziv_sufix',
                     'lokacijas.is_duplicate', 
                     'lokacijas.mesto', 
-                    'terminals.sn')
+                    'terminals.sn',
+                    'terminal_acq.acq_tid')
                 ->leftJoin('lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
                 ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
+                ->leftJoin('terminal_acq', 'terminal_acq.terminalId', '=', 'terminal_lokacijas.terminalId')
                 ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                 ->where('l_naziv', 'like', '%'.$this->searchTerminalLokacijaNaziv.'%')
                 ->where('mesto', 'like', '%'.$this->searchTerminalMesto.'%')
-                ->where('sn', 'like', '%'.$this->searchTerminalSn.'%')
+                ->tap(fn ($upit) => $this->snIliTid($upit, (string) $this->searchTerminalSn))
                 ->when($this->tiketAkcija[1] == "region", function ($rtval){
                     return $rtval->where('regions.id', '=', $this->userRegion);
                 })
@@ -317,6 +321,26 @@ class Tikets extends Component
     }
     
     
+    /**
+     * Pretraga po SN-u ili ACQ TID-u uređaja (Call centar često dobija TID). Prazno polje
+     * zadržava raniji uslov (samo redovi sa uređajem).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $upit
+     */
+    private function snIliTid($upit, string $trazeno): void
+    {
+        $trazeno = trim($trazeno);
+        if ($trazeno === '') {
+            $upit->where('terminals.sn', 'like', '%%');
+
+            return;
+        }
+
+        $upit->where(fn ($uslov) => $uslov
+            ->where('terminals.sn', 'like', '%'.$trazeno.'%')
+            ->orWhere('terminal_acq.acq_tid', 'like', '%'.$trazeno.'%'));
+    }
+
     /**
      * Pronadji korisnika kome dodeljujes tiket
      *

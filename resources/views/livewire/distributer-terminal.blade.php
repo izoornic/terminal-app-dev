@@ -48,7 +48,7 @@
                             <tr class="bg-orange-50">
                                 <td></td>
                                 <td>
-                                    <x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model.live="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="SN ili TID" />
                                 </td>
                                 <td colspan="2">
                                     <x-jet-input wire:model.live="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto, adresu, naziv" />

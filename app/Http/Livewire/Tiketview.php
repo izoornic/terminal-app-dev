@@ -29,6 +29,7 @@ use App\Actions\Tiket\TiketPonovoOtvori;
 use App\Actions\Tiket\TiketPromeniVrstuKvara;
 use App\Actions\Terminali\TerminalHistory;
 use App\Actions\Terminali\SelectedTerminalInfo;
+use App\Actions\TerminalAcq\TidInfoUredjaja;
 
 use App\Http\Helpers;
 use App\Models\TiketPartType;
@@ -611,6 +612,7 @@ class Tiketview extends Component
                 'tiket' => $this->read(), 
                 'akcije'=>$this->kvarAkcije(), 
                 'terminal' => SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId), 
+                'acq' => TidInfoUredjaja::zaTerminalLokaciju($this->tiket->tremina_lokacijalId),
                 'historyData' => $this->historyData(), 
                 'komentari' => $this->readComments(),
                 'rezervniDelovi' => $this->partsAdded()]);

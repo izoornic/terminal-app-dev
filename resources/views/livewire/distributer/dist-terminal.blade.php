@@ -16,7 +16,7 @@
                             {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td><x-heroicon-o-funnel class="mx-auto text-orange-600 w-4 h-4" /></td>
-                                <td class="px-1 py-1"><x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" /></td>
+                                <td class="px-1 py-1"><x-jet-input wire:model.live="searchSB" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN ili TID" /></td>
                                 <td class="px-1 py-1">
                                     <x-jet-input wire:model.live="searchName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /> 
                                 </td>

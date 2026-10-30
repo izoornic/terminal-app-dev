@@ -411,6 +411,9 @@
                 <x-jet-input wire:model.live="mb" id="" class="block mt-1 w-full" type="text" />
                 @error('mb') <span class="error">{{ $message }}</span> @enderror
             </div>
+            @if($lokacija_tipId == 3)
+                @include('livewire.terminal-acq.lokacija-acq-polja')
+            @endif
             <div class="mt-4">
                 <x-jet-label for="email" value="{{ __('e-mail') }}" />
                 {{-- @if ($email_is_set)

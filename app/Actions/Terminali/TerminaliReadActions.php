@@ -1,12 +1,28 @@
 <?php
 
 namespace App\Actions\Terminali;
+
+use App\Models\TerminalAcq;
 use App\Models\TerminalLokacija;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class TerminaliReadActions
 {
     
+    /**
+     * Pretraga po SN-u ili ACQ TID-u uređaja (podupit, bez join-a, da se redovi ne dupliraju).
+     *
+     * @param  Builder<TerminalLokacija>  $query
+     * @return Builder<TerminalLokacija>
+     */
+    private static function snIliTid(Builder $query, string $trazeno): Builder
+    {
+        return $query->where(fn ($uslov) => $uslov
+            ->where('terminals.sn', 'like', '%'.$trazeno.'%')
+            ->orWhereIn('terminals.id', TerminalAcq::query()->select('terminalId')->whereNotNull('terminalId')->where('acq_tid', 'like', '%'.$trazeno.'%')));
+    }
+
     /**
      * TerminaliRead
      *
@@ -64,7 +80,7 @@ class TerminaliReadActions
             return $query->where('terminal_lokacijas.distributerId', '=', $searchDistId);
         })
         ->when($searchSB, function ($query, $searchSB) {
-            return $query->where('terminals.sn', 'like', '%' . $searchSB . '%');
+            return self::snIliTid($query, $searchSB);
         })
         ->when($searchKutija, function ($query, $searchKutija) {
             return $query->where('terminals.broj_kutije', 'like', '%' . $searchKutija . '%');
@@ -153,7 +169,7 @@ class TerminaliReadActions
             ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
             ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
             ->when($searchSB, function ($query, $searchSB) {
-                return $query->where('terminals.sn', 'like', '%' . $searchSB . '%');
+                return self::snIliTid($query, $searchSB);
             })
             ->when($searchKutija, function ($query, $searchKutija) {
                 return $query->where('terminals.broj_kutije', 'like', '%' . $searchKutija . '%');
