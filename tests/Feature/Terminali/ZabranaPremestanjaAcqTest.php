@@ -132,6 +132,18 @@ class ZabranaPremestanjaAcqTest extends TestCase
         $this->assertNistaNijePremesteno();
     }
 
+    #[Test]
+    public function licence_i_distributer_boje_red_uredjaja_pod_tid_om(): void
+    {
+        foreach ([LicencaTerminal::class, DistTerminal::class] as $komponenta) {
+            $html = Livewire::test($komponenta)->assertSee('A26-12RB-SLOBODAN')->html();
+
+            preg_match_all('/class="(bg-sky-(?:50|100))"\s+title="ACQ TID (PN\d{6})"/', $html, $pogodci);
+            $this->assertSame(['PN004096'], $pogodci[2], $komponenta);
+            $this->assertSame(1, preg_match_all('/<tr\s+class="bg-sky-/', $html), $komponenta.': samo red sa TID-om je plav');
+        }
+    }
+
     private function assertNistaNijePremesteno(): void
     {
         $this->assertSame($this->trgovac->id, $this->podTidom->fresh()->lokacijaId);

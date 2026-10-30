@@ -253,6 +253,24 @@ class AcqAkcijeTest extends TestCase
         $this->assertSame(0, TerminalLokacijaHistory::count(), 'ništa nije premešteno');
     }
 
+    #[Test]
+    public function stranica_terminali_boji_red_uredjaja_pod_tid_om(): void
+    {
+        TiketPrioritetTip::forceCreate(['id' => 4, 'tp_naziv' => 'Normalan', 'btn_collor' => 'green-600', 'btn_hover_collor' => 'green-700', 'tr_bg_collor' => 'green-50']);
+        TerminalVendor::forceCreate(['name' => 'HALK']);
+        [, $prvi] = $this->aktivanTid('PN004096');
+        [, $drugi] = $this->aktivanTid('PN004097');
+        $slobodan = $this->uredjaj('A26-12RB-SLOBODAN', $this->magacin->id, self::STATUS_MAGACIN);
+
+        $html = Livewire::test(TerminalStranica::class)->html();
+
+        preg_match_all('/wire:key="terminal-(\d+)"\s+class="(bg-sky-(?:50|100))"\s+title="ACQ TID (PN\d{6})"/', $html, $pogodci);
+        $this->assertEqualsCanonicalizing([(string) $prvi->id, (string) $drugi->id], $pogodci[1]);
+        $this->assertEqualsCanonicalizing(['bg-sky-50', 'bg-sky-100'], $pogodci[2], 'parni i neparni redovi sa TID-om imaju različite nijanse');
+        $this->assertEqualsCanonicalizing(['PN004096', 'PN004097'], $pogodci[3]);
+        $this->assertDoesNotMatchRegularExpression('/wire:key="terminal-'.$slobodan->id.'"\s+class="bg-sky/', $html);
+    }
+
     /**
      * @param  array<string, mixed>  $lokacija
      * @return array{0: TerminalAcq, 1: TerminalLokacija, 2: Lokacija}

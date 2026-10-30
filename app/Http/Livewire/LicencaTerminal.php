@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 use App\Http\Livewire\TerminalAcq\ZabranaPremestanjaAcq;
+use App\Actions\TerminalAcq\AktivniTidUredjaja;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Terminali\StatusZaPremestanje;
@@ -155,10 +156,14 @@ class LicencaTerminal extends Component
         $perPage = Config::get('global.terminal_paginate');
         $terms = $builder->paginate($perPage, ['*'], 'terminali');
 
+        // aktivni ACQ TID-ovi uredjaja na strani (red sa TID-om ima drugu boju pozadine)
+        $acqTidovi = AktivniTidUredjaja::poUredjaju($terms->getCollection()->pluck('tid'));
+
         // enrich paginated items and collect ids present on the current page
-        $terms->getCollection()->transform(function ($item) {
+        $terms->getCollection()->transform(function ($item) use ($acqTidovi) {
             $licenca = LicenceZaTerminal::where('terminal_lokacijaId', $item->tlid)->first();
             $item->tzlid = $licenca ? $licenca->licenca_poreklo : 0;
+            $item->acq_tid = $acqTidovi->get($item->tid);
             $this->allInPage[] = (string) $item->tlid;
             return $item;
         });

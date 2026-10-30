@@ -91,7 +91,13 @@
                             <!-- DATA  -->
                             @if ($data->count())
                                 @foreach ($data as $item)
-                                    <tr wire:key="terminal-{{ $item->tlid }}" @if($loop->even) class="bg-gray-50" @endif >
+                                    <tr wire:key="terminal-{{ $item->tlid }}"
+                                        @class([
+                                            'bg-sky-50' => $item->acq_tid && $loop->odd,
+                                            'bg-sky-100' => $item->acq_tid && $loop->even,
+                                            'bg-gray-50' => ! $item->acq_tid && $loop->even,
+                                        ])
+                                        @if($item->acq_tid) title="ACQ TID {{ $item->acq_tid }}" @endif >
                                         {{-- CHECK FIELD --}}
                                         <td class="px-1 py-1">
                                             <input type="checkbox" value="{{ $item->tlid }}" wire:model.live="selectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500">
