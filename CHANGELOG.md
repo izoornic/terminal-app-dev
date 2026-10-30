@@ -535,3 +535,13 @@ V 2.2.10 ( 23.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
       pa se dobijao status tudjeg terminala ili null.
     - Logika izdvojena u App\Actions\Terminali\StatusZaPremestanje; sva tri mesta zovu istu akciju.
     - Testovi: Terminali/StatusZaPremestanjeTest, Terminali/DistTerminalPremestiTest.
+
+V 2.2.11 ( 29.10.2026.) @HALK-terminal-acq
+    - Header (navigation-menu) zavisi od APP_ENV: van produkcije (APP_ENV != production) traka je zuta s crvenom
+      donjom ivicom i oznakom "TEST" pored logoa; u produkciji ostaje bela kao ranije.
+    - Pre deploy-a na main na produkciji postaviti APP_ENV=production (i APP_DEBUG=false) pa php artisan config:clear,
+      inace i produkcija prikazuje oznaku TEST. Develop server ostaje APP_ENV=local.
+    - Test tests/Feature/TestOkruzenjeHeaderTest.php.
+    - Ispravka: mobilni meni (navigation-menu) nije proveravao Route::has kao desktop meni, pa je stranica u bazi
+      bez rute u kodu obarala svaku stranicu ("Route [...] not defined"). Pojavilo se na develop-u posle
+      sinhronizacije test baze. Test tests/Feature/NavigacijaMeniTest.php.

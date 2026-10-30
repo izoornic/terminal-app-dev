@@ -1,4 +1,7 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" @class([
+    'bg-white border-b border-gray-100' => app()->isProduction(),
+    'bg-amber-200 border-b-4 border-red-600' => ! app()->isProduction(),
+])>
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -8,6 +11,9 @@
                     <a href="{{ route('dashboard') }}">
                         <x-jet-application-mark class="block h-9 w-auto" />
                     </a>
+                    @unless (app()->isProduction())
+                        <span class="ml-4 px-3 py-1 rounded-md bg-red-600 text-white text-lg font-extrabold tracking-widest">TEST</span>
+                    @endunless
                 </div>
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
@@ -153,9 +159,11 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @foreach (Auth::user()->userPozicijeList(Auth::user()->id) as $key => $value)
+                @if(Route::has($key))
                 <x-jet-responsive-nav-link href="{{ route( $key ) }}" :active="request()->routeIs($key)">
                     {{ $value }}
                 </x-jet-responsive-nav-link>
+                @endif
             @endforeach
             @if (Auth::id() === 1)
                 <x-jet-responsive-nav-link href="{{ route('two-factor-recovery') }}" :active="request()->routeIs('two-factor-recovery')">
