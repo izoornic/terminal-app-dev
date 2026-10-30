@@ -50,7 +50,7 @@ class UvozZahtevaStranicaTest extends TestCase
             PozicijaPrikazStranica::create(['pozicija_tipId' => $pozicijaId, 'stranicaId' => $stranica->id]);
         }
 
-        $this->privremeniFolder = sys_get_temp_dir().'/halk_stranica_'.uniqid();
+        $this->privremeniFolder = sys_get_temp_dir().'/acq_stranica_'.uniqid();
         mkdir($this->privremeniFolder);
     }
 
@@ -105,7 +105,7 @@ class UvozZahtevaStranicaTest extends TestCase
 
         $this->assertCount(2, $komponenta->get('redovi'));
         $this->assertSame(['izabran' => true, 'lokacija' => UvozZahteva::NOVA_LOKACIJA, 'regionId' => null, 'sn' => ''], $komponenta->get('izbori')[2]);
-        $this->assertCount(1, Storage::disk('local')->files('halk-zahtevi'));
+        $this->assertCount(1, Storage::disk('local')->files('acq-zahtevi'));
         $this->assertSame(0, TerminalAcq::count());
     }
 

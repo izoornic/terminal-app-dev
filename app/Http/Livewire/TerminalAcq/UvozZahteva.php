@@ -17,7 +17,7 @@ use RuntimeException;
 /**
  * Faza 3b: uvoz Excel zahteva banke (instalacija / prekonfiguracija).
  *
- * Fajl se arhivira u storage/app/halk-zahtevi/, pa se iz njega pravi pregled. Pri
+ * Fajl se arhivira u storage/app/acq-zahtevi/, pa se iz njega pravi pregled. Pri
  * potvrdi se fajl ponovo čita sa servera; iz browsera se uzimaju samo izbori
  * korisnika (red, lokacija, region, SN), ne i podaci reda.
  */
@@ -29,11 +29,11 @@ class UvozZahteva extends Component
      * Pravo na stranicu (pozicija_prikaz_stranicas) važi i za akcije komponente,
      * jer Livewire zahtevi ne prolaze kroz accessrole middleware.
      */
-    public const ROUTE_NAME = 'halk-uvoz-zahteva';
+    public const ROUTE_NAME = 'acq-uvoz-zahteva';
 
     public const NOVA_LOKACIJA = 'nova';
 
-    private const ARHIVA = 'halk-zahtevi';
+    private const ARHIVA = 'acq-zahtevi';
 
     public ?TemporaryUploadedFile $fajl = null;
 

@@ -54,6 +54,21 @@ class TerminalAcqHistory extends Model
         return $this->belongsTo(TerminalAcq::class, 'terminal_acqId');
     }
 
+    public function terminal(): BelongsTo
+    {
+        return $this->belongsTo(Terminal::class, 'terminalId');
+    }
+
+    public function lokacija(): BelongsTo
+    {
+        return $this->belongsTo(Lokacija::class, 'lokacijaId');
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(TerminalStatusTip::class, 'terminal_statusId');
+    }
+
     /**
      * Snapshot stanja TID-a PRE izmene. Poziva se u istoj transakciji kao izmena,
      * pre izmene TID-a i pre premeštanja uređaja.
