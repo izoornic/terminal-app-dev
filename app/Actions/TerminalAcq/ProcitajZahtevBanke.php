@@ -47,23 +47,50 @@ class ProcitajZahtevBanke
         $noviPibUFajlu = [];
 
         foreach ($this->citac->procitaj($putanja, self::OBAVEZNE_KOLONE) as $sirov) {
-            $red = $this->osnova($sirov);
-
-            $this->proveriTid($red, $tidoviUFajlu);
-            if ($red['vrsta'] === self::PREKONFIGURACIJA) {
-                $this->proveriStariTid($red);
-            } elseif ($fajlPrekonfiguracija) {
-                $red['upozorenja'][] = 'Fajl je zahtev za prekonfiguraciju, a red nema "prekonfiguracija PN…"; uvozi se kao instalacija.';
-            }
-
-            $this->predloziLokaciju($red, $noviPibUFajlu);
-            $this->proveriPodatke($red);
-
-            $red['izabran'] = $red['greske'] === [];
-            $redovi[] = $red;
+            $redovi[] = $this->pripremiRed($sirov, $tidoviUFajlu, $noviPibUFajlu, $fajlPrekonfiguracija);
         }
 
         return ['datum_zahteva' => $this->datumIzNaziva($nazivFajla), 'redovi' => $redovi];
+    }
+
+    /**
+     * Jedan red unet ručno (npr. zahtev stigao mailom), u istom obliku kao red iz Excela
+     * (ključevi kao u HalkExcelCitac). Prolazi iste provere i isti predlog lokacije.
+     *
+     * @param  array<string, mixed>  $sirov
+     * @return array<string, mixed>
+     */
+    public function procitajRucno(array $sirov): array
+    {
+        $tidovi = [];
+        $noviPib = [];
+
+        return $this->pripremiRed(['red' => 1, ...$sirov], $tidovi, $noviPib, false);
+    }
+
+    /**
+     * @param  array<string, mixed>  $sirov
+     * @param  array<string, int|string>  $tidoviUFajlu
+     * @param  array<string, int|string>  $noviPibUFajlu
+     * @return array<string, mixed>
+     */
+    private function pripremiRed(array $sirov, array &$tidoviUFajlu, array &$noviPibUFajlu, bool $fajlPrekonfiguracija): array
+    {
+        $red = $this->osnova($sirov);
+
+        $this->proveriTid($red, $tidoviUFajlu);
+        if ($red['vrsta'] === self::PREKONFIGURACIJA) {
+            $this->proveriStariTid($red);
+        } elseif ($fajlPrekonfiguracija) {
+            $red['upozorenja'][] = 'Fajl je zahtev za prekonfiguraciju, a red nema "prekonfiguracija PN…"; uvozi se kao instalacija.';
+        }
+
+        $this->predloziLokaciju($red, $noviPibUFajlu);
+        $this->proveriPodatke($red);
+
+        $red['izabran'] = $red['greske'] === [];
+
+        return $red;
     }
 
     /**

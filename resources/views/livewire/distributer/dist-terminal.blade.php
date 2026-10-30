@@ -372,4 +372,25 @@
         </x-slot>
     </x-jet-dialog-modal>
 
+    {{-- GREŠKA: uređaj pod aktivnim ACQ TID-om --}}
+    <x-jet-dialog-modal wire:model.live="modalErorLicencaVisible">
+        <x-slot name="title">
+            GREŠKA
+        </x-slot>
+        <x-slot name="content">
+            <div class="bg-red-50 border border-red-500 text-red-500 px-4 py-3 rounded relative my-4" role="alert">
+                <span class="font-bold block sm:inline">
+                    @if($licencaError == 'acq')
+                        @include('livewire.terminal-acq.zabrana-premestanja')
+                    @endif
+                </span>
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalErorLicencaVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
 </div>

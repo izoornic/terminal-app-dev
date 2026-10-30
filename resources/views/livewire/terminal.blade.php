@@ -323,6 +323,8 @@
                     @elseif($licencaError == 'db')
                         Došlo je do greške! <br />
                         Pokušajte kasnije.
+                    @elseif($licencaError == 'acq')
+                        @include('livewire.terminal-acq.zabrana-premestanja')
                     @endif
                 </span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">

@@ -2,7 +2,12 @@
 
 namespace App\Http\Livewire\TerminalAcq;
 
+use App\Actions\TerminalAcq\DeinstalirajTerminalAcq;
+use App\Actions\TerminalAcq\DodeliUredjajTerminalAcq;
+use App\Actions\TerminalAcq\IzvrsiPrekonfiguraciju;
+use App\Actions\TerminalAcq\OpozoviTerminalAcq;
 use App\Actions\TerminalAcq\TerminalAcqLista;
+use App\Models\Lokacija;
 use App\Models\LokacijaKontaktOsoba;
 use App\Models\PozicijaPrikazStranica;
 use App\Models\TerminalAcq;
@@ -14,9 +19,12 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use RuntimeException;
 
 /**
- * Lista ACQ TID-ova (Faza 4): pretraga, filteri po efektivnom statusu i detalj sa istorijom.
+ * Lista ACQ TID-ova (Faza 4): pretraga, filteri po efektivnom statusu, detalj sa istorijom
+ * i akcije nad TID-om (dodela uređaja, izvršenje prekonfiguracije, deinstalacija, opoziv).
+ * Svaka akcija proverava pravo i stanje TID-a; pravila su u Action klasama.
  */
 class AcqTerminali extends Component
 {
@@ -47,6 +55,21 @@ class AcqTerminali extends Component
 
     public bool $detaljVisible = false;
 
+    public string $dodelaSn = '';
+
+    public ?int $deinstalacijaLokacijaId = null;
+
+    public ?int $deinstalacijaStatusId = null;
+
+    #[Locked]
+    public ?string $porukaAkcije = null;
+
+    #[Locked]
+    public ?string $greskaAkcije = null;
+
+    #[Locked]
+    public ?string $porukaListe = null;
+
     public function mount(): void
     {
         $this->proveriPristup();
@@ -69,13 +92,68 @@ class AcqTerminali extends Component
     {
         $this->proveriPristup();
         $this->detaljId = TerminalAcq::findOrFail($id)->id;
+        $this->reset(['dodelaSn', 'deinstalacijaLokacijaId', 'deinstalacijaStatusId', 'porukaAkcije', 'greskaAkcije']);
         $this->detaljVisible = true;
     }
 
-    #[On('tidDodat')]
-    public function osvezi(): void
+    public function dodeliUredjaj(DodeliUredjajTerminalAcq $dodela): void
     {
+        $this->akcija(function (TerminalAcq $acq) use ($dodela): string {
+            if (trim($this->dodelaSn) === '') {
+                throw new RuntimeException('Unesite SN uređaja.');
+            }
+            $upozorenja = $dodela->izvrsi($acq, $this->dodelaSn, auth()->user());
+
+            return trim('Uređaj je dodeljen TID-u. '.implode(' ', $upozorenja));
+        });
+    }
+
+    public function izvrsiPrekonfiguraciju(IzvrsiPrekonfiguraciju $prekonfiguracija): void
+    {
+        $this->akcija(fn (TerminalAcq $acq): string => trim('Prekonfiguracija je izvršena. '.implode(' ', $prekonfiguracija->izvrsi($acq, auth()->user()))));
+    }
+
+    public function deinstaliraj(DeinstalirajTerminalAcq $deinstalacija): void
+    {
+        $this->akcija(function (TerminalAcq $acq) use ($deinstalacija): string {
+            if ($this->deinstalacijaLokacijaId === null || $this->deinstalacijaStatusId === null) {
+                throw new RuntimeException('Izaberite lokaciju i status uređaja.');
+            }
+            $deinstalacija->izvrsi($acq, $this->deinstalacijaLokacijaId, $this->deinstalacijaStatusId, auth()->user());
+
+            return 'TID je deinstaliran, a uređaj premešten.';
+        });
+    }
+
+    public function opozovi(OpozoviTerminalAcq $opoziv): void
+    {
+        $this->akcija(function (TerminalAcq $acq) use ($opoziv): string {
+            $opoziv->izvrsi($acq, auth()->user());
+
+            return 'TID je opozvan.';
+        });
+    }
+
+    #[On('tidDodat')]
+    public function osvezi(?string $poruka = null): void
+    {
+        $this->porukaListe = $poruka;
         $this->resetPage();
+    }
+
+    /**
+     * Ručna prekonfiguracija aktivnog TID-a (zahtev stigao mailom): otvara formu RucnaPrekonfiguracija.
+     */
+    public function otvoriPrekonfiguraciju(): void
+    {
+        $this->proveriPristup();
+        $acq = TerminalAcq::findOrFail($this->detaljId);
+        if ($acq->terminalId === null) {
+            return;
+        }
+
+        $this->detaljVisible = false;
+        $this->dispatch('rucnaPrekonfiguracija', stariId: $acq->id);
     }
 
     public function render(TerminalAcqLista $lista): View
@@ -86,6 +164,11 @@ class AcqTerminali extends Component
             'statusiFilter' => $lista->statusiUpotrebljeni(),
             'brziFilteri' => TerminalAcqLista::brziFilteri(),
             'detalj' => $this->detaljVisible ? $this->detalj() : null,
+            'ciljneLokacije' => Lokacija::query()->whereIn('lokacija_tipId', DeinstalirajTerminalAcq::CILJNI_TIPOVI_LOKACIJE)
+                ->orderBy('lokacija_tipId')->orderBy('l_naziv')->pluck('l_naziv', 'id'),
+            'statusiUredjaja' => TerminalStatusTip::tipoviList(),
+            'statusZaInstalacijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::ZA_INSTALACIJU),
+            'statusCekaPrekonfiguracijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::CEKA_PREKONFIGURACIJU),
         ]);
     }
 
@@ -123,6 +206,26 @@ class AcqTerminali extends Component
             'kontakti' => $lokacija !== null ? LokacijaKontaktOsoba::query()->where('lokacijaId', $lokacija->id)->get() : collect(),
             'istorija' => $acq->histories->reverse()->values(),
         ];
+    }
+
+    /**
+     * Zajednički tok akcije nad TID-om iz detalja: pravo, učitavanje TID-a iz baze,
+     * poruka o uspehu ili grešci (RuntimeException iz Action klase).
+     *
+     * @param  callable(TerminalAcq): string  $izvrsi
+     */
+    private function akcija(callable $izvrsi): void
+    {
+        $this->proveriPristup();
+        $this->porukaAkcije = null;
+        $this->greskaAkcije = null;
+
+        try {
+            $this->porukaAkcije = $izvrsi(TerminalAcq::findOrFail($this->detaljId));
+            $this->reset(['dodelaSn', 'deinstalacijaLokacijaId', 'deinstalacijaStatusId']);
+        } catch (RuntimeException $e) {
+            $this->greskaAkcije = $e->getMessage();
+        }
     }
 
     /**

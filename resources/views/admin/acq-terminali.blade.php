@@ -30,6 +30,7 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 @livewire('terminal-acq.acq-terminali')
                 @livewire('terminal-acq.dodaj-terminal')
+                @livewire('terminal-acq.rucna-prekonfiguracija')
             </div>
         </div>
     </div>

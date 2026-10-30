@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
+use App\Http\Livewire\TerminalAcq\ZabranaPremestanjaAcq;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Lokacije\LokacijaInfo;
@@ -29,6 +30,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class Lokacijes extends Component
 {
     use WithPagination;
+    use ZabranaPremestanjaAcq;
     
     public $modalFormVisible;
     public $modalConfirmDeleteVisible;
@@ -639,6 +641,12 @@ class Lokacijes extends Component
             }
             
             $this->errAddMsg = ''; 
+
+            //Uredjaj pod aktivnim ACQ TID-om se premesta samo kroz ACQ terminali
+            if ($this->zabranaPremestanjaAcq($this->selsectedTerminals)) {
+                $this->modalAddTerminalVisible = false;
+                return;
+            }
 
             //Da li treminali imaju licencu? Brisu se servisne licence ako ih ima
             foreach($this->selsectedTerminals as $item){

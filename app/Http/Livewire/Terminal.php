@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
+use App\Http\Livewire\TerminalAcq\ZabranaPremestanjaAcq;
 
 use App\Actions\Licence\CryptoSign;
 use App\Actions\Terminali\TerminalHistory;
@@ -39,6 +40,7 @@ use App\Actions\Terminali\TerminaliReadActions;
 class Terminal extends Component
 {
     use WithPagination;
+    use ZabranaPremestanjaAcq;
     
     public $modalFormVisible;
     public $modalConfirmPremestiVisible;
@@ -423,6 +425,9 @@ class Terminal extends Component
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
         $this->licencaError = '';
+        if ($this->zabranaPremestanjaAcq([$id])) {
+            return;
+        }
         //podaci o terminalu koji se premesta
         //kupi ih komponenta preko modeId-a
         $this->modalConfirmPremestiVisible = true;
@@ -448,6 +453,9 @@ class Terminal extends Component
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
         $this->licencaError = '';
+        if ($this->zabranaPremestanjaAcq($this->selectedTerminals)) {
+            return;
+        }
 
         $this->modalConfirmPremestiVisible = true;
 
@@ -501,6 +509,13 @@ class Terminal extends Component
         $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : null;
 
         if(!$this->multiSelected) $this->selectedTerminals[0] = $this->modelId;
+
+        //Uredjaj pod aktivnim ACQ TID-om se premesta samo kroz ACQ terminali
+        if ($this->zabranaPremestanjaAcq($this->selectedTerminals)) {
+            $this->selectedTerminals = [];
+            $this->modalConfirmPremestiVisible = false;
+            return;
+        }
 
         //Da li terminal ima aktivnu licencu  Brisu se servisne licence ako ih ima
         foreach($this->selectedTerminals as $item){

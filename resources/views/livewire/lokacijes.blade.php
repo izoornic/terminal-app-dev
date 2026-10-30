@@ -194,6 +194,8 @@
                     @if($licencaError == 'multi')
                         Jedan ili više izabranih terminala imaju licencu! <br />
                         Samo terminali bez licenci mogu da se premeštaju.
+                    @elseif($licencaError == 'acq')
+                        @include('livewire.terminal-acq.zabrana-premestanja')
                     @elseif($licencaError == 'db')
                         Došlo je do greške! <br />
                         Pokušajte kasnije.

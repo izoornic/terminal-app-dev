@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
+use App\Http\Livewire\TerminalAcq\ZabranaPremestanjaAcq;
 
 use App\Actions\Terminali\SelectedTerminalInfo;
 use App\Actions\Terminali\StatusZaPremestanje;
@@ -29,8 +30,13 @@ use App\Helpers\PaginationHelper;
 class DistTerminal extends Component
 {
     use WithPagination;
+    use ZabranaPremestanjaAcq;
 
     public $distId;
+
+    //Error MODAL (uredjaj pod aktivnim ACQ TID-om)
+    public $licencaError = '';
+    public $modalErorLicencaVisible = false;
     public $distData;
 
     //read fnc
@@ -114,6 +120,10 @@ class DistTerminal extends Component
         $this->canMoveTerminal = 0;
         $this->modalStatusPremesti = $status;
         $this->selectedCampagin = null;
+        $this->licencaError = '';
+        if ($this->zabranaPremestanjaAcq([$id])) {
+            return;
+        }
 
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
@@ -135,6 +145,10 @@ class DistTerminal extends Component
     public function premestiSelectedShowModal(){
         
         $this->multiSelected = true;
+        $this->licencaError = '';
+        if ($this->zabranaPremestanjaAcq($this->selectedTerminals)) {
+            return;
+        }
         $this->multiSelectedInfo = $this->multiSelectedTInfo();
 
         //status na listi se setuje prema prvom izabranom terminalu, a ako ga nema na "Instaliran"
@@ -262,6 +276,13 @@ class DistTerminal extends Component
      * @return void
      */
     public function moveTerminal(){
+        //Uredjaj pod aktivnim ACQ TID-om se premesta samo kroz ACQ terminali
+        if ($this->zabranaPremestanjaAcq($this->multiSelected ? $this->selectedTerminals : [$this->modelId])) {
+            $this->selectedTerminals = [];
+            $this->modalConfirmPremestiVisible = false;
+            return;
+        }
+
         //samo za lokaciju tipa "Korisnik terminala" kampanja obavezna
         if(Lokacija::where('id', '=', $this->plokacija)->first()->lokacija_tipId == 3){
             $this->validate([

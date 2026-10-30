@@ -15,7 +15,8 @@ use RuntimeException;
 /**
  * Faza 3b: upis potvrđenih redova zahteva banke, sve u jednoj transakciji.
  *
- * Redovi dolaze iz ProcitajZahtevBanke (ponovo pročitani sa servera); od korisnika se
+ * Redovi dolaze iz ProcitajZahtevBanke (ponovo pročitani sa servera, ili jedan ručno unet
+ * red kod ručne prekonfiguracije / instalacije); od korisnika se
  * uzimaju samo izbori: da li se red uvozi, lokacija (postojeća ili nova), region i SN.
  *
  * - instalacija: TID "Za instalaciju" na lokaciji; uz SN odmah "Dodela uređaja"
@@ -48,12 +49,12 @@ class UpisiZahtevBanke
      *
      * @throws RuntimeException "Red N: …" — ništa nije upisano
      */
-    public function upisi(array $redovi, array $izbori, string $datumZahteva, string $izvorFajl, User $korisnik): array
+    public function upisi(array $redovi, array $izbori, string $datumZahteva, ?string $izvorFajl, User $korisnik, string $izvor = TerminalAcq::IZVOR_ZAHTEV): array
     {
         $this->noveLokacije = [];
         $rezultat = ['tidova' => 0, 'lokacija' => 0, 'kontakata' => 0, 'upozorenja' => []];
 
-        DB::transaction(function () use ($redovi, $izbori, $datumZahteva, $izvorFajl, $korisnik, &$rezultat): void {
+        DB::transaction(function () use ($redovi, $izbori, $datumZahteva, $izvorFajl, $korisnik, $izvor, &$rezultat): void {
             foreach ($redovi as $red) {
                 $izbor = $izbori[$red['red']] ?? [];
                 if (! ($izbor['izabran'] ?? false)) {
@@ -61,7 +62,7 @@ class UpisiZahtevBanke
                 }
 
                 try {
-                    $this->upisiRed($red, $izbor, $datumZahteva, $izvorFajl, $korisnik, $rezultat);
+                    $this->upisiRed($red, $izbor, $datumZahteva, $izvorFajl, $korisnik, $izvor, $rezultat);
                 } catch (RuntimeException $e) {
                     throw new RuntimeException("Red {$red['red']} ({$red['tid_sirovo']}): {$e->getMessage()}", 0, $e);
                 }
@@ -76,7 +77,7 @@ class UpisiZahtevBanke
      * @param  array<string, mixed>  $izbor
      * @param  array{tidova: int, lokacija: int, kontakata: int, upozorenja: list<string>}  $rezultat
      */
-    private function upisiRed(array $red, array $izbor, string $datumZahteva, string $izvorFajl, User $korisnik, array &$rezultat): void
+    private function upisiRed(array $red, array $izbor, string $datumZahteva, ?string $izvorFajl, User $korisnik, string $izvor, array &$rezultat): void
     {
         if ($red['greske'] !== []) {
             throw new RuntimeException($red['greske'][0]);
@@ -112,7 +113,7 @@ class UpisiZahtevBanke
                 'prethodni_terminal_acqId' => $stari?->id,
                 'zahtev_acq_mid' => $zahtevMid,
                 'trazeni_terminal_tipId' => $red['trazeni_terminal_tipId'],
-                'izvor' => TerminalAcq::IZVOR_ZAHTEV,
+                'izvor' => $izvor,
                 'izvor_fajl' => $izvorFajl,
             ],
             $lokacija->id,

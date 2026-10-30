@@ -1,4 +1,8 @@
 <div class="p-6">
+    @if ($porukaListe)
+        <div class="mb-4 p-3 rounded-md border border-green-300 bg-green-50 text-sm text-green-800">{{ $porukaListe }}</div>
+    @endif
+
     {{-- BRZI FILTERI --}}
     <div class="flex flex-wrap gap-2 mb-4">
         @foreach ($brziFilteri as $kljuc => $naziv)
@@ -162,6 +166,73 @@
                             <div class="text-gray-500">Bez lokacije.</div>
                         @endif
                     </div>
+                </div>
+
+                {{-- AKCIJE --}}
+                @if ($porukaAkcije)
+                    <div class="mt-4 p-3 rounded-md border border-green-300 bg-green-50 text-sm text-green-800">{{ $porukaAkcije }}</div>
+                @endif
+                @if ($greskaAkcije)
+                    <div class="mt-4 p-3 rounded-md border border-red-300 bg-red-50 text-sm text-red-700">{{ $greskaAkcije }}</div>
+                @endif
+
+                <div class="mt-4 p-3 rounded-md border border-gray-200 text-sm">
+                    <div class="font-semibold text-gray-700 mb-2">Akcije</div>
+
+                    @if ($acq->terminalId === null && $acq->terminal_statusId === $statusZaInstalacijuId)
+                        <div class="flex flex-wrap items-end gap-2">
+                            <div>
+                                <x-jet-label for="dodelaSn" value="SN uređaja za dodelu" />
+                                <x-jet-input wire:model="dodelaSn" id="dodelaSn" class="block mt-1 w-56" type="text" />
+                            </div>
+                            <x-jet-button wire:click="dodeliUredjaj" wire:loading.attr="disabled">Dodeli uređaj</x-jet-button>
+                            <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}?" wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                        </div>
+                        <div class="mt-1 text-xs text-gray-500">Ako uređaj nije na lokaciji TID-a, premešta se tamo sa statusom „Za instalaciju”.</div>
+                    @elseif ($acq->terminalId === null && $acq->terminal_statusId === $statusCekaPrekonfiguracijuId)
+                        <div class="mb-2">Stari TID: <span class="font-semibold">{{ $acq->prethodni?->acq_tid ?? '—' }}</span>
+                            @if ($acq->zahtev_acq_mid) <span class="text-amber-700">· MID lokacije biće zamenjen sa {{ $acq->zahtev_acq_mid }}</span> @endif
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <x-jet-button wire:click="izvrsiPrekonfiguraciju" wire:confirm="Tehničar je prekonfigurisao uređaj? Stari TID {{ $acq->prethodni?->acq_tid }} se zatvara, a uređaj prelazi na {{ $acq->acq_tid }}." wire:loading.attr="disabled">Izvrši prekonfiguraciju</x-jet-button>
+                            <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}? Stari TID ostaje aktivan." wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                        </div>
+                    @elseif ($acq->terminalId !== null)
+                        <div class="flex flex-wrap items-end gap-2">
+                            <div>
+                                <x-jet-label for="deinstalacijaLokacijaId" value="Uređaj ide u" />
+                                <select wire:model="deinstalacijaLokacijaId" id="deinstalacijaLokacijaId" class="block mt-1 border-gray-300 rounded-md text-sm">
+                                    <option value="">---</option>
+                                    @foreach ($ciljneLokacije as $id => $naziv)
+                                        <option value="{{ $id }}">{{ $naziv }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <x-jet-label for="deinstalacijaStatusId" value="Status uređaja" />
+                                <select wire:model="deinstalacijaStatusId" id="deinstalacijaStatusId" class="block mt-1 border-gray-300 rounded-md text-sm">
+                                    <option value="">---</option>
+                                    @foreach ($statusiUredjaja as $id => $naziv)
+                                        <option value="{{ $id }}">{{ $naziv }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <x-jet-danger-button wire:click="deinstaliraj" wire:confirm="Deinstalirati TID {{ $acq->acq_tid }} i premestiti uređaj?" wire:loading.attr="disabled">Deinstaliraj</x-jet-danger-button>
+                        </div>
+                        @unless ($acq->naslednik)
+                            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+                                <x-jet-secondary-button wire:click="otvoriPrekonfiguraciju">
+                                    <x-heroicon-o-arrow-path class="w-4 h-4 mr-2" />
+                                    Prekonfiguriši
+                                </x-jet-secondary-button>
+                                <span class="text-xs text-gray-500">Ručno, za zahtev koji nije stigao Excelom (ista ili nova firma).</span>
+                            </div>
+                        @else
+                            <div class="mt-3 text-xs text-gray-500">Prekonfiguracija je već zatražena: {{ $acq->naslednik->acq_tid }}.</div>
+                        @endunless
+                    @else
+                        <div class="text-gray-500">TID je zatvoren; nema akcija.</div>
+                    @endif
                 </div>
 
                 <div class="font-semibold text-gray-700 mt-6 mb-1 text-sm">Istorija</div>
