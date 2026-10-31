@@ -53,6 +53,8 @@ class RucnaPrekonfiguracijaTest extends TestCase
         TerminalStatusTip::forceCreate(['id' => 8, 'ts_naziv' => 'Za instalaciju']);
         $stranica = Stranica::forceCreate(['naziv' => 'ACQ terminali', 'route_name' => AcqTerminali::ROUTE_NAME, 'menu_order' => 39, 'show_in_meni' => 1]);
         PozicijaPrikazStranica::create(['pozicija_tipId' => self::ADMIN, 'stranicaId' => $stranica->id]);
+        $upravljanje = Stranica::forceCreate(['naziv' => 'ACQ upravljanje', 'route_name' => AcqTerminali::PRAVO_UPRAVLJANJE, 'menu_order' => 39, 'show_in_meni' => 0]);
+        PozicijaPrikazStranica::create(['pozicija_tipId' => self::ADMIN, 'stranicaId' => $upravljanje->id]);
 
         $this->trgovac = Lokacija::factory()->create([
             'regionId' => $this->nis, 'lokacija_tipId' => 3, 'distributerId' => null,

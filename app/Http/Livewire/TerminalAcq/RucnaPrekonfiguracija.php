@@ -84,13 +84,13 @@ class RucnaPrekonfiguracija extends Component
 
     public function mount(): void
     {
-        $this->proveriPristup();
+        $this->proveriPristupStranici();
     }
 
     #[On('rucnaPrekonfiguracija')]
     public function otvori(int $stariId): void
     {
-        $this->proveriPristup();
+        AcqTerminali::proveriUpravljanje();
         $stari = TerminalAcq::with('terminal')->findOrFail($stariId);
         if ($stari->terminalId === null) {
             return;
@@ -124,7 +124,7 @@ class RucnaPrekonfiguracija extends Component
      */
     public function proveri(ProcitajZahtevBanke $citac): void
     {
-        $this->proveriPristup();
+        AcqTerminali::proveriUpravljanje();
         $this->greska = null;
         $red = $citac->procitajRucno($this->sirov());
         $this->pregled = $red;
@@ -140,7 +140,7 @@ class RucnaPrekonfiguracija extends Component
 
     public function sacuvaj(ProcitajZahtevBanke $citac, UpisiZahtevBanke $upis, IzvrsiPrekonfiguraciju $prekonfiguracija): void
     {
-        $this->proveriPristup();
+        AcqTerminali::proveriUpravljanje();
         $this->validate(
             ['datum_zahteva' => ['required', 'date']],
             ['datum_zahteva.required' => 'Unesite datum zahteva.', 'datum_zahteva.date' => 'Datum zahteva nije ispravan.']
@@ -218,9 +218,10 @@ class RucnaPrekonfiguracija extends Component
     }
 
     /**
-     * Ručna prekonfiguracija je deo stranice ACQ terminali (Admin i Call centar)
+     * Komponenta je deo stranice ACQ terminali, pa se učitava uz pravo na stranicu;
+     * same akcije traže pravo upravljanja (Admin i Call centar).
      */
-    private function proveriPristup(): void
+    private function proveriPristupStranici(): void
     {
         abort_unless(PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, AcqTerminali::ROUTE_NAME), 403);
     }

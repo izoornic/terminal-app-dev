@@ -36,6 +36,13 @@ class AcqTerminali extends Component
      */
     public const ROUTE_NAME = 'acq-terminali';
 
+    /**
+     * Pravo bez rute (red u stranicas, show_in_meni = 0) za akcije koje menjaju evidenciju:
+     * Dodaj terminal, ručna prekonfiguracija, opoziv. Ostale akcije (dodela uređaja,
+     * izvršenje prekonfiguracije, deinstalacija) ima svako ko ima pravo na stranicu.
+     */
+    public const PRAVO_UPRAVLJANJE = 'acq-terminali-upravljanje';
+
     public string $searchTid = '';
 
     public string $searchSn = '';
@@ -127,6 +134,7 @@ class AcqTerminali extends Component
 
     public function opozovi(OpozoviTerminalAcq $opoziv): void
     {
+        self::proveriUpravljanje();
         $this->akcija(function (TerminalAcq $acq) use ($opoziv): string {
             $opoziv->izvrsi($acq, auth()->user());
 
@@ -146,7 +154,7 @@ class AcqTerminali extends Component
      */
     public function otvoriPrekonfiguraciju(): void
     {
-        $this->proveriPristup();
+        self::proveriUpravljanje();
         $acq = TerminalAcq::findOrFail($this->detaljId);
         if ($acq->terminalId === null) {
             return;
@@ -169,6 +177,7 @@ class AcqTerminali extends Component
             'statusiUredjaja' => TerminalStatusTip::tipoviList(),
             'statusZaInstalacijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::ZA_INSTALACIJU),
             'statusCekaPrekonfiguracijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::CEKA_PREKONFIGURACIJU),
+            'mozeUpravljati' => self::mozeUpravljati(),
         ]);
     }
 
@@ -229,7 +238,21 @@ class AcqTerminali extends Component
     }
 
     /**
-     * Stranicu i akcije vide samo pozicije kojima je dodeljena ruta (Admin i Call centar)
+     * Da li prijavljeni korisnik sme da dodaje TID, radi ručnu prekonfiguraciju i opoziv
+     * (Admin i Call centar; čita se iz pozicija_prikaz_stranicas).
+     */
+    public static function mozeUpravljati(): bool
+    {
+        return PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, self::PRAVO_UPRAVLJANJE);
+    }
+
+    public static function proveriUpravljanje(): void
+    {
+        abort_unless(self::mozeUpravljati(), 403);
+    }
+
+    /**
+     * Stranicu vide pozicije kojima je dodeljena ruta (Admin, Call centar, Šef servisa, Serviser)
      */
     private function proveriPristup(): void
     {

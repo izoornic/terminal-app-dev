@@ -56,6 +56,7 @@ class AcqTerminaliStranicaTest extends TestCase
         TerminalStatusTip::forceCreate(['id' => self::STATUS_ZA_INSTALACIJU, 'ts_naziv' => 'Za instalaciju']);
         $this->trgovac = $this->lokacija(['l_naziv' => 'SAVSKI VENAC RENT', 'pib' => '113735946', 'acq_mid' => '000000000004388', 'mcc' => null, 'ptt' => null]);
         $this->dodeliStranicu(AcqTerminali::ROUTE_NAME, [self::ADMIN, self::CALL_CENTAR]);
+        $this->dodeliStranicu(AcqTerminali::PRAVO_UPRAVLJANJE, [self::ADMIN, self::CALL_CENTAR]);
     }
 
     /**

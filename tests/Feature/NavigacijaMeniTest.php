@@ -32,9 +32,23 @@ class NavigacijaMeniTest extends TestCase
         $this->assertSame(2, substr_count($response->getContent(), 'Postojeca stranica'));
     }
 
-    private function dodeliStranicu(string $routeName, string $naziv, int $pozicijaId): void
+    /**
+     * Stranice sa istim menu_order uvek idu istim redom (po id-u), a ne kako baza vrati.
+     */
+    public function test_isti_menu_order_se_sortira_po_id(): void
     {
-        $stranica = Stranica::forceCreate(['naziv' => $naziv, 'route_name' => $routeName, 'menu_order' => 1, 'show_in_meni' => 1]);
+        $pozicija = PozicijaTip::forceCreate(['naziv' => 'Admin']);
+        $this->dodeliStranicu('tiket', 'Tiketi', $pozicija->id, 6);
+        $this->dodeliStranicu('terminal', 'Terminali', $pozicija->id, 4);
+        $this->dodeliStranicu('lokacije', 'Lokacije', $pozicija->id, 4);
+        $korisnik = User::factory()->create(['pozicija_tipId' => $pozicija->id]);
+
+        $this->assertSame(['terminal', 'lokacije', 'tiket'], array_keys(User::userPozicijeList($korisnik->id)));
+    }
+
+    private function dodeliStranicu(string $routeName, string $naziv, int $pozicijaId, int $menuOrder = 1): void
+    {
+        $stranica = Stranica::forceCreate(['naziv' => $naziv, 'route_name' => $routeName, 'menu_order' => $menuOrder, 'show_in_meni' => 1]);
         PozicijaPrikazStranica::create(['pozicija_tipId' => $pozicijaId, 'stranicaId' => $stranica->id]);
     }
 }

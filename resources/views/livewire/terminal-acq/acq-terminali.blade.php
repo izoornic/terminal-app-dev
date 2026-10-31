@@ -186,7 +186,9 @@
                                 <x-jet-input wire:model="dodelaSn" id="dodelaSn" class="block mt-1 w-56" type="text" />
                             </div>
                             <x-jet-button wire:click="dodeliUredjaj" wire:loading.attr="disabled">Dodeli uređaj</x-jet-button>
-                            <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}?" wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                            @if ($mozeUpravljati)
+                                <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}?" wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                            @endif
                         </div>
                         <div class="mt-1 text-xs text-gray-500">Ako uređaj nije na lokaciji TID-a, premešta se tamo sa statusom „Za instalaciju”.</div>
                     @elseif ($acq->terminalId === null && $acq->terminal_statusId === $statusCekaPrekonfiguracijuId)
@@ -195,7 +197,9 @@
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <x-jet-button wire:click="izvrsiPrekonfiguraciju" wire:confirm="Tehničar je prekonfigurisao uređaj? Stari TID {{ $acq->prethodni?->acq_tid }} se zatvara, a uređaj prelazi na {{ $acq->acq_tid }}." wire:loading.attr="disabled">Izvrši prekonfiguraciju</x-jet-button>
-                            <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}? Stari TID ostaje aktivan." wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                            @if ($mozeUpravljati)
+                                <x-jet-danger-button wire:click="opozovi" wire:confirm="Opozvati TID {{ $acq->acq_tid }}? Stari TID ostaje aktivan." wire:loading.attr="disabled">Opozovi</x-jet-danger-button>
+                            @endif
                         </div>
                     @elseif ($acq->terminalId !== null)
                         <div class="flex flex-wrap items-end gap-2">
@@ -219,7 +223,9 @@
                             </div>
                             <x-jet-danger-button wire:click="deinstaliraj" wire:confirm="Deinstalirati TID {{ $acq->acq_tid }} i premestiti uređaj?" wire:loading.attr="disabled">Deinstaliraj</x-jet-danger-button>
                         </div>
-                        @unless ($acq->naslednik)
+                        @if ($acq->naslednik)
+                            <div class="mt-3 text-xs text-gray-500">Prekonfiguracija je već zatražena: {{ $acq->naslednik->acq_tid }}.</div>
+                        @elseif ($mozeUpravljati)
                             <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
                                 <x-jet-secondary-button wire:click="otvoriPrekonfiguraciju">
                                     <x-heroicon-o-arrow-path class="w-4 h-4 mr-2" />
@@ -227,9 +233,7 @@
                                 </x-jet-secondary-button>
                                 <span class="text-xs text-gray-500">Ručno, za zahtev koji nije stigao Excelom (ista ili nova firma).</span>
                             </div>
-                        @else
-                            <div class="mt-3 text-xs text-gray-500">Prekonfiguracija je već zatražena: {{ $acq->naslednik->acq_tid }}.</div>
-                        @endunless
+                        @endif
                     @else
                         <div class="text-gray-500">TID je zatvoren; nema akcija.</div>
                     @endif

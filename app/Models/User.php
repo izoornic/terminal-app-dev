@@ -105,7 +105,7 @@ class User extends Authenticatable
             WHERE
                 s.id = ps.stranicaId AND ps.pozicija_tipId = pt.id AND pt.id = u.pozicija_tipId AND s.show_in_meni = 1 AND s.sub_menu_order IS NULL AND u.id = ?
             ORDER BY
-                s.menu_order' , 
+                s.menu_order, s.id' , 
             [$curentUserId]
         );
 

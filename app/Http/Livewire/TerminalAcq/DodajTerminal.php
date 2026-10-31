@@ -63,13 +63,13 @@ class DodajTerminal extends Component
 
     public function mount(): void
     {
-        $this->proveriPristup();
+        $this->proveriPristupStranici();
     }
 
     #[On('dodajTerminal')]
     public function otvori(): void
     {
-        $this->proveriPristup();
+        AcqTerminali::proveriUpravljanje();
         $this->resetValidation();
         $this->reset(['acq_tid', 'sn', 'naziv_na_slipu', 'komunikacija', 'iccid', 'inventarni_broj', 'dodatne_opcije', 'napomena', 'datum_zahteva', 'datum_instalacije', 'testni', 'acq_mid', 'mcc', 'ptt']);
         $this->modalVisible = true;
@@ -77,7 +77,7 @@ class DodajTerminal extends Component
 
     public function sacuvaj(DodajTerminalAcq $dodaj): void
     {
-        $this->proveriPristup();
+        AcqTerminali::proveriUpravljanje();
         $this->acq_tid = strtoupper(preg_replace('/\s+/', '', $this->acq_tid));
         $this->sn = trim($this->sn);
         $this->validate();
@@ -218,9 +218,10 @@ class DodajTerminal extends Component
     }
 
     /**
-     * "Dodaj terminal" je deo stranice ACQ terminali (Admin i Call centar)
+     * Komponenta je deo stranice ACQ terminali, pa se učitava uz pravo na stranicu;
+     * same akcije traže pravo upravljanja (Admin i Call centar).
      */
-    private function proveriPristup(): void
+    private function proveriPristupStranici(): void
     {
         abort_unless(PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, AcqTerminali::ROUTE_NAME), 403);
     }

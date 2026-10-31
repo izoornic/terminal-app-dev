@@ -16,11 +16,13 @@
                         </a>
                     </div>
                 @endif
-                <span class="mr-2 pr-2">
-                    <livewire:komponente.add-new-item-button
-                            btn_name="Dodaj terminal"
-                            btn_event="dodajTerminal" />
-                </span>
+                @if (\App\Http\Livewire\TerminalAcq\AcqTerminali::mozeUpravljati())
+                    <span class="mr-2 pr-2">
+                        <livewire:komponente.add-new-item-button
+                                btn_name="Dodaj terminal"
+                                btn_event="dodajTerminal" />
+                    </span>
+                @endif
             </div>
         </h2>
     </x-slot>
@@ -29,8 +31,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 @livewire('terminal-acq.acq-terminali')
-                @livewire('terminal-acq.dodaj-terminal')
-                @livewire('terminal-acq.rucna-prekonfiguracija')
+                @if (\App\Http\Livewire\TerminalAcq\AcqTerminali::mozeUpravljati())
+                    @livewire('terminal-acq.dodaj-terminal')
+                    @livewire('terminal-acq.rucna-prekonfiguracija')
+                @endif
             </div>
         </div>
     </div>
