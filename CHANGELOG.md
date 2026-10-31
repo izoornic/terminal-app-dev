@@ -545,3 +545,36 @@ V 2.2.11 ( 29.10.2026.) @HALK-terminal-acq
     - Ispravka: mobilni meni (navigation-menu) nije proveravao Route::has kao desktop meni, pa je stranica u bazi
       bez rute u kodu obarala svaku stranicu ("Route [...] not defined"). Pojavilo se na develop-u posle
       sinhronizacije test baze. Test tests/Feature/NavigacijaMeniTest.php.
+
+V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
+    - Nova evidencija terminala po ACQ TID-u (HALK): tabela terminal_acq (jedan red po TID-u) i terminal_acq_histories.
+      Dok je TID pod uredjajem, status i lokacija se citaju sa uredjaja (terminal_lokacijas); sopstveni status i
+      lokaciju TID ima samo kad nema uredjaj (Za instalaciju, Ceka prekonfiguraciju, Deinstaliran, Prekonfigurisan,
+      Opozvan). Novi statusi samo za TID (terminal_status_tips.ts_za_uredjaj = 0) se ne nude u listama statusa uredjaja.
+    - lokacijas: nove kolone acq_mid, mcc, ptt, precizna_lokacija; lokacija_kontakt_osobas.tel 16 -> 32 znaka.
+    - Stranica "ACQ terminali" (ruta acq-terminali, Admin i Call centar): lista TID-ova sa pretragom i filterima,
+      detalj sa istorijom, Dodaj terminal, Dodeli uredjaj, Izvrsi prekonfiguraciju, Prekonfigurisi (rucno, za zahtev
+      stigao mailom), Deinstaliraj (TID se zatvara i uredjaj premesta u servis/magacin), Opozovi.
+    - Stranica "Uvoz zahteva banke" (ruta acq-uvoz-zahteva, dugme na stranici ACQ terminali): Excel zahtev za
+      instalaciju ili prekonfiguraciju -> pregled po redu -> upis; fajlovi se arhiviraju u storage/app/acq-zahtevi/.
+    - Uredjaj pod aktivnim TID-om se vise ne premesta sa stranica Terminali, Licence, Lokacije i Distributer
+      (premesta se kroz ACQ terminali); promena samo statusa uredjaja ostaje dozvoljena.
+    - TID se prikazuje u komponenti Terminal info i na stranici tiketa; redovi sa TID-om su svetloplavi na
+      stranicama Terminali, Licence i Distributer; pretraga po SN-u trazi i po TID-u (liste terminala, tiketi,
+      modal Novi tiket); forma lokacije ima blok "Podaci banke (ACQ)" (kod Distributera samo prikaz).
+    - Artisan komande (jednokratni uvoz glavne HALK tabele): halk:provera (izvestaj, bez upisa),
+      halk:ispravi-status (uredjaji kod trgovca sa statusom "Za instalaciju" -> "Instaliran"),
+      halk:uvoz (uvoz TID-ova). Bez --potvrdi sve tri samo prave CSV izvestaj u storage/app/halk/.
+    - DEPLOY (redosled je vazan):
+        1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_*). Migracije moraju pre ili odmah
+           uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
+        2. Rucno pokrenuti SQL za stranice acq-terminali i acq-uvoz-zahteva (stranicas + prava za pozicije 1 i 2);
+           na develop serveru isti SQL dodati i u /home/eposrs/db-sync/posle-uvoza.sql (inace ga nocna
+           sinhronizacija brise).
+        3. Na produkciji APP_ENV=production pa php artisan config:clear (inace header prikazuje oznaku TEST, V 2.2.11).
+        4. Jednokratno, nad konacnom HALK tabelom: halk:provera -> halk:ispravi-status (pregled liste, pa --potvrdi
+           --korisnik=<id>) -> halk:uvoz (pregled izvestaja, pa --potvrdi --korisnik=<id>).
+    - Testovi: tests/Feature/Terminali/ (TerminalAcqModelTest, HalkProveraTest, HalkIspravkaStatusaTest,
+      HalkUvozTest, DodajTerminalAcqTest, ZahtevBankeTest, UvozZahtevaStranicaTest, AcqTerminaliStranicaTest,
+      AcqAkcijeTest, RucnaPrekonfiguracijaTest, ZabranaPremestanjaAcqTest, TerminalInfoAcqTest, LokacijaAcqPoljaTest),
+      tests/Unit/HalkNormalizatorTest, dopuna Tiket/TiketsPretragaTest.
