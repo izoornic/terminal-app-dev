@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Terminali;
 
-use App\Actions\TerminalAcq\DodajTerminalAcq;
 use App\Actions\TerminalAcq\HalkUvoz;
 use App\Models\Lokacija;
 use App\Models\LokacijaKontaktOsoba;
@@ -11,6 +10,7 @@ use App\Models\Terminal;
 use App\Models\TerminalAcq;
 use App\Models\TerminalAcqHistory;
 use App\Models\TerminalLokacija;
+use App\Models\TerminalLokacijaHistory;
 use App\Models\TerminalStatusTip;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -115,16 +115,158 @@ class HalkUvozTest extends TestCase
     }
 
     #[Test]
-    public function drugi_pib_ne_dopunjuje_lokaciju(): void
+    public function drugi_pib_za_instalaciju_ne_dopunjuje_i_ne_premesta(): void
     {
         $this->uredjaj('A26-12RB-1K14121', $this->korisnik->id);
 
-        $izvestaj = $this->uvezi([$this->red(['pib' => 115682682, 'kontakt' => 'Neko'])]);
+        $izvestaj = $this->uvezi([$this->red(['pib' => 115682682, 'kontakt' => 'Neko', 'status' => 'Za instalaciju'] + $this->trgovac())]);
 
         $this->assertStringContainsString('nije dopunjena', $izvestaj[0]['opis']);
         $this->assertNull($this->korisnik->fresh()->acq_mid);
+        $this->assertSame(self::PIB, $this->korisnik->fresh()->pib);
         $this->assertSame(0, LokacijaKontaktOsoba::count());
+        $this->assertSame(0, TerminalLokacijaHistory::count());
         $this->assertTrue(TerminalAcq::where('acq_tid', 'PN004096')->exists(), 'TID se i dalje uvozi');
+    }
+
+    #[Test]
+    public function drugi_pib_na_istoj_adresi_ispravlja_pib_lokacije_i_status(): void
+    {
+        $this->korisnik->update(['adresa' => 'Kneza Lazara 34', 'pib' => '11432104']);
+        $terminalId = $this->uredjaj('A26-12RB-1K14121', $this->korisnik->id, self::STATUS_ZA_INSTALACIJU);
+
+        $izvestaj = $this->uvezi([$this->red(['adresa' => 'KNEZA LAZARA 34'])]);
+
+        $lokacija = $this->korisnik->fresh();
+        $this->assertSame(self::PIB, $lokacija->pib);
+        $this->assertSame('000000000004388', $lokacija->acq_mid, 'posle ispravke PIB-a lokacija se dopunjuje');
+        $this->assertSame(self::STATUS_INSTALIRAN, TerminalLokacija::where('terminalId', $terminalId)->value('terminal_statusId'));
+        $this->assertSame(self::STATUS_ZA_INSTALACIJU, TerminalLokacijaHistory::sole()->terminal_statusId);
+        $this->assertStringContainsString('PIB lokacije', $izvestaj[0]['opis']);
+        $this->assertStringContainsString('Za instalaciju → Instaliran', $izvestaj[0]['opis']);
+    }
+
+    #[Test]
+    public function drugi_pib_premesta_uredjaj_na_lokaciju_sa_pib_om_iz_excela(): void
+    {
+        $druga = $this->lokacija(['pib' => '113978783', 'adresa' => 'Štrosmajerova 6', 'acq_mid' => null]);
+        $terminalId = $this->uredjaj('A26-12RB-1K14121', $this->korisnik->id);
+
+        $izvestaj = $this->uvezi([$this->red(['pib' => 113978783, 'kontakt' => 'Aida'] + $this->trgovac(['adresa' => 'ŠTROSMAJEROVA BB']))]);
+
+        $terminalLokacija = TerminalLokacija::where('terminalId', $terminalId)->sole();
+        $this->assertSame($druga->id, $terminalLokacija->lokacijaId);
+        $this->assertSame(self::STATUS_INSTALIRAN, $terminalLokacija->terminal_statusId);
+        $this->assertSame($this->autor->id, $terminalLokacija->korisnikId);
+        $this->assertSame($this->korisnik->id, TerminalLokacijaHistory::sole()->lokacijaId);
+        $this->assertSame($druga->id, TerminalAcq::where('acq_tid', 'PN004096')->sole()->efektivnaLokacijaId());
+        $this->assertSame('000000000004388', $druga->fresh()->acq_mid);
+        $this->assertSame(['Aida'], LokacijaKontaktOsoba::where('lokacijaId', $druga->id)->pluck('name')->all());
+        $this->assertNull($this->korisnik->fresh()->acq_mid, 'stara lokacija se ne dira');
+        $this->assertStringContainsString("na {$druga->id}", $izvestaj[0]['opis']);
+    }
+
+    #[Test]
+    public function uredjaj_u_magacinu_instaliran_u_excelu_ide_na_novu_lokaciju_sa_regionom_po_mestu(): void
+    {
+        $kragujevac = Region::create(['r_naziv' => 'Kragujevac'])->id;
+        $this->lokacija(['mesto' => 'Sjenica', 'regionId' => $kragujevac]);
+        $this->lokacija(['mesto' => 'SJENICA', 'regionId' => $kragujevac, 'lokacija_tipId' => 2]);
+        $this->lokacija(['mesto' => 'Sjenica ', 'regionId' => $this->regionId]);
+        $magacin = $this->lokacija(['lokacija_tipId' => 2]);
+        $terminalId = $this->uredjaj('A26-12RB-1K17312', $magacin->id, self::STATUS_ZA_INSTALACIJU);
+        TerminalLokacija::where('terminalId', $terminalId)->update(['updated_at' => '2026-10-14 11:56:55']);
+
+        $izvestaj = $this->uvezi([$this->red([
+            'acq_tid' => 'PN005368',
+            'sn' => 'A26-12RB-1K17312',
+            'pib' => 113235358,
+            'acq_mid' => '000000000004884',
+            'mcc' => 5422,
+            'ptt' => 36310,
+            'kontakt' => 'Lea Mahmutović',
+            'datum_instalacije' => 46316,
+        ] + $this->trgovac(['naziv_trgovca' => 'DELIKATES AH', 'adresa' => 'Jablanička bb', 'mesto' => 'SJENICA '])
+        )]);
+
+        $nova = Lokacija::where('pib', '113235358')->sole();
+        $this->assertSame('DELIKATES AH', $nova->l_naziv);
+        $this->assertSame('Jablanička bb', $nova->adresa);
+        $this->assertSame('SJENICA', $nova->mesto);
+        $this->assertSame(3, $nova->lokacija_tipId);
+        $this->assertSame($kragujevac, $nova->regionId, 'najčešći region među lokacijama iz Sjenice');
+        $this->assertSame('000000000004884', $nova->acq_mid);
+        $this->assertSame('5422', $nova->mcc);
+        $this->assertSame('36310', $nova->ptt);
+        $this->assertSame(0, $nova->is_duplicate);
+
+        $terminalLokacija = TerminalLokacija::where('terminalId', $terminalId)->sole();
+        $this->assertSame($nova->id, $terminalLokacija->lokacijaId);
+        $this->assertSame(self::STATUS_INSTALIRAN, $terminalLokacija->terminal_statusId);
+        $this->assertSame('2026-10-21', $terminalLokacija->updated_at->toDateString(), 'datum instalacije iz Excela');
+        $this->assertSame($magacin->id, TerminalLokacijaHistory::sole()->lokacijaId);
+        $this->assertSame(1, LokacijaKontaktOsoba::where('lokacijaId', $nova->id)->count());
+        $this->assertStringContainsString('nova lokacija', $izvestaj[0]['opis']);
+    }
+
+    #[Test]
+    public function vise_lokacija_sa_pib_om_bira_istu_adresu_a_druga_adresa_pravi_podlokaciju(): void
+    {
+        $this->lokacija(['pib' => '104300483', 'adresa' => 'Kralja Petra 1', 'mesto' => 'Beograd']);
+        $trgSrpskih = $this->lokacija(['pib' => '104300483', 'adresa' => 'Trg srpskih dobrovoljaca 11', 'mesto' => 'Beograd']);
+        $prvi = $this->uredjaj('SN-TRIVIT-0001', $this->korisnik->id);
+        $drugi = $this->uredjaj('SN-TRIVIT-0002', $this->korisnik->id);
+
+        $this->uvezi([
+            $this->red(['red' => 2, 'acq_tid' => 'PN003083', 'sn' => 'SN-TRIVIT-0001', 'pib' => 104300483] + $this->trgovac(['adresa' => 'Trg srpskih dobrovoljaca 11'])),
+            $this->red(['red' => 3, 'acq_tid' => 'PN003084', 'sn' => 'SN-TRIVIT-0002', 'pib' => 104300483] + $this->trgovac(['adresa' => 'Bulevar 5', 'mesto' => 'Beograd'])),
+        ]);
+
+        $this->assertSame($trgSrpskih->id, TerminalLokacija::where('terminalId', $prvi)->value('lokacijaId'));
+        $podlokacija = Lokacija::where('adresa', 'Bulevar 5')->sole();
+        $this->assertSame($podlokacija->id, TerminalLokacija::where('terminalId', $drugi)->value('lokacijaId'));
+        $this->assertSame(2, $podlokacija->is_duplicate);
+    }
+
+    #[Test]
+    public function isti_novi_trgovac_u_dva_reda_pravi_jednu_lokaciju(): void
+    {
+        $magacin = $this->lokacija(['lokacija_tipId' => 2, 'mesto' => 'Beograd']);
+        $prvi = $this->uredjaj('SN-NOVI-00001', $magacin->id, self::STATUS_ZA_INSTALACIJU);
+        $drugi = $this->uredjaj('SN-NOVI-00002', $magacin->id, self::STATUS_ZA_INSTALACIJU);
+
+        $this->uvezi([
+            $this->red(['red' => 2, 'acq_tid' => 'PN005001', 'sn' => 'SN-NOVI-00001', 'pib' => 101012958] + $this->trgovac()),
+            $this->red(['red' => 3, 'acq_tid' => 'PN005002', 'sn' => 'SN-NOVI-00002', 'pib' => 101012958] + $this->trgovac()),
+        ]);
+
+        $nova = Lokacija::where('pib', '101012958')->sole();
+        $this->assertSame([$nova->id, $nova->id], [
+            TerminalLokacija::where('terminalId', $prvi)->value('lokacijaId'),
+            TerminalLokacija::where('terminalId', $drugi)->value('lokacijaId'),
+        ]);
+    }
+
+    #[Test]
+    public function bez_regiona_za_mesto_testni_i_za_instalaciju_uredjaj_ostaje_u_magacinu(): void
+    {
+        $magacin = $this->lokacija(['lokacija_tipId' => 2, 'mesto' => 'Beograd']);
+        foreach (['SN-MAG-000001', 'SN-MAG-000002', 'SN-MAG-000003'] as $sn) {
+            $this->uredjaj($sn, $magacin->id, self::STATUS_ZA_INSTALACIJU);
+        }
+        $brojLokacija = Lokacija::count();
+
+        $izvestaj = $this->uvezi([
+            $this->red(['red' => 2, 'acq_tid' => 'PN005011', 'sn' => 'SN-MAG-000001', 'pib' => 101012958] + $this->trgovac(['mesto' => 'Tutin'])),
+            $this->red(['red' => 3, 'acq_tid' => 'PN005012 TEST', 'sn' => 'SN-MAG-000002', 'pib' => 101012958] + $this->trgovac()),
+            $this->red(['red' => 4, 'acq_tid' => 'PN005013', 'sn' => 'SN-MAG-000003', 'pib' => 101012958, 'status' => 'Za instalaciju'] + $this->trgovac()),
+        ]);
+
+        $this->assertStringContainsString('region za mesto "Tutin" nije pronađen', $izvestaj[0]['opis']);
+        $this->assertSame($brojLokacija, Lokacija::count());
+        $this->assertSame([$magacin->id], TerminalLokacija::pluck('lokacijaId')->unique()->values()->all());
+        $this->assertSame(0, TerminalLokacijaHistory::count());
+        $this->assertSame(3, TerminalAcq::count(), 'TID-ovi se i dalje uvoze');
     }
 
     #[Test]
@@ -278,7 +420,7 @@ class HalkUvozTest extends TestCase
      */
     private function uvezi(array $redovi): array
     {
-        return (new HalkUvoz(new DodajTerminalAcq))->uvezi($redovi, $this->autor, 'tabela.xlsx');
+        return app(HalkUvoz::class)->uvezi($redovi, $this->autor, 'tabela.xlsx');
     }
 
     /**
@@ -313,6 +455,17 @@ class HalkUvozTest extends TestCase
     }
 
     /**
+     * Podaci trgovca iz Excela (potrebni kad uvoz pravi novu lokaciju).
+     *
+     * @param  array<string, string>  $izmene
+     * @return array<string, string>
+     */
+    private function trgovac(array $izmene = []): array
+    {
+        return $izmene + ['naziv_trgovca' => 'DEMAX', 'adresa' => 'Grobljanska 3', 'mesto' => 'Beograd'];
+    }
+
+    /**
      * @param  array<string, mixed>  $atributi
      */
     private function lokacija(array $atributi = []): Lokacija
@@ -320,13 +473,13 @@ class HalkUvozTest extends TestCase
         return Lokacija::factory()->create($atributi + ['regionId' => $this->regionId, 'lokacija_tipId' => 3]);
     }
 
-    private function uredjaj(string $sn, int $lokacijaId): int
+    private function uredjaj(string $sn, int $lokacijaId, int $statusId = self::STATUS_INSTALIRAN): int
     {
         $terminal = Terminal::create(['sn' => $sn, 'terminal_tipId' => 1]);
         TerminalLokacija::create([
             'terminalId' => $terminal->id,
             'lokacijaId' => $lokacijaId,
-            'terminal_statusId' => self::STATUS_INSTALIRAN,
+            'terminal_statusId' => $statusId,
             'korisnikId' => 1,
             'korisnikIme' => 'Test',
         ]);

@@ -5,6 +5,7 @@ namespace Tests\Feature\Terminali;
 use App\Actions\TerminalAcq\DeinstalirajTerminalAcq;
 use App\Actions\TerminalAcq\IzvrsiPrekonfiguraciju;
 use App\Actions\TerminalAcq\OpozoviTerminalAcq;
+use App\Actions\TerminalAcq\PremestiUredjajTerminalAcq;
 use App\Http\Livewire\Terminal as TerminalStranica;
 use App\Http\Livewire\TerminalAcq\AcqTerminali;
 use App\Models\Lokacija;
@@ -14,6 +15,7 @@ use App\Models\Region;
 use App\Models\Stranica;
 use App\Models\Terminal;
 use App\Models\TerminalAcq;
+use App\Models\TerminalAcqHistory;
 use App\Models\TerminalLokacija;
 use App\Models\TerminalLokacijaHistory;
 use App\Models\TerminalStatusTip;
@@ -27,8 +29,9 @@ use RuntimeException;
 use Tests\TestCase;
 
 /**
- * Faza 4.2: izvršenje prekonfiguracije, deinstalacija, opoziv i dodela uređaja iz detalja
- * TID-a, i zabrana premeštanja uređaja pod aktivnim TID-om na stranici Terminali.
+ * Faza 4.2: izvršenje prekonfiguracije, deinstalacija, opoziv, dodela uređaja i premeštanje
+ * uređaja (TID ostaje) iz detalja TID-a, i zabrana premeštanja uređaja pod aktivnim TID-om
+ * na stranici Terminali.
  */
 class AcqAkcijeTest extends TestCase
 {
@@ -221,6 +224,90 @@ class AcqAkcijeTest extends TestCase
 
         $this->assertSame(TerminalStatusTip::idPoNazivu(TerminalStatusTip::DEINSTALIRAN), $ceka->fresh()->terminal_statusId);
         $this->assertSame($this->magacin->id, $slobodan->fresh()->lokacijaId);
+    }
+
+    #[Test]
+    public function premestanje_uredjaja_tid_ostaje_isti_uz_istoriju_oba(): void
+    {
+        [$acq, $uredjaj, $staraLokacija] = $this->aktivanTid('PN004096', ['pib' => '113735946', 'acq_mid' => '000000000004388']);
+        $nova = $this->lokacija(['l_naziv' => 'Savski venac rent 2', 'pib' => '113735946', 'acq_mid' => '000000000004388']);
+
+        Livewire::test(AcqTerminali::class)
+            ->call('prikaziDetalj', $acq->id)
+            ->assertSee('Premesti uređaj (TID ostaje)')
+            ->assertSet('premestanjeStatusId', self::STATUS_INSTALIRAN)
+            ->set('premestanjeTrazi', 'venac rent 2')
+            ->assertSee('Savski venac rent 2')
+            ->call('izaberiLokacijuPremestanja', $nova->id)
+            ->assertSet('premestanjeLokacijaId', $nova->id)
+            ->assertDontSee('drugi PIB')
+            ->call('premestiUredjaj')
+            ->assertSet('greskaAkcije', null)
+            ->assertSet('porukaAkcije', 'Uređaj je premešten, a TID PN004096 ostaje isti.')
+            ->assertSet('premestanjeLokacijaId', null);
+
+        $acq->refresh();
+        $this->assertSame($uredjaj->terminalId, $acq->terminalId);
+        $this->assertSame($nova->id, $acq->efektivnaLokacijaId());
+        $this->assertSame($staraLokacija->id, TerminalAcqHistory::where('terminal_acqId', $acq->id)->sole()->lokacijaId);
+
+        $uredjaj->refresh();
+        $this->assertSame($nova->id, $uredjaj->lokacijaId);
+        $this->assertSame(self::STATUS_INSTALIRAN, $uredjaj->terminal_statusId);
+        $this->assertSame($this->korisnik->id, $uredjaj->korisnikId);
+        $this->assertSame($staraLokacija->id, TerminalLokacijaHistory::where('terminal_lokacijaId', $uredjaj->id)->sole()->lokacijaId);
+    }
+
+    #[Test]
+    public function premestanje_na_drugu_firmu_upozorava_ali_dozvoljava(): void
+    {
+        [$acq, $uredjaj] = $this->aktivanTid('PN004096', ['pib' => '113735946', 'acq_mid' => '000000000004388']);
+        $drugaFirma = $this->lokacija(['pib' => '115682682', 'acq_mid' => '000000000004845']);
+
+        Livewire::test(AcqTerminali::class)
+            ->call('prikaziDetalj', $acq->id)
+            ->call('izaberiLokacijuPremestanja', $drugaFirma->id)
+            ->assertSee('Ciljna lokacija ima drugi PIB (113735946 → 115682682)')
+            ->assertSee('Ciljna lokacija ima drugi MID')
+            ->set('premestanjeStatusId', self::STATUS_ZA_INSTALACIJU)
+            ->call('premestiUredjaj')
+            ->assertSet('greskaAkcije', null);
+
+        $this->assertSame($drugaFirma->id, $uredjaj->fresh()->lokacijaId);
+        $this->assertSame(self::STATUS_ZA_INSTALACIJU, $uredjaj->fresh()->terminal_statusId);
+    }
+
+    #[Test]
+    public function premestanje_odbija_magacin_istu_lokaciju_status_samo_za_tid_i_tid_bez_uredjaja(): void
+    {
+        [$acq, $uredjaj, $lokacija] = $this->aktivanTid('PN004096');
+        $druga = $this->lokacija();
+        $akcija = new PremestiUredjajTerminalAcq;
+
+        foreach ([
+            [$this->magacin->id, self::STATUS_INSTALIRAN, 'lokaciju korisnika terminala'],
+            [$lokacija->id, self::STATUS_INSTALIRAN, 'već na toj lokaciji'],
+            [$druga->id, TerminalStatusTip::idPoNazivu(TerminalStatusTip::DEINSTALIRAN), 'status uređaja'],
+        ] as [$lokacijaId, $statusId, $poruka]) {
+            try {
+                $akcija->izvrsi($acq, $lokacijaId, $statusId, $this->korisnik);
+                $this->fail('Očekivan izuzetak.');
+            } catch (RuntimeException $e) {
+                $this->assertStringContainsString($poruka, $e->getMessage());
+            }
+        }
+        $this->assertSame($lokacija->id, $uredjaj->fresh()->lokacijaId);
+        $this->assertSame(0, TerminalLokacijaHistory::count());
+
+        Livewire::test(AcqTerminali::class)
+            ->call('prikaziDetalj', $acq->id)
+            ->set('premestanjeLokacijaId', $this->magacin->id)
+            ->call('premestiUredjaj')
+            ->assertSet('greskaAkcije', 'Izaberite lokaciju korisnika terminala.');
+
+        $bezUredjaja = TerminalAcq::factory()->bezUredjaja(self::STATUS_ZA_INSTALACIJU, $lokacija->id)->create(['acq_tid' => 'PN000009']);
+        $this->expectExceptionMessage('nema uređaj');
+        $akcija->izvrsi($bezUredjaja, $druga->id, self::STATUS_INSTALIRAN, $this->korisnik);
     }
 
     #[Test]

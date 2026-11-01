@@ -310,7 +310,7 @@ class ProcitajZahtevBanke
 
     private function uporedivaAdresa(?string $adresa): string
     {
-        return preg_replace('/[^a-z0-9]/', '', Str::lower(Str::ascii((string) $adresa)));
+        return HalkNormalizator::uporediviTekst($adresa);
     }
 
     private function datumIzNaziva(string $nazivFajla): string

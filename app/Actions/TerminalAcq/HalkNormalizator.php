@@ -3,6 +3,7 @@
 namespace App\Actions\TerminalAcq;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 /**
@@ -163,6 +164,14 @@ class HalkNormalizator
         $tekst = trim(preg_replace('/\s+/u', ' ', (string) $vrednost));
 
         return $tekst === '' ? null : $tekst;
+    }
+
+    /**
+     * Adresa ili mesto za poređenje: bez dijakritika, razmaka i interpunkcije, malim slovima.
+     */
+    public static function uporediviTekst(?string $vrednost): string
+    {
+        return preg_replace('/[^a-z0-9]/', '', Str::lower(Str::ascii((string) $vrednost)));
     }
 
     public static function sn(mixed $vrednost): ?string

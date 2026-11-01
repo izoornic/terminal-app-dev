@@ -223,6 +223,50 @@
                             </div>
                             <x-jet-danger-button wire:click="deinstaliraj" wire:confirm="Deinstalirati TID {{ $acq->acq_tid }} i premestiti uređaj?" wire:loading.attr="disabled">Deinstaliraj</x-jet-danger-button>
                         </div>
+
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="font-semibold text-gray-700 mb-1">Premesti uređaj (TID ostaje)</div>
+                            <div class="flex flex-wrap items-end gap-2">
+                                <div class="relative">
+                                    <x-jet-label for="premestanjeTrazi" value="Lokacija korisnika (naziv, PIB, adresa, mesto)" />
+                                    @if ($premestanjeLokacija)
+                                        <div class="mt-1 flex items-center gap-2">
+                                            <span class="font-semibold">{{ $premestanjeLokacija->l_naziv }}</span>
+                                            <span class="text-gray-500">{{ $premestanjeLokacija->adresa }}, {{ $premestanjeLokacija->mesto }} · PIB {{ $premestanjeLokacija->pib ?? '—' }}</span>
+                                            <button type="button" wire:click="$set('premestanjeLokacijaId', null)" class="text-xs text-sky-700 underline">promeni</button>
+                                        </div>
+                                    @else
+                                        <x-jet-input wire:model.live.debounce.400ms="premestanjeTrazi" id="premestanjeTrazi" class="block mt-1 w-80" type="text" />
+                                        @if ($premestanjeKandidati->isNotEmpty())
+                                            <div class="absolute z-10 mt-1 w-[32rem] max-w-[90vw] bg-white border border-gray-200 rounded-md shadow-lg">
+                                                @foreach ($premestanjeKandidati as $kandidat)
+                                                    <button type="button" wire:key="premestanje-{{ $kandidat->id }}" wire:click="izaberiLokacijuPremestanja({{ $kandidat->id }})" class="block w-full text-left px-3 py-1 hover:bg-sky-50">
+                                                        <span class="font-semibold">{{ $kandidat->l_naziv }}</span>
+                                                        <span class="text-gray-500">{{ $kandidat->adresa }}, {{ $kandidat->mesto }} · PIB {{ $kandidat->pib ?? '—' }}</span>
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @elseif (mb_strlen(trim($premestanjeTrazi)) >= 2)
+                                            <div class="mt-1 text-xs text-gray-500">Nema lokacije korisnika za „{{ $premestanjeTrazi }}”.</div>
+                                        @endif
+                                    @endif
+                                </div>
+                                <div>
+                                    <x-jet-label for="premestanjeStatusId" value="Status uređaja" />
+                                    <select wire:model="premestanjeStatusId" id="premestanjeStatusId" class="block mt-1 border-gray-300 rounded-md text-sm">
+                                        <option value="">---</option>
+                                        @foreach ($statusiUredjaja as $id => $naziv)
+                                            <option value="{{ $id }}">{{ $naziv }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <x-jet-button wire:click="premestiUredjaj" wire:confirm="Premestiti uređaj na izabranu lokaciju? TID {{ $acq->acq_tid }} ostaje isti." wire:loading.attr="disabled">Premesti uređaj</x-jet-button>
+                            </div>
+                            @foreach ($premestanjeUpozorenja as $upozorenje)
+                                <div class="mt-2 p-2 rounded-md border border-amber-300 bg-amber-50 text-amber-800">{{ $upozorenje }}</div>
+                            @endforeach
+                            <div class="mt-1 text-xs text-gray-500">Samo na lokaciju korisnika terminala; u servis ili magacin uređaj ide kroz deinstalaciju.</div>
+                        </div>
                         @if ($acq->naslednik)
                             <div class="mt-3 text-xs text-gray-500">Prekonfiguracija je već zatražena: {{ $acq->naslednik->acq_tid }}.</div>
                         @elseif ($mozeUpravljati)

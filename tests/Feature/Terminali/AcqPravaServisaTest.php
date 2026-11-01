@@ -21,8 +21,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Šef servisa i serviser na stranici ACQ terminali: dodela uređaja, izvršenje prekonfiguracije
- * i deinstalacija. Dodaj terminal, ručna prekonfiguracija i opoziv traže pravo upravljanja
+ * Šef servisa i serviser na stranici ACQ terminali: dodela uređaja, izvršenje prekonfiguracije,
+ * premeštanje uređaja (TID ostaje) i deinstalacija. Dodaj terminal, ručna prekonfiguracija i opoziv traže pravo upravljanja
  * (acq-terminali-upravljanje), koje imaju samo Admin i Call centar.
  */
 class AcqPravaServisaTest extends TestCase
@@ -104,6 +104,25 @@ class AcqPravaServisaTest extends TestCase
             ->assertSet('porukaAkcije', 'TID je deinstaliran, a uređaj premešten.');
 
         $this->assertSame($this->magacin->id, $uredjaj->fresh()->lokacijaId);
+    }
+
+    #[Test]
+    #[DataProvider('servis')]
+    public function servis_premesta_uredjaj_a_tid_ostaje(int $pozicijaId): void
+    {
+        $this->actingAs($this->korisnik($pozicijaId));
+        $uredjaj = $this->uredjaj('A26-12RB-1K14121', $this->trgovac->id, self::STATUS_INSTALIRAN);
+        $acq = TerminalAcq::factory()->saUredjajem($uredjaj->terminalId)->create(['acq_tid' => 'PN004096']);
+        $druga = Lokacija::factory()->create(['regionId' => $this->regionId, 'lokacija_tipId' => 3, 'distributerId' => null]);
+
+        Livewire::test(AcqTerminali::class)
+            ->call('prikaziDetalj', $acq->id)
+            ->call('izaberiLokacijuPremestanja', $druga->id)
+            ->call('premestiUredjaj')
+            ->assertSet('greskaAkcije', null);
+
+        $this->assertSame($druga->id, $uredjaj->fresh()->lokacijaId);
+        $this->assertSame($uredjaj->terminalId, $acq->fresh()->terminalId);
     }
 
     #[Test]

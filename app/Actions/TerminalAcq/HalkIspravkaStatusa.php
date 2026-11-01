@@ -86,7 +86,7 @@ class HalkIspravkaStatusa
                 count($aktivniTidPoSn[$kandidat['sn']] ?? []) > 1 => 'Uređaj je aktivan pod više TID-ova u Excelu.',
                 isset($vecIzabrani[$kandidat['sn']]) => 'Isti uređaj je već u listi iz drugog reda.',
                 $kandidat['pib_aplikacija'] === null => 'Lokacija u aplikaciji nema PIB.',
-                $kandidat['pib_excel'] !== $kandidat['pib_aplikacija'] => 'PIB se razlikuje od lokacije u aplikaciji.',
+                $kandidat['pib_excel'] !== $kandidat['pib_aplikacija'] => 'PIB se razlikuje od lokacije u aplikaciji (rešava halk:uvoz).',
                 default => null,
             };
 
@@ -131,7 +131,7 @@ class HalkIspravkaStatusa
                 $terminalLokacija->terminal_statusId = $instaliranId;
                 $terminalLokacija->korisnikId = $korisnik->id;
                 $terminalLokacija->korisnikIme = $korisnik->name;
-                $terminalLokacija->updated_at = $this->datumPromene($ispravka['datum_instalacije'], $terminalLokacija->updated_at);
+                $terminalLokacija->updated_at = self::datumPromene($ispravka['datum_instalacije'], $terminalLokacija->updated_at);
                 $terminalLokacija->save();
 
                 $ispravljeno++;
@@ -141,7 +141,7 @@ class HalkIspravkaStatusa
         return $ispravljeno;
     }
 
-    private function datumPromene(?CarbonImmutable $datumInstalacije, mixed $poslednjaIzmena): CarbonImmutable
+    public static function datumPromene(?CarbonImmutable $datumInstalacije, mixed $poslednjaIzmena): CarbonImmutable
     {
         $sada = CarbonImmutable::now();
 

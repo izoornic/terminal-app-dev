@@ -6,6 +6,7 @@ use App\Actions\TerminalAcq\DeinstalirajTerminalAcq;
 use App\Actions\TerminalAcq\DodeliUredjajTerminalAcq;
 use App\Actions\TerminalAcq\IzvrsiPrekonfiguraciju;
 use App\Actions\TerminalAcq\OpozoviTerminalAcq;
+use App\Actions\TerminalAcq\PremestiUredjajTerminalAcq;
 use App\Actions\TerminalAcq\TerminalAcqLista;
 use App\Models\Lokacija;
 use App\Models\LokacijaKontaktOsoba;
@@ -23,7 +24,8 @@ use RuntimeException;
 
 /**
  * Lista ACQ TID-ova (Faza 4): pretraga, filteri po efektivnom statusu, detalj sa istorijom
- * i akcije nad TID-om (dodela uređaja, izvršenje prekonfiguracije, deinstalacija, opoziv).
+ * i akcije nad TID-om (dodela uređaja, izvršenje prekonfiguracije, premeštanje uređaja,
+ * deinstalacija, opoziv).
  * Svaka akcija proverava pravo i stanje TID-a; pravila su u Action klasama.
  */
 class AcqTerminali extends Component
@@ -39,7 +41,7 @@ class AcqTerminali extends Component
     /**
      * Pravo bez rute (red u stranicas, show_in_meni = 0) za akcije koje menjaju evidenciju:
      * Dodaj terminal, ručna prekonfiguracija, opoziv. Ostale akcije (dodela uređaja,
-     * izvršenje prekonfiguracije, deinstalacija) ima svako ko ima pravo na stranicu.
+     * izvršenje prekonfiguracije, premeštanje uređaja, deinstalacija) ima svako ko ima pravo na stranicu.
      */
     public const PRAVO_UPRAVLJANJE = 'acq-terminali-upravljanje';
 
@@ -67,6 +69,12 @@ class AcqTerminali extends Component
     public ?int $deinstalacijaLokacijaId = null;
 
     public ?int $deinstalacijaStatusId = null;
+
+    public string $premestanjeTrazi = '';
+
+    public ?int $premestanjeLokacijaId = null;
+
+    public ?int $premestanjeStatusId = null;
 
     #[Locked]
     public ?string $porukaAkcije = null;
@@ -99,8 +107,33 @@ class AcqTerminali extends Component
     {
         $this->proveriPristup();
         $this->detaljId = TerminalAcq::findOrFail($id)->id;
-        $this->reset(['dodelaSn', 'deinstalacijaLokacijaId', 'deinstalacijaStatusId', 'porukaAkcije', 'greskaAkcije']);
+        $this->resetAkcija();
+        $this->reset(['porukaAkcije', 'greskaAkcije']);
         $this->detaljVisible = true;
+    }
+
+    public function izaberiLokacijuPremestanja(int $lokacijaId): void
+    {
+        $this->premestanjeLokacijaId = Lokacija::query()
+            ->where('lokacija_tipId', PremestiUredjajTerminalAcq::LOKACIJA_TIP_KORISNIK)
+            ->findOrFail($lokacijaId)
+            ->id;
+        $this->premestanjeTrazi = '';
+    }
+
+    /**
+     * Uređaj prelazi na drugu lokaciju korisnika terminala, a TID ostaje isti.
+     */
+    public function premestiUredjaj(PremestiUredjajTerminalAcq $premestanje): void
+    {
+        $this->akcija(function (TerminalAcq $acq) use ($premestanje): string {
+            if ($this->premestanjeLokacijaId === null || $this->premestanjeStatusId === null) {
+                throw new RuntimeException('Izaberite lokaciju i status uređaja.');
+            }
+            $premestanje->izvrsi($acq, $this->premestanjeLokacijaId, $this->premestanjeStatusId, auth()->user());
+
+            return "Uređaj je premešten, a TID {$acq->acq_tid} ostaje isti.";
+        });
     }
 
     public function dodeliUredjaj(DodeliUredjajTerminalAcq $dodela): void
@@ -178,7 +211,36 @@ class AcqTerminali extends Component
             'statusZaInstalacijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::ZA_INSTALACIJU),
             'statusCekaPrekonfiguracijuId' => TerminalStatusTip::idPoNazivu(TerminalStatusTip::CEKA_PREKONFIGURACIJU),
             'mozeUpravljati' => self::mozeUpravljati(),
+            ...$this->premestanje(),
         ]);
+    }
+
+    /**
+     * Pretraga ciljne lokacije (naziv, PIB, adresa ili mesto) i upozorenja za izabranu.
+     *
+     * @return array{premestanjeKandidati: \Illuminate\Support\Collection<int, Lokacija>, premestanjeLokacija: ?Lokacija, premestanjeUpozorenja: list<string>}
+     */
+    private function premestanje(): array
+    {
+        $trazi = trim($this->premestanjeTrazi);
+        $kandidati = ! $this->detaljVisible || mb_strlen($trazi) < 2 ? collect() : Lokacija::query()
+            ->where('lokacija_tipId', PremestiUredjajTerminalAcq::LOKACIJA_TIP_KORISNIK)
+            ->where(fn ($upit) => $upit->where('l_naziv', 'like', "%{$trazi}%")
+                ->orWhere('pib', 'like', "%{$trazi}%")
+                ->orWhere('adresa', 'like', "%{$trazi}%")
+                ->orWhere('mesto', 'like', "%{$trazi}%"))
+            ->orderBy('l_naziv')
+            ->limit(10)
+            ->get();
+
+        $lokacija = $this->detaljVisible && $this->premestanjeLokacijaId !== null ? Lokacija::find($this->premestanjeLokacijaId) : null;
+        $acq = $lokacija !== null ? TerminalAcq::find($this->detaljId) : null;
+
+        return [
+            'premestanjeKandidati' => $kandidati,
+            'premestanjeLokacija' => $lokacija,
+            'premestanjeUpozorenja' => $acq !== null ? PremestiUredjajTerminalAcq::upozorenja($acq, $lokacija) : [],
+        ];
     }
 
     private function read(TerminalAcqLista $lista): LengthAwarePaginator
@@ -231,10 +293,16 @@ class AcqTerminali extends Component
 
         try {
             $this->porukaAkcije = $izvrsi(TerminalAcq::findOrFail($this->detaljId));
-            $this->reset(['dodelaSn', 'deinstalacijaLokacijaId', 'deinstalacijaStatusId']);
+            $this->resetAkcija();
         } catch (RuntimeException $e) {
             $this->greskaAkcije = $e->getMessage();
         }
+    }
+
+    private function resetAkcija(): void
+    {
+        $this->reset(['dodelaSn', 'deinstalacijaLokacijaId', 'deinstalacijaStatusId', 'premestanjeTrazi', 'premestanjeLokacijaId']);
+        $this->premestanjeStatusId = TerminalStatusTip::idPoNazivu('Instaliran');
     }
 
     /**

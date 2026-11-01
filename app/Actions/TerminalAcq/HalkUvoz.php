@@ -8,6 +8,7 @@ use App\Models\Terminal;
 use App\Models\TerminalAcq;
 use App\Models\TerminalAcqHistory;
 use App\Models\TerminalLokacija;
+use App\Models\TerminalLokacijaHistory;
 use App\Models\TerminalStatusTip;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -23,8 +24,13 @@ use RuntimeException;
  * i uređaj zatvorenog TID-a se upisuju u terminal_acq_histories ("TID je bio na
  * uređaju X"), da ostane trag pod kojim TID-ovima je uređaj bio.
  *
- * Postojeći TID-ovi i postojeće vrednosti lokacija se ne menjaju, pa je ponovno
- * pokretanje bezbedno: dodaje samo ono što nedostaje (npr. posle ispravke Excela).
+ * Excel je izvor istine za lokaciju aktivnog TID-a: kad se PIB razlikuje od lokacije
+ * uređaja na istoj adresi, ispravlja se PIB lokacije; kad je uređaj kod druge firme ili
+ * u servisu/magacinu, a banka ga vodi kao instaliran, uređaj se premešta kod trgovca iz
+ * Excela (postojeća lokacija po PIB-u ili nova, region po mestu) sa statusom Instaliran.
+ *
+ * Postojeći TID-ovi se ne menjaju, a polja lokacija se samo dopunjuju (osim ispravke
+ * PIB-a), pa je ponovno pokretanje bezbedno: dodaje samo ono što nedostaje.
  */
 class HalkUvoz
 {
@@ -78,7 +84,17 @@ class HalkUvoz
      */
     private array $lokacijePoPib = [];
 
-    public function __construct(private DodajTerminalAcq $dodajTerminalAcq) {}
+    /**
+     * Uporedivo mesto → region najčešći među postojećim lokacijama tog mesta (učitava se pri prvoj novoj lokaciji).
+     *
+     * @var array<string, int>|null
+     */
+    private ?array $regionPoMestu = null;
+
+    public function __construct(
+        private DodajTerminalAcq $dodajTerminalAcq,
+        private PremestiUredjajTerminalAcq $premestiUredjaj,
+    ) {}
 
     /**
      * @param  list<array<string, mixed>>  $redovi  redovi iz HalkExcelCitac
@@ -175,31 +191,193 @@ class HalkUvoz
                 : 'Uređaj ne postoji ili nema red u terminal_lokacijas.');
         }
 
-        $lokacija = $this->lokacije->get($uredjaj['lokacijaId']);
-        $dopunaDozvoljena = $lokacija !== null
-            && $lokacija->lokacija_tipId === self::LOKACIJA_TIP_KORISNIK
-            && ($red['pib'] === null || in_array(HalkNormalizator::pib($lokacija->pib), [null, $red['pib']], true));
+        $opis = 'Uređaj '.$red['sn'].'.';
+        $lokacija = $this->lokacijaPoExcelu($red, $uredjaj, $korisnik, $opis);
 
         $acq = $this->dodajTerminalAcq->saUredjajem(
             ['acq_tid' => $red['tid'], ...$this->podaciTid($red, $izvorFajl)],
             $uredjaj['terminalId'],
             $korisnik,
-            $dopunaDozvoljena ? $red['dopuna_lokacije'] : []
+            $lokacija !== null ? $red['dopuna_lokacije'] : []
         );
 
-        $opis = 'Uređaj '.$red['sn'].'.';
-        if ($dopunaDozvoljena) {
+        if ($lokacija !== null) {
             $lokacija->refresh();
             if ($this->dodajKontakt($lokacija, $red)) {
                 $opis .= ' Dodat kontakt.';
             }
-        } elseif ($lokacija !== null) {
-            $opis .= ' Lokacija nije dopunjena (nije kod korisnika ili se PIB razlikuje).';
         }
 
         $this->upisi($red, self::AKTIVAN, $opis);
 
         return $acq;
+    }
+
+    /**
+     * Lokacija aktivnog TID-a po Excelu; vraća lokaciju uređaja koja sme da se dopuni, ili null.
+     *
+     * - lokacija korisnika sa istim (ili praznim) PIB-om: dopuna
+     * - lokacija korisnika na istoj adresi, drugi PIB: ispravka PIB-a
+     * - druga firma ili servis/magacin, a Excel kaže Instaliran: premeštanje kod trgovca iz Excela
+     * - ostalo (Za instalaciju, testni, bez PIB-a): ništa
+     *
+     * @param  array<string, mixed>  $red
+     * @param  array{terminalId: int, lokacijaId: ?int}  $uredjaj
+     */
+    private function lokacijaPoExcelu(array $red, array $uredjaj, User $korisnik, string &$opis): ?Lokacija
+    {
+        $lokacija = $this->lokacije->get($uredjaj['lokacijaId']);
+        $kodKorisnika = $lokacija?->lokacija_tipId === self::LOKACIJA_TIP_KORISNIK;
+        $pibLokacije = HalkNormalizator::pib($lokacija?->pib);
+
+        if ($kodKorisnika && ($red['pib'] === null || in_array($pibLokacije, [null, $red['pib']], true))) {
+            return $lokacija;
+        }
+
+        $instaliran = $red['status'] === 'Instaliran' && ! $red['testni'];
+
+        if ($kodKorisnika && $red['adresa'] !== null
+            && HalkNormalizator::uporediviTekst($lokacija->adresa) === HalkNormalizator::uporediviTekst($red['adresa'])) {
+            $this->promeniPibLokacije($lokacija, $red['pib']);
+            $opis .= " PIB lokacije {$lokacija->id} ispravljen ({$pibLokacije} → {$red['pib']}).";
+            if ($instaliran) {
+                $opis .= $this->instaliraj($uredjaj, $red, $korisnik);
+            }
+
+            return $lokacija;
+        }
+
+        if (! $instaliran || $red['pib'] === null) {
+            if ($lokacija !== null) {
+                $opis .= ' Lokacija nije dopunjena (nije kod korisnika ili se PIB razlikuje).';
+            }
+
+            return null;
+        }
+
+        try {
+            $ciljna = $this->lokacijaTrgovca($red);
+            $terminalLokacija = TerminalLokacija::query()->where('terminalId', $uredjaj['terminalId'])->firstOrFail();
+            $this->premestiUredjaj->premesti(
+                $terminalLokacija,
+                $ciljna->id,
+                $this->statusId['Instaliran'],
+                $korisnik,
+                HalkIspravkaStatusa::datumPromene($red['datum_instalacije'], $terminalLokacija->updated_at)
+            );
+        } catch (RuntimeException $e) {
+            $opis .= ' Uređaj nije premešten: '.$e->getMessage();
+
+            return null;
+        }
+
+        $this->uredjaji->put($red['sn'], ['terminalId' => $uredjaj['terminalId'], 'lokacijaId' => $ciljna->id]);
+        $opis .= ' Premešten sa lokacije '.($lokacija !== null ? "{$lokacija->id} ({$lokacija->l_naziv})" : $uredjaj['lokacijaId'])
+            ." na {$ciljna->id} ({$ciljna->l_naziv})".($ciljna->wasRecentlyCreated ? ', nova lokacija' : '').', status Instaliran.';
+
+        return $ciljna;
+    }
+
+    /**
+     * Lokacija trgovca po PIB-u iz Excela: ista adresa, pa jedina lokacija sa tim PIB-om,
+     * inače nova lokacija (uz postojeće sa istim PIB-om postaje podlokacija).
+     *
+     * @param  array<string, mixed>  $red
+     *
+     * @throws RuntimeException kad nova lokacija ne može da se napravi
+     */
+    private function lokacijaTrgovca(array $red): Lokacija
+    {
+        $kandidati = collect($this->lokacijePoPib[$red['pib']] ?? [])->map(fn (int $id): Lokacija => $this->lokacije->get($id));
+
+        $istaAdresa = $kandidati->first(fn (Lokacija $lokacija): bool => $red['adresa'] !== null
+            && HalkNormalizator::uporediviTekst($lokacija->adresa) === HalkNormalizator::uporediviTekst($red['adresa']));
+        if ($istaAdresa !== null) {
+            return $istaAdresa;
+        }
+
+        if ($kandidati->count() === 1) {
+            return $kandidati->first();
+        }
+
+        if ($red['naziv_trgovca'] === null || $red['adresa'] === null || $red['mesto'] === null) {
+            throw new RuntimeException('za novu lokaciju nedostaje naziv trgovca, adresa ili mesto.');
+        }
+
+        $regionId = $this->regionZaMesto($red['mesto']);
+        if ($regionId === null) {
+            throw new RuntimeException("region za mesto \"{$red['mesto']}\" nije pronađen (nijedna lokacija iz tog mesta).");
+        }
+
+        $lokacija = Lokacija::create([
+            'is_duplicate' => Lokacija::query()->where('pib', $red['pib'])->count(),
+            'regionId' => $regionId,
+            'lokacija_tipId' => self::LOKACIJA_TIP_KORISNIK,
+            'l_naziv' => $red['naziv_trgovca'],
+            'mesto' => $red['mesto'],
+            'adresa' => $red['adresa'],
+            'pib' => $red['pib'],
+            ...array_intersect_key($red['dopuna_lokacije'], array_flip(['acq_mid', 'mcc', 'ptt'])),
+        ]);
+        $this->lokacije->put($lokacija->id, $lokacija);
+        $this->lokacijePoPib[$red['pib']][] = $lokacija->id;
+
+        return $lokacija;
+    }
+
+    private function regionZaMesto(string $mesto): ?int
+    {
+        if ($this->regionPoMestu === null) {
+            $poMestu = [];
+            foreach (Lokacija::query()->whereNotNull('mesto')->get(['mesto', 'regionId']) as $lokacija) {
+                $kljuc = HalkNormalizator::uporediviTekst($lokacija->mesto);
+                $poMestu[$kljuc][$lokacija->regionId] = ($poMestu[$kljuc][$lokacija->regionId] ?? 0) + 1;
+            }
+
+            $this->regionPoMestu = [];
+            foreach ($poMestu as $kljuc => $regioni) {
+                arsort($regioni);
+                $this->regionPoMestu[$kljuc] = (int) array_key_first($regioni);
+            }
+        }
+
+        return $this->regionPoMestu[HalkNormalizator::uporediviTekst($mesto)] ?? null;
+    }
+
+    private function promeniPibLokacije(Lokacija $lokacija, string $pib): void
+    {
+        $stari = HalkNormalizator::pib($lokacija->pib);
+        $lokacija->pib = $pib;
+        $lokacija->save();
+
+        if ($stari !== null) {
+            $this->lokacijePoPib[$stari] = array_values(array_diff($this->lokacijePoPib[$stari] ?? [], [$lokacija->id]));
+        }
+        $this->lokacijePoPib[$pib][] = $lokacija->id;
+    }
+
+    /**
+     * Uređaj na lokaciji korisnika koji je u aplikaciji još "Za instalaciju" postaje Instaliran.
+     *
+     * @param  array{terminalId: int, lokacijaId: ?int}  $uredjaj
+     * @param  array<string, mixed>  $red
+     * @return string dopuna opisa
+     */
+    private function instaliraj(array $uredjaj, array $red, User $korisnik): string
+    {
+        $terminalLokacija = TerminalLokacija::query()->where('terminalId', $uredjaj['terminalId'])->first();
+        if ($terminalLokacija === null || $terminalLokacija->terminal_statusId !== TerminalStatusTip::idPoNazivu(TerminalStatusTip::ZA_INSTALACIJU)) {
+            return '';
+        }
+
+        TerminalLokacijaHistory::createNewHistory($terminalLokacija->id);
+        $terminalLokacija->terminal_statusId = $this->statusId['Instaliran'];
+        $terminalLokacija->korisnikId = $korisnik->id;
+        $terminalLokacija->korisnikIme = $korisnik->name;
+        $terminalLokacija->updated_at = HalkIspravkaStatusa::datumPromene($red['datum_instalacije'], $terminalLokacija->updated_at);
+        $terminalLokacija->save();
+
+        return ' Status uređaja: Za instalaciju → Instaliran.';
     }
 
     /**
@@ -344,6 +522,9 @@ class HalkUvoz
                 'datum_zahteva' => $datumZahteva,
                 'datum_instalacije' => $datumInstalacije,
                 'pib' => HalkNormalizator::pib($red['pib'] ?? null),
+                'naziv_trgovca' => HalkNormalizator::tekst($red['naziv_trgovca'] ?? null),
+                'adresa' => HalkNormalizator::tekst($red['adresa'] ?? null),
+                'mesto' => HalkNormalizator::tekst($red['mesto'] ?? null),
                 'kontakt' => HalkNormalizator::tekst($red['kontakt'] ?? null),
                 'telefon' => HalkNormalizator::telefonZaKontakt($red['telefon'] ?? null),
                 'naziv_na_slipu' => HalkNormalizator::tekst($red['naziv_na_slipu'] ?? null),

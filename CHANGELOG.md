@@ -557,7 +557,9 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
       rucna prekonfiguracija i opoziv traze pravo acq-terminali-upravljanje (red u stranicas bez rute i menija,
       samo Admin i Call centar). Lista TID-ova sa pretragom i filterima,
       detalj sa istorijom, Dodaj terminal, Dodeli uredjaj, Izvrsi prekonfiguraciju, Prekonfigurisi (rucno, za zahtev
-      stigao mailom), Deinstaliraj (TID se zatvara i uredjaj premesta u servis/magacin), Opozovi.
+      stigao mailom), Deinstaliraj (TID se zatvara i uredjaj premesta u servis/magacin), Opozovi,
+      Premesti uredjaj (TID ostaje; samo na lokaciju korisnika terminala, upozorenje kad ciljna lokacija ima drugi
+      PIB ili MID; Admin, Call centar i servis).
     - Stranica "Uvoz zahteva banke" (ruta acq-uvoz-zahteva, Admin i Call centar, dugme na stranici ACQ terminali): Excel zahtev za
       instalaciju ili prekonfiguraciju -> pregled po redu -> upis; fajlovi se arhiviraju u storage/app/acq-zahtevi/.
     - Uredjaj pod aktivnim TID-om se vise ne premesta sa stranica Terminali, Licence, Lokacije i Distributer
@@ -570,6 +572,10 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
     - Artisan komande (jednokratni uvoz glavne HALK tabele): halk:provera (izvestaj, bez upisa),
       halk:ispravi-status (uredjaji kod trgovca sa statusom "Za instalaciju" -> "Instaliran"),
       halk:uvoz (uvoz TID-ova). Bez --potvrdi sve tri samo prave CSV izvestaj u storage/app/halk/.
+      halk:uvoz Excel tretira kao izvor istine za lokaciju aktivnog TID-a: drugi PIB na istoj adresi ispravlja PIB
+      lokacije; uredjaj kod druge firme ili u servisu/magacinu, a u Excelu "Instaliran", premesta se kod trgovca iz
+      Excela (postojeca lokacija po PIB-u ili nova, region po mestu) sa statusom "Instaliran". Uredjaj sa licencom
+      ili mesto bez ijedne lokacije u bazi se ne premesta (razlog je u CSV izvestaju).
     - DEPLOY (redosled je vazan):
         1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_*). Migracije moraju pre ili odmah
            uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
