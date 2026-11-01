@@ -12,6 +12,7 @@ use App\Models\TerminalLokacija;
 use App\Models\TerminalStatusTip;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -208,6 +209,12 @@ class TerminalAcqModelTest extends TestCase
         $kontakt = LokacijaKontaktOsoba::create(['lokacijaId' => $lokacija->id, 'name' => 'Test', 'tel' => $dvaBroja]);
 
         $this->assertSame($dvaBroja, $kontakt->fresh()->tel);
+    }
+
+    #[Test]
+    public function terminal_lokacijas_ima_indeks_na_terminal_id_za_spajanje_sa_tid_om(): void
+    {
+        $this->assertTrue(Schema::hasIndex('terminal_lokacijas', ['terminalId']));
     }
 
     /**

@@ -577,8 +577,9 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
       Excela (postojeca lokacija po PIB-u ili nova, region po mestu) sa statusom "Instaliran". Uredjaj sa licencom
       ili mesto bez ijedne lokacije u bazi se ne premesta (razlog je u CSV izvestaju).
     - DEPLOY (redosled je vazan):
-        1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_*). Migracije moraju pre ili odmah
-           uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
+        1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_* i indeks 2026_11_01_* na
+           terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora). Migracije moraju
+           pre ili odmah uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
         2. Rucno pokrenuti SQL za stranice (vidi plan): acq-terminali (menu_order 5, pozicije 1-4),
            acq-terminali-upravljanje i acq-uvoz-zahteva (bez menija, pozicije 1 i 2) i Tiketi sa menu_order 5 na 6,
            da ACQ terminali stoje posle Terminala;
