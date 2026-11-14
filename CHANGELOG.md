@@ -560,6 +560,9 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
       stigao mailom), Deinstaliraj (TID se zatvara i uredjaj premesta u servis/magacin), Opozovi,
       Premesti uredjaj (TID ostaje; samo na lokaciju korisnika terminala, upozorenje kad ciljna lokacija ima drugi
       PIB ili MID; Admin, Call centar i servis).
+    - Komentari TID-a na stranici ACQ terminali (tabela terminal_acq_comments, brojac br_komentara na terminal_acq):
+      kolona "Komentari" sa brojem (i brojem komentara uredjaja), modal sa komentarima TID-a i, samo za citanje,
+      komentarima uredjaja. Dodaju svi sa pravom na stranicu; brise autor, Admin ili Call centar (meko, is_active = 0).
     - Stranica "Uvoz zahteva banke" (ruta acq-uvoz-zahteva, Admin i Call centar, dugme na stranici ACQ terminali): Excel zahtev za
       instalaciju ili prekonfiguraciju -> pregled po redu -> upis; fajlovi se arhiviraju u storage/app/acq-zahtevi/.
     - Uredjaj pod aktivnim TID-om se vise ne premesta sa stranica Terminali, Licence, Lokacije i Distributer
@@ -577,8 +580,9 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
       Excela (postojeca lokacija po PIB-u ili nova, region po mestu) sa statusom "Instaliran". Uredjaj sa licencom
       ili mesto bez ijedne lokacije u bazi se ne premesta (razlog je u CSV izvestaju).
     - DEPLOY (redosled je vazan):
-        1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_* i indeks 2026_11_01_* na
-           terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora). Migracije moraju
+        1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_*, indeks 2026_11_01_* na
+           terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora, i komentari
+           TID-a 2026_11_14_*). Migracije moraju
            pre ili odmah uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
         2. Rucno pokrenuti SQL za stranice (vidi plan): acq-terminali (menu_order 5, pozicije 1-4),
            acq-terminali-upravljanje i acq-uvoz-zahteva (bez menija, pozicije 1 i 2) i Tiketi sa menu_order 5 na 6,
@@ -590,5 +594,5 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
            --korisnik=<id>) -> halk:uvoz (pregled izvestaja, pa --potvrdi --korisnik=<id>).
     - Testovi: tests/Feature/Terminali/ (TerminalAcqModelTest, HalkProveraTest, HalkIspravkaStatusaTest,
       HalkUvozTest, DodajTerminalAcqTest, ZahtevBankeTest, UvozZahtevaStranicaTest, AcqTerminaliStranicaTest,
-      AcqAkcijeTest, AcqPravaServisaTest, RucnaPrekonfiguracijaTest, ZabranaPremestanjaAcqTest, TerminalInfoAcqTest, LokacijaAcqPoljaTest),
+      AcqAkcijeTest, AcqPravaServisaTest, AcqKomentariTest, RucnaPrekonfiguracijaTest, ZabranaPremestanjaAcqTest, TerminalInfoAcqTest, LokacijaAcqPoljaTest),
       tests/Unit/HalkNormalizatorTest, dopuna Tiket/TiketsPretragaTest.

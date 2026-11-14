@@ -33,6 +33,7 @@
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">MID</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Status</th>
                                 <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Ukupno: {{ $data->total() }}</th>
+                                <th class="px-1 py-3 bg-gray-50 text-left text-sm leading-4 font-medium text-gray-500">Komentari</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -52,6 +53,7 @@
                                         @endforeach
                                     </select>
                                 </td>
+                                <td></td>
                                 <td></td>
                             </tr>
                             <!-- DATA  -->
@@ -82,10 +84,16 @@
                                         @endif
                                     </td>
                                     <td class="px-1 py-2 text-xs text-gray-500">{{ $item->datum_instalacije?->format('d.m.Y') }}</td>
+                                    <td class="px-1 py-2">
+                                        <button class="px-2 py-1 text-sm relative text-gray-600 uppercase border rounded-md hover:bg-gray-700 hover:text-white" wire:click="komentariShowModal({{ $item->id }})" title="Komentari TID-a{{ $item->uredjaj_br_komentara ? ' (uređaj ima '.$item->uredjaj_br_komentara.')' : '' }}">
+                                            <div class="mx-1 text-lg">{{ $item->br_komentara }}@if ($item->uredjaj_br_komentara)<span class="text-xs text-gray-400"> +{{ $item->uredjaj_br_komentara }}</span>@endif</div>
+                                            <x-heroicon-o-chat-bubble-bottom-center-text class="z-10 absolute top-1 right-1 text-gray-400 -mt-1.5 ml-2.5 w-4 h-4"/>
+                                        </button>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="px-6 py-4 text-sm whitespace-no-wrap" colspan="8">Nema rezultata</td>
+                                    <td class="px-6 py-4 text-sm whitespace-no-wrap" colspan="9">Nema rezultata</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -317,6 +325,19 @@
 
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$set('detaljVisible', false)">Zatvori</x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- KOMENTARI MODAL --}}
+    <x-jet-dialog-modal wire:model.live="modalKomentariVisible">
+        <x-slot name="title">Komentari</x-slot>
+        <x-slot name="content">
+            @if ($modalKomentariVisible && $komentariTidId)
+                <livewire:terminal-acq.acq-komentari :terminalAcqId="$komentariTidId" :wire:key="'acq-komentari-'.$komentariTidId" />
+            @endif
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalKomentariVisible')" wire:loading.attr="disabled">Zatvori</x-jet-secondary-button>
         </x-slot>
     </x-jet-dialog-modal>
 </div>

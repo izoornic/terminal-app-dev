@@ -64,6 +64,11 @@ class AcqTerminali extends Component
 
     public bool $detaljVisible = false;
 
+    #[Locked]
+    public ?int $komentariTidId = null;
+
+    public bool $modalKomentariVisible = false;
+
     public string $dodelaSn = '';
 
     public ?int $deinstalacijaLokacijaId = null;
@@ -174,6 +179,22 @@ class AcqTerminali extends Component
             return 'TID je opozvan.';
         });
     }
+
+    /**
+     * Komentari TID-a (i, samo za čitanje, komentari uređaja) u modalu.
+     */
+    public function komentariShowModal(int $id): void
+    {
+        $this->proveriPristup();
+        $this->komentariTidId = TerminalAcq::findOrFail($id)->id;
+        $this->modalKomentariVisible = true;
+    }
+
+    /**
+     * Posle dodavanja ili brisanja komentara lista se ponovo iscrtava (broj komentara).
+     */
+    #[On('acqKomentarPromenjen')]
+    public function komentarPromenjen(): void {}
 
     #[On('tidDodat')]
     public function osvezi(?string $poruka = null): void

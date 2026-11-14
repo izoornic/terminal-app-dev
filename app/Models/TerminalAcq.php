@@ -106,6 +106,14 @@ class TerminalAcq extends Model
         return $this->hasOne(self::class, 'prethodni_terminal_acqId');
     }
 
+    /**
+     * Aktivni komentari TID-a, od najstarijeg.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(TerminalAcqComment::class, 'terminal_acqId')->where('is_active', true)->orderBy('id');
+    }
+
     public function histories(): HasMany
     {
         return $this->hasMany(TerminalAcqHistory::class, 'terminal_acqId')->orderBy('id');

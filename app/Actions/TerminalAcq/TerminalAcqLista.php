@@ -82,6 +82,7 @@ class TerminalAcqLista
                 'lokacijas.pib as lokacija_pib',
                 'lokacijas.acq_mid as lokacija_acq_mid',
                 'terminals.sn as sn',
+                'terminal_lokacijas.br_komentara as uredjaj_br_komentara',
             ]);
 
         $this->tekst($upit, 'terminal_acq.acq_tid', $filteri['tid'] ?? '');
