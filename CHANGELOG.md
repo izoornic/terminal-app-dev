@@ -588,11 +588,13 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
            terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora, komentari
            i opcije TID-a 2026_11_14_*). Migracije moraju
            pre ili odmah uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
-        2. Rucno pokrenuti SQL za stranice (vidi plan): acq-terminali (menu_order 5, pozicije 1-4),
+        2. Rucno pokrenuti SQL za stranice database/sql/V2.3.0_acq_stranice.sql (idempotentan; npr.
+           mysql <baza> < database/sql/V2.3.0_acq_stranice.sql ili kroz phpMyAdmin): acq-terminali (menu_order 5, pozicije 1-4),
            acq-terminali-upravljanje i acq-uvoz-zahteva (bez menija, pozicije 1 i 2), acq-opcije (bez menija,
            samo pozicija 1) i Tiketi sa menu_order 5 na 6,
            da ACQ terminali stoje posle Terminala;
-           na develop serveru isti SQL dodati i u /home/eposrs/db-sync/posle-uvoza.sql (inace ga nocna
+           na develop serveru u /home/eposrs/db-sync/posle-uvoza.sql dodati
+           SOURCE /home/eposrs/develop-servis-epos-app/database/sql/V2.3.0_acq_stranice.sql; (inace ga nocna
            sinhronizacija brise).
         3. Na produkciji APP_ENV=production pa php artisan config:clear (inace header prikazuje oznaku TEST, V 2.2.11).
         4. Jednokratno, nad konacnom HALK tabelom: halk:provera -> halk:ispravi-status (pregled liste, pa --potvrdi
