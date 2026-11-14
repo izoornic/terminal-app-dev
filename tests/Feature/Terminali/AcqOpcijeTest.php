@@ -154,7 +154,8 @@ class AcqOpcijeTest extends TestCase
 
         Livewire::test(AcqTerminali::class)
             ->call('prikaziDetalj', $drugi->id)
-            ->assertDontSee('Ručni unos')
+            ->assertDontSeeHtml('wire:key="tid-opcija-'.$drugi->id.'-'.$rucniUnos->id.'"')
+            ->assertSeeHtml('wire:key="tid-opcija-'.$drugi->id.'-'.TerminalAcqOpcija::where('naziv', 'Cashback')->value('id').'"')
             ->call('promeniOpciju', $rucniUnos->id, true)
             ->assertSet('greskaAkcije', 'Opcija Ručni unos nije aktivna.');
         $this->assertSame(0, $drugi->opcijeVeze()->count());
@@ -204,6 +205,45 @@ class AcqOpcijeTest extends TestCase
             (new OpcijeTerminalAcq)->postavi($acq, $opcija->id, true, $admin);
             $this->assertSame(['CNP predautorizacija'], $acq->opcije()->pluck('naziv')->all());
         }
+    }
+
+    #[Test]
+    public function filter_po_opciji_prikazuje_samo_tid_ove_sa_ukljucenom_opcijom(): void
+    {
+        $this->actingAs($this->korisnik(self::SERVISER));
+        $sCashback = $this->aktivanTid();
+        $iskljucen = TerminalAcq::factory()->bezUredjaja(self::STATUS_ZA_INSTALACIJU, $this->trgovac->id)->create(['acq_tid' => 'PN005306']);
+        $bezOpcija = TerminalAcq::factory()->bezUredjaja(self::STATUS_ZA_INSTALACIJU, $this->trgovac->id)->create(['acq_tid' => 'PN005307']);
+        $cashback = TerminalAcqOpcija::where('naziv', 'Cashback')->sole();
+        $rucniUnos = TerminalAcqOpcija::where('naziv', 'Ručni unos')->sole();
+        $sCashback->opcijeVeze()->attach([$cashback->id => ['ukljucena' => true], $rucniUnos->id => ['ukljucena' => true]]);
+        $iskljucen->opcijeVeze()->attach($cashback->id, ['ukljucena' => false]);
+        $rucniUnos->update(['aktivna' => false]);
+        TerminalAcqOpcija::create(['naziv' => 'Stara neaktivna', 'redosled' => 9, 'aktivna' => false]);
+
+        $komponenta = Livewire::test(AcqTerminali::class)
+            ->assertViewHas('opcijeFilter', [
+                TerminalAcqOpcija::where('naziv', 'CNP predautorizacija')->value('id') => 'CNP predautorizacija (0)',
+                $cashback->id => 'Cashback (1)',
+                $rucniUnos->id => 'Ručni unos (1)',
+            ])
+            ->assertSee(['PN004096', 'PN005306', 'PN005307']);
+
+        $komponenta->set('searchOpcija', $cashback->id)
+            ->assertSee('PN004096')
+            ->assertDontSee('PN005306')
+            ->assertDontSee('PN005307')
+            ->set('searchOpcija', $rucniUnos->id)
+            ->assertSee('PN004096')
+            ->assertDontSee('PN005306')
+            ->set('searchOpcija', $cashback->id)
+            ->set('brziFilter', 'ceka_uredjaj')
+            ->assertSee('Nema rezultata')
+            ->set('brziFilter', null)
+            ->set('searchOpcija', null)
+            ->assertSee(['PN004096', 'PN005306', 'PN005307']);
+
+        $this->assertNotNull($bezOpcija->id);
     }
 
     private function aktivanTid(): TerminalAcq

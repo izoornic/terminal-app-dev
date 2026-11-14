@@ -566,7 +566,8 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
     - Opcije TID-a: sifarnik na stranici "Opcije ACQ terminala" (ruta acq-opcije, samo Admin, dugme na stranici ACQ
       terminali; opcija se ne brise nego deaktivira; pocetne: CNP predautorizacija, Cashback, Rucni unos). U detalju
       TID-a check polja (svi sa pravom na stranicu, snima se odmah; veza pamti ko je i kada poslednji menjao);
-      zatvoren TID samo prikaz; novi TID iz zahteva za prekonfiguraciju preuzima opcije starog.
+      zatvoren TID samo prikaz; novi TID iz zahteva za prekonfiguraciju preuzima opcije starog. Filter "Opcija"
+      u listi (pored brzih filtera, sa brojem TID-ova po opciji).
     - Stranica "Uvoz zahteva banke" (ruta acq-uvoz-zahteva, Admin i Call centar, dugme na stranici ACQ terminali): Excel zahtev za
       instalaciju ili prekonfiguraciju -> pregled po redu -> upis; fajlovi se arhiviraju u storage/app/acq-zahtevi/.
     - Uredjaj pod aktivnim TID-om se vise ne premesta sa stranica Terminali, Licence, Lokacije i Distributer

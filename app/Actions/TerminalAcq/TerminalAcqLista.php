@@ -3,6 +3,7 @@
 namespace App\Actions\TerminalAcq;
 
 use App\Models\TerminalAcq;
+use App\Models\TerminalAcqOpcija;
 use App\Models\TerminalStatusTip;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -64,7 +65,23 @@ class TerminalAcqLista
     }
 
     /**
-     * @param  array{tid?: string, sn?: string, trgovac?: string, pib?: string, mid?: string, statusId?: int|string|null, brzi?: string|null, testni?: bool|string|null}  $filteri
+     * Opcije za filter: aktivne i neaktivne koje su još uključene na nekom TID-u, sa brojem TID-ova.
+     *
+     * @return array<int, string> opcijaId => "naziv (broj)"
+     */
+    public function opcijeFilter(): array
+    {
+        return TerminalAcqOpcija::query()
+            ->withCount('terminali')
+            ->poRedosledu()
+            ->get()
+            ->filter(fn (TerminalAcqOpcija $opcija): bool => $opcija->aktivna || $opcija->terminali_count > 0)
+            ->mapWithKeys(fn (TerminalAcqOpcija $opcija): array => [$opcija->id => "{$opcija->naziv} ({$opcija->terminali_count})"])
+            ->all();
+    }
+
+    /**
+     * @param  array{tid?: string, sn?: string, trgovac?: string, pib?: string, mid?: string, statusId?: int|string|null, opcijaId?: int|string|null, brzi?: string|null, testni?: bool|string|null}  $filteri
      * @return Builder<TerminalAcq>
      */
     public function upit(array $filteri = []): Builder
@@ -99,6 +116,14 @@ class TerminalAcqLista
 
         if (($filteri['statusId'] ?? null) !== null && $filteri['statusId'] !== '') {
             $upit->whereRaw(self::EFEKTIVNI_STATUS.' = ?', [(int) $filteri['statusId']]);
+        }
+
+        if (($filteri['opcijaId'] ?? null) !== null && $filteri['opcijaId'] !== '') {
+            $upit->whereExists(fn ($veza) => $veza->selectRaw('1')
+                ->from(TerminalAcqOpcija::VEZA)
+                ->whereColumn(TerminalAcqOpcija::VEZA.'.terminal_acqId', 'terminal_acq.id')
+                ->where(TerminalAcqOpcija::VEZA.'.terminal_acq_opcijaId', (int) $filteri['opcijaId'])
+                ->where(TerminalAcqOpcija::VEZA.'.ukljucena', true));
         }
 
         if (($filteri['testni'] ?? null) !== null && $filteri['testni'] !== '') {

@@ -4,7 +4,7 @@
     @endif
 
     {{-- BRZI FILTERI --}}
-    <div class="flex flex-wrap gap-2 mb-4">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
         @foreach ($brziFilteri as $kljuc => $naziv)
             <button wire:click="postaviBrziFilter('{{ $kljuc }}')"
                     @class([
@@ -15,6 +15,19 @@
                 {{ $naziv }}
             </button>
         @endforeach
+        <label class="flex items-center gap-2 ml-auto text-sm text-gray-700">
+            Opcija:
+            <select wire:model.live="searchOpcija" @class([
+                'border rounded-md text-sm py-1.5 pl-2 pr-8',
+                'border-gray-300 bg-white' => ! $searchOpcija,
+                'border-orange-400 bg-orange-50' => $searchOpcija,
+            ])>
+                <option value="">sve</option>
+                @foreach ($opcijeFilter as $id => $naziv)
+                    <option value="{{ $id }}">{{ $naziv }}</option>
+                @endforeach
+            </select>
+        </label>
     </div>
 
     {{-- The data table --}}

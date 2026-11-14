@@ -60,6 +60,8 @@ class AcqTerminali extends Component
 
     public ?int $searchStatus = null;
 
+    public ?int $searchOpcija = null;
+
     public ?string $brziFilter = null;
 
     #[Locked]
@@ -244,6 +246,7 @@ class AcqTerminali extends Component
             'data' => $this->read($lista),
             'statusi' => TerminalStatusTip::tidStatusList(),
             'statusiFilter' => $lista->statusiUpotrebljeni(),
+            'opcijeFilter' => $lista->opcijeFilter(),
             'brziFilteri' => TerminalAcqLista::brziFilteri(),
             'detalj' => $this->detaljVisible ? $this->detalj() : null,
             'ciljneLokacije' => Lokacija::query()->whereIn('lokacija_tipId', DeinstalirajTerminalAcq::CILJNI_TIPOVI_LOKACIJE)
@@ -293,6 +296,7 @@ class AcqTerminali extends Component
             'pib' => $this->searchPib,
             'mid' => $this->searchMid,
             'statusId' => $this->searchStatus,
+            'opcijaId' => $this->searchOpcija,
             'brzi' => $this->brziFilter,
         ])->paginate(Config::get('global.terminal_paginate'));
     }
