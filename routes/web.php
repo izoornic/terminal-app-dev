@@ -83,6 +83,11 @@ Route::group(['middleware' => [
         return view('admin.acq-terminali');
         })->name('acq-terminali');
 
+    //ACQ - sifarnik opcija TID-a
+    Route::get('/acq-opcije', function(){
+        return view('admin.acq-opcije');
+        })->name('acq-opcije');
+
     //ACQ - uvoz zahteva banke (instalacija / prekonfiguracija)
     Route::get('/acq-uvoz-zahteva', function(){
         return view('admin.acq-uvoz-zahteva');

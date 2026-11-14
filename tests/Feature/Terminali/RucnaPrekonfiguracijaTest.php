@@ -11,6 +11,7 @@ use App\Models\Region;
 use App\Models\Stranica;
 use App\Models\Terminal;
 use App\Models\TerminalAcq;
+use App\Models\TerminalAcqOpcija;
 use App\Models\TerminalLokacija;
 use App\Models\TerminalStatusTip;
 use App\Models\User;
@@ -75,6 +76,10 @@ class RucnaPrekonfiguracijaTest extends TestCase
     #[Test]
     public function ista_firma_pravi_tid_koji_ceka_tehnicara(): void
     {
+        $cashback = TerminalAcqOpcija::where('naziv', 'Cashback')->sole();
+        $rucniUnos = TerminalAcqOpcija::where('naziv', 'Ručni unos')->sole();
+        $this->stari->opcijeVeze()->attach([$cashback->id => ['ukljucena' => true], $rucniUnos->id => ['ukljucena' => false]]);
+
         Livewire::test(RucnaPrekonfiguracija::class)
             ->dispatch('rucnaPrekonfiguracija', stariId: $this->stari->id)
             ->assertSet('modalVisible', true)
@@ -100,6 +105,7 @@ class RucnaPrekonfiguracijaTest extends TestCase
         $this->assertNull($novi->izvor_fajl);
         $this->assertSame('prekonfiguracija PN004096; mail Nikola 29.10.', $novi->dodatne_opcije);
         $this->assertNotNull($this->stari->fresh()->terminalId, 'stari TID ostaje aktivan do izvršenja');
+        $this->assertSame(['Cashback'], $novi->opcije()->pluck('naziv')->all(), 'novi TID preuzima uključene opcije starog');
     }
 
     #[Test]

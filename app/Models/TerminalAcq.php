@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -104,6 +105,24 @@ class TerminalAcq extends Model
     public function naslednik(): HasOne
     {
         return $this->hasOne(self::class, 'prethodni_terminal_acqId');
+    }
+
+    /**
+     * Sve veze sa opcijama, i isključene (ukljucena, korisnik i vreme poslednje izmene u pivot-u).
+     */
+    public function opcijeVeze(): BelongsToMany
+    {
+        return $this->belongsToMany(TerminalAcqOpcija::class, TerminalAcqOpcija::VEZA, 'terminal_acqId', 'terminal_acq_opcijaId')
+            ->withPivot(['ukljucena', 'korisnikId'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Uključene opcije TID-a.
+     */
+    public function opcije(): BelongsToMany
+    {
+        return $this->opcijeVeze()->wherePivot('ukljucena', true);
     }
 
     /**

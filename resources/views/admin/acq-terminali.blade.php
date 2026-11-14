@@ -8,6 +8,14 @@
                 ACQ terminali (TID)
             </div>
             <div class="flex">
+                @if (\App\Models\PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, \App\Http\Livewire\TerminalAcq\AcqOpcije::ROUTE_NAME))
+                    <div class="flex justify-end mr-4">
+                        <a href="{{ route(\App\Http\Livewire\TerminalAcq\AcqOpcije::ROUTE_NAME) }}" class="flex bg-gray-200 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" title="Opcije TID-a">
+                            <x-heroicon-o-adjustments-horizontal class="w-5 h-5 ml-1" />
+                            <span class="mx-2">Opcije</span>
+                        </a>
+                    </div>
+                @endif
                 @if (\App\Models\PozicijaPrikazStranica::isRoleHasRightToAccess(auth()->user()->pozicija_tipId, \App\Http\Livewire\TerminalAcq\UvozZahteva::ROUTE_NAME))
                     <div class="flex justify-end mr-4">
                         <a href="{{ route(\App\Http\Livewire\TerminalAcq\UvozZahteva::ROUTE_NAME) }}" class="flex bg-gray-200 text-sm text-gray-700 uppercase border rounded-md p-1.5 hover:bg-gray-700 hover:text-white" title="Uvoz zahteva banke">

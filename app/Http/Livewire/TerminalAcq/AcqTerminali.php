@@ -5,6 +5,7 @@ namespace App\Http\Livewire\TerminalAcq;
 use App\Actions\TerminalAcq\DeinstalirajTerminalAcq;
 use App\Actions\TerminalAcq\DodeliUredjajTerminalAcq;
 use App\Actions\TerminalAcq\IzvrsiPrekonfiguraciju;
+use App\Actions\TerminalAcq\OpcijeTerminalAcq;
 use App\Actions\TerminalAcq\OpozoviTerminalAcq;
 use App\Actions\TerminalAcq\PremestiUredjajTerminalAcq;
 use App\Actions\TerminalAcq\TerminalAcqLista;
@@ -12,7 +13,9 @@ use App\Models\Lokacija;
 use App\Models\LokacijaKontaktOsoba;
 use App\Models\PozicijaPrikazStranica;
 use App\Models\TerminalAcq;
+use App\Models\TerminalAcqOpcija;
 use App\Models\TerminalStatusTip;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Config;
@@ -24,7 +27,7 @@ use RuntimeException;
 
 /**
  * Lista ACQ TID-ova (Faza 4): pretraga, filteri po efektivnom statusu, detalj sa istorijom
- * i akcije nad TID-om (dodela uređaja, izvršenje prekonfiguracije, premeštanje uređaja,
+ * i akcije nad TID-om (opcije, dodela uređaja, izvršenje prekonfiguracije, premeštanje uređaja,
  * deinstalacija, opoziv).
  * Svaka akcija proverava pravo i stanje TID-a; pravila su u Action klasama.
  */
@@ -124,6 +127,23 @@ class AcqTerminali extends Component
             ->findOrFail($lokacijaId)
             ->id;
         $this->premestanjeTrazi = '';
+    }
+
+    /**
+     * Check polje opcije u detalju TID-a: izmena se snima odmah (svi sa pravom na stranicu).
+     */
+    public function promeniOpciju(int $opcijaId, bool $ukljucena, OpcijeTerminalAcq $opcije): void
+    {
+        $this->proveriPristup();
+        $this->porukaAkcije = null;
+        $this->greskaAkcije = null;
+
+        try {
+            $opcija = $opcije->postavi(TerminalAcq::findOrFail($this->detaljId), $opcijaId, $ukljucena, auth()->user());
+            $this->porukaAkcije = "Opcija {$opcija->naziv} je ".($ukljucena ? 'uključena.' : 'isključena.');
+        } catch (RuntimeException $e) {
+            $this->greskaAkcije = $e->getMessage();
+        }
     }
 
     /**
@@ -283,7 +303,7 @@ class AcqTerminali extends Component
     private function detalj(): ?array
     {
         $acq = TerminalAcq::query()
-            ->with(['terminal', 'terminalLokacija', 'trazeniTerminalTip', 'prethodni', 'naslednik', 'histories.terminal', 'histories.lokacija'])
+            ->with(['terminal', 'terminalLokacija', 'trazeniTerminalTip', 'prethodni', 'naslednik', 'histories.terminal', 'histories.lokacija', 'opcijeVeze'])
             ->find($this->detaljId);
         if ($acq === null) {
             return null;
@@ -297,7 +317,41 @@ class AcqTerminali extends Component
             'lokacija' => $lokacija,
             'kontakti' => $lokacija !== null ? LokacijaKontaktOsoba::query()->where('lokacijaId', $lokacija->id)->get() : collect(),
             'istorija' => $acq->histories->reverse()->values(),
+            'opcije' => $this->opcijeDetalja($acq),
+            'opcijeZakljucane' => OpcijeTerminalAcq::jeZatvoren($acq),
         ];
+    }
+
+    /**
+     * Aktivne opcije i neaktivne koje su još uključene na TID-u, sa stanjem i poslednjom izmenom.
+     *
+     * @return list<array{id: int, naziv: string, opis: ?string, aktivna: bool, ukljucena: bool, izmena: ?string}>
+     */
+    private function opcijeDetalja(TerminalAcq $acq): array
+    {
+        $veze = $acq->opcijeVeze->keyBy('id');
+        $ukljucene = $veze->filter(fn (TerminalAcqOpcija $opcija): bool => (bool) $opcija->pivot->ukljucena)->keys();
+        $autori = User::query()->whereIn('id', $veze->pluck('pivot.korisnikId')->filter()->unique())->pluck('name', 'id');
+
+        return TerminalAcqOpcija::query()
+            ->where(fn ($upit) => $upit->where('aktivna', true)->orWhereIn('id', $ukljucene))
+            ->poRedosledu()
+            ->get()
+            ->map(function (TerminalAcqOpcija $opcija) use ($veze, $autori): array {
+                $veza = $veze->get($opcija->id)?->pivot;
+
+                return [
+                    'id' => $opcija->id,
+                    'naziv' => $opcija->naziv,
+                    'opis' => $opcija->opis,
+                    'aktivna' => $opcija->aktivna,
+                    'ukljucena' => (bool) $veza?->ukljucena,
+                    'izmena' => $veza !== null
+                        ? trim(($veza->ukljucena ? 'Uključio' : 'Isključio').' '.($autori[$veza->korisnikId] ?? '').', '.$veza->updated_at?->format('d.m.Y H:i'))
+                        : null,
+                ];
+            })
+            ->all();
     }
 
     /**

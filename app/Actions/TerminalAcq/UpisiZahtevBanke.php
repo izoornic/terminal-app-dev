@@ -20,7 +20,7 @@ use RuntimeException;
  * uzimaju samo izbori: da li se red uvozi, lokacija (postojeća ili nova), region i SN.
  *
  * - instalacija: TID "Za instalaciju" na lokaciji; uz SN odmah "Dodela uređaja"
- * - prekonfiguracija: TID "Čeka prekonfiguraciju" sa vezom na stari TID; stari TID i
+ * - prekonfiguracija: TID "Čeka prekonfiguraciju" sa vezom na stari TID i opcijama starog TID-a; stari TID i
  *   uređaj se ne menjaju (to radi "Izvrši prekonfiguraciju"); MID koji bi zamenio
  *   postojeći MID lokacije čeka u zahtev_acq_mid
  * - lokacija: postojeća dobija samo prazna polja; nova se pravi iz reda (isti PIB =
@@ -40,6 +40,7 @@ class UpisiZahtevBanke
     public function __construct(
         private DodajTerminalAcq $dodajTerminalAcq,
         private DodeliUredjajTerminalAcq $dodeliUredjaj,
+        private OpcijeTerminalAcq $opcije,
     ) {}
 
     /**
@@ -121,6 +122,10 @@ class UpisiZahtevBanke
             $korisnik
         );
         $rezultat['tidova']++;
+
+        if ($stari !== null) {
+            $this->opcije->prenesi($stari, $acq, $korisnik);
+        }
 
         $sn = trim((string) ($izbor['sn'] ?? ''));
         if ($sn !== '' && ! $prekonfiguracija) {

@@ -563,6 +563,10 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
     - Komentari TID-a na stranici ACQ terminali (tabela terminal_acq_comments, brojac br_komentara na terminal_acq):
       kolona "Komentari" sa brojem (i brojem komentara uredjaja), modal sa komentarima TID-a i, samo za citanje,
       komentarima uredjaja. Dodaju svi sa pravom na stranicu; brise autor, Admin ili Call centar (meko, is_active = 0).
+    - Opcije TID-a: sifarnik na stranici "Opcije ACQ terminala" (ruta acq-opcije, samo Admin, dugme na stranici ACQ
+      terminali; opcija se ne brise nego deaktivira; pocetne: CNP predautorizacija, Cashback, Rucni unos). U detalju
+      TID-a check polja (svi sa pravom na stranicu, snima se odmah; veza pamti ko je i kada poslednji menjao);
+      zatvoren TID samo prikaz; novi TID iz zahteva za prekonfiguraciju preuzima opcije starog.
     - Stranica "Uvoz zahteva banke" (ruta acq-uvoz-zahteva, Admin i Call centar, dugme na stranici ACQ terminali): Excel zahtev za
       instalaciju ili prekonfiguraciju -> pregled po redu -> upis; fajlovi se arhiviraju u storage/app/acq-zahtevi/.
     - Uredjaj pod aktivnim TID-om se vise ne premesta sa stranica Terminali, Licence, Lokacije i Distributer
@@ -581,11 +585,12 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
       ili mesto bez ijedne lokacije u bazi se ne premesta (razlog je u CSV izvestaju).
     - DEPLOY (redosled je vazan):
         1. Na serveru rucno: php artisan migrate --force (5 migracija 2026_10_20_*, indeks 2026_11_01_* na
-           terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora, i komentari
-           TID-a 2026_11_14_*). Migracije moraju
+           terminal_lokacijas.terminalId, bez njega je stranica ACQ terminali na MariaDB jako spora, komentari
+           i opcije TID-a 2026_11_14_*). Migracije moraju
            pre ili odmah uz deploy koda: TerminalStatusTip::tipoviList() cita kolonu ts_za_uredjaj.
         2. Rucno pokrenuti SQL za stranice (vidi plan): acq-terminali (menu_order 5, pozicije 1-4),
-           acq-terminali-upravljanje i acq-uvoz-zahteva (bez menija, pozicije 1 i 2) i Tiketi sa menu_order 5 na 6,
+           acq-terminali-upravljanje i acq-uvoz-zahteva (bez menija, pozicije 1 i 2), acq-opcije (bez menija,
+           samo pozicija 1) i Tiketi sa menu_order 5 na 6,
            da ACQ terminali stoje posle Terminala;
            na develop serveru isti SQL dodati i u /home/eposrs/db-sync/posle-uvoza.sql (inace ga nocna
            sinhronizacija brise).
@@ -594,5 +599,5 @@ V 2.3.0 ( 31.10.2026.) @HALK-terminal-acq
            --korisnik=<id>) -> halk:uvoz (pregled izvestaja, pa --potvrdi --korisnik=<id>).
     - Testovi: tests/Feature/Terminali/ (TerminalAcqModelTest, HalkProveraTest, HalkIspravkaStatusaTest,
       HalkUvozTest, DodajTerminalAcqTest, ZahtevBankeTest, UvozZahtevaStranicaTest, AcqTerminaliStranicaTest,
-      AcqAkcijeTest, AcqPravaServisaTest, AcqKomentariTest, RucnaPrekonfiguracijaTest, ZabranaPremestanjaAcqTest, TerminalInfoAcqTest, LokacijaAcqPoljaTest),
+      AcqAkcijeTest, AcqPravaServisaTest, AcqKomentariTest, AcqOpcijeTest, RucnaPrekonfiguracijaTest, ZabranaPremestanjaAcqTest, TerminalInfoAcqTest, LokacijaAcqPoljaTest),
       tests/Unit/HalkNormalizatorTest, dopuna Tiket/TiketsPretragaTest.

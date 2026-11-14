@@ -176,6 +176,32 @@
                     </div>
                 </div>
 
+                {{-- OPCIJE --}}
+                <div class="mt-4 p-3 rounded-md border border-gray-200 text-sm">
+                    <div class="font-semibold text-gray-700 mb-2">Opcije
+                        @if ($detalj['opcijeZakljucane'])
+                            <span class="font-normal text-xs text-gray-500">(TID je zatvoren; samo pregled)</span>
+                        @endif
+                    </div>
+                    @forelse ($detalj['opcije'] as $opcija)
+                        <label wire:key="tid-opcija-{{ $acq->id }}-{{ $opcija['id'] }}" class="flex items-center gap-2 py-0.5" title="{{ $opcija['izmena'] ?? $opcija['opis'] }}">
+                            <input type="checkbox" class="rounded border-gray-300 text-sky-600 disabled:opacity-50"
+                                   @checked($opcija['ukljucena'])
+                                   @disabled($detalj['opcijeZakljucane'] || (! $opcija['aktivna'] && ! $opcija['ukljucena']))
+                                   wire:change="promeniOpciju({{ $opcija['id'] }}, $event.target.checked)">
+                            <span @class(['line-through text-gray-500' => ! $opcija['aktivna']])>{{ $opcija['naziv'] }}</span>
+                            @if (! $opcija['aktivna'])
+                                <span class="text-xs text-gray-500">(neaktivna)</span>
+                            @endif
+                            @if ($opcija['izmena'])
+                                <span class="text-xs text-gray-400">{{ $opcija['izmena'] }}</span>
+                            @endif
+                        </label>
+                    @empty
+                        <div class="text-gray-500">Nema definisanih opcija.</div>
+                    @endforelse
+                </div>
+
                 {{-- AKCIJE --}}
                 @if ($porukaAkcije)
                     <div class="mt-4 p-3 rounded-md border border-green-300 bg-green-50 text-sm text-green-800">{{ $porukaAkcije }}</div>
