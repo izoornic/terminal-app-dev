@@ -9,9 +9,9 @@ use App\Models\TerminalLokacija;
 use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-use App\Models\LicencaParametarTerminal;
 
 use App\Actions\Terminali\TerminaliReadActions;
+use App\Actions\Licence\ObrisiLicenceTerminala;
 
 use App\Http\Helpers;
 
@@ -135,35 +135,9 @@ class DistributerTerminal extends Component
     * @return [type]
     * 
     */
-   public function deleteLicenceTerminala()
+   public function deleteLicenceTerminala(ObrisiLicenceTerminala $obrisiLicence)
    {
-        //dd($this->licenceDodateTerminalu());
-        $licence_za_brisanje = LicenceZaTerminal::where('terminal_lokacijaId', '=', $this->modelId)->get();
-        foreach ($licence_za_brisanje as $key => $value) {
-            $key_arr = [
-                'terminal_lokacijaId' => $value->terminal_lokacijaId,
-                'distributerId' => $value->distributerId,
-                'licenca_distributer_cenaId' => $value->licenca_distributer_cenaId
-            ];
-            // brisanje parametara licence
-            LicencaParametarTerminal::deleteParametars($key_arr);
-            $licenca_naplata = LicencaNaplata::where($key_arr)->where('aktivna', '=', 1)->first();
-            //dd($licenca_naplata);
-            $licenca_naplata->zaduzeno          = $licenca_naplata->zaduzeno ?? 0;
-            $licenca_naplata->datum_zaduzenja   = $licenca_naplata->datum_zaduzenja ?? Helpers::datumKalendarNow();
-            $licenca_naplata->razduzeno         = $licenca_naplata->razduzeno ?? 0;
-            $licenca_naplata->datum_razduzenja  = $licenca_naplata->datum_razduzenja ?? Helpers::datumKalendarNow();
-            $licenca_naplata->aktivna = 0;
-            //dd($licenca_naplata);
-            $licenca_naplata->save();
-
-            // brisanje licence
-            $value->delete();
-        }
-
-        foreach ($this->licenceDodateTerminalu() as $key => $value) { 
-            
-        }
+        $obrisiLicence->izvrsi((int) $this->modelId);
         $this->modalTerminalInfoVisible = false;
    }
 

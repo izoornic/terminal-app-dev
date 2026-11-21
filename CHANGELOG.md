@@ -535,3 +535,12 @@ V 2.2.10 ( 23.9.2026.) @Tiketi-ponovo-otvori-vrsta-kvara
       pa se dobijao status tudjeg terminala ili null.
     - Logika izdvojena u App\Actions\Terminali\StatusZaPremestanje; sva tri mesta zovu istu akciju.
     - Testovi: Terminali/StatusZaPremestanjeTest, Terminali/DistTerminalPremestiTest.
+
+V 2.2.12 ( 21.11.2026.) @Distributer-brisanje-licenci
+    - Stranica Distributer terminali, "Obrisi licence": licence bez aktivne naplate (servisne, licenca_poreklo = 2,
+      i regularne kojima je naplata vec zatvorena) nisu se brisale iz licence_za_terminals, jer je funkcija pucala
+      pri citanju naplate (svojstvo nad null) pre brisanja licence. Brisanje je moglo da stane na pola (bez transakcije).
+    - Logika izdvojena u App\Actions\Licence\ObrisiLicenceTerminala: parametri licence, zatvaranje aktivne naplate
+      (samo ako postoji) i brisanje licence, sve u jednoj transakciji.
+    - V 2.2.11 je na grani HALK-terminal-acq (jos nije na main-u), zato ova verzija preskace broj.
+    - Test tests/Feature/Licence/ObrisiLicenceTerminalaTest.php.
